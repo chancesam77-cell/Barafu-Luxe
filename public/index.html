@@ -153,6 +153,198 @@
 .spa-footer{margin:16px;background:rgba(184,137,42,0.03);border:0.5px solid rgba(184,137,42,0.1);border-radius:3px;padding:14px;}
 .spa-footer-note{font-size:9px;color:var(--mt);line-height:1.9;letter-spacing:0.04em;margin-bottom:12px;}
 
+
+/* ════ THE BARAFU CIRCLE ════ */
+.circle-hero{background:linear-gradient(160deg,#080808,#0d0a02,#080808);padding:28px 20px 22px;border-bottom:0.5px solid rgba(184,137,42,0.15);text-align:center;}
+.circle-hero-eyebrow{font-size:8px;letter-spacing:0.3em;color:rgba(184,137,42,0.6);text-transform:uppercase;margin-bottom:10px;}
+.circle-hero-title{font-family:'Cormorant Garamond',serif;font-size:38px;font-weight:300;color:#fff;line-height:1.1;margin-bottom:12px;}
+.circle-hero-title em{color:var(--gold);font-style:italic;}
+.circle-hero-sub{font-size:11px;color:var(--mt);line-height:1.9;max-width:270px;margin:0 auto 16px;}
+.circle-hero-rule{width:28px;height:1px;background:linear-gradient(to right,transparent,var(--gold),transparent);margin:0 auto;}
+.circle-tabs{display:flex;overflow-x:auto;border-bottom:0.5px solid var(--bd);scrollbar-width:none;padding:0 14px;}
+.circle-tabs::-webkit-scrollbar{display:none;}
+.circle-tab{flex-shrink:0;background:transparent;border:none;padding:11px 14px;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--mt);font-family:Montserrat,sans-serif;cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;white-space:nowrap;}
+.circle-tab.active{color:var(--gold);border-bottom-color:var(--gold);}
+/* Feed cards */
+.circle-card{background:var(--card);border:0.5px solid var(--bd);border-radius:3px;padding:16px;transition:border-color 0.2s;}
+.circle-card:active{border-color:rgba(184,137,42,0.3);}
+.circle-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.circle-tag{font-size:8px;letter-spacing:0.16em;text-transform:uppercase;padding:3px 10px;border-radius:10px;font-weight:600;}
+.circle-badge{font-size:8px;letter-spacing:0.1em;text-transform:uppercase;font-weight:600;animation:circlePulse 2s ease infinite;}
+@keyframes circlePulse{0%,100%{opacity:1;}50%{opacity:0.5;}}
+.circle-card-title{font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--ow);line-height:1.3;margin-bottom:8px;}
+.circle-card-body{font-size:11px;color:var(--mt);line-height:1.85;margin-bottom:12px;}
+.circle-card-foot{display:flex;align-items:center;justify-content:space-between;border-top:0.5px solid var(--bd);padding-top:10px;margin-bottom:10px;}
+.circle-time{font-size:9px;color:#444;letter-spacing:0.06em;}
+.circle-cta{display:block;background:rgba(184,137,42,0.08);border:0.5px solid rgba(184,137,42,0.25);color:var(--gold);text-decoration:none;padding:9px 16px;border-radius:2px;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;font-family:Montserrat,sans-serif;text-align:center;}
+
+
+/* ════ TRANSFERS SCREEN ════ */
+.tr-hero{background:linear-gradient(160deg,#060608,#0a0a10,#060608);padding:28px 20px 22px;border-bottom:0.5px solid rgba(184,137,42,0.15);text-align:center;}
+.tr-hero-eyebrow{font-size:8px;letter-spacing:0.3em;color:rgba(184,137,42,0.6);text-transform:uppercase;margin-bottom:10px;}
+.tr-hero-title{font-family:'Cormorant Garamond',serif;font-size:38px;font-weight:300;color:#fff;line-height:1.1;margin-bottom:12px;}
+.tr-hero-title em{color:var(--gold);font-style:italic;}
+.tr-hero-sub{font-size:11px;color:var(--mt);line-height:1.9;max-width:270px;margin:0 auto 16px;}
+.tr-hero-rule{width:28px;height:1px;background:linear-gradient(to right,transparent,var(--gold),transparent);margin:0 auto;}
+.tr-badges{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;border-bottom:0.5px solid var(--bd);}
+.tr-badge{padding:12px 6px;display:flex;flex-direction:column;align-items:center;gap:5px;border-right:0.5px solid var(--bd);}
+.tr-badge:last-child{border-right:none;}
+.tr-badge i{font-size:16px;color:var(--gold);}
+.tr-badge span{font-size:8px;color:var(--mt);letter-spacing:0.06em;text-align:center;line-height:1.4;}
+.tr-tabs{display:flex;border-bottom:0.5px solid var(--bd);}
+.tr-tab{flex:1;background:transparent;border:none;padding:12px 8px;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--mt);font-family:Montserrat,sans-serif;cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;}
+.tr-tab.active{color:var(--gold);border-bottom-color:var(--gold);}
+.tr-tab-body{padding-bottom:14px;}
+/* Route cards */
+.rc{background:var(--card);border:0.5px solid var(--bd);border-radius:3px;overflow:hidden;cursor:pointer;transition:border-color 0.2s;}
+.rc:active{border-color:rgba(184,137,42,0.4);}
+.rc-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;}
+.rc-name{font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--ow);margin-bottom:2px;}
+.rc-tzs{font-size:9px;color:var(--mt);}
+.rc-price{font-family:'Cormorant Garamond',serif;font-size:24px;color:var(--gold);}
+.rc-body{display:none;padding:0 16px 14px;border-top:0.5px solid var(--bd);}
+.rc-body.open{display:block;}
+.rc-info{font-size:10px;color:var(--mt);line-height:1.8;margin-bottom:10px;padding-top:12px;}
+/* Add-ons */
+.tr-addon{display:flex;align-items:center;gap:12px;background:var(--card);border:0.5px solid var(--bd);border-radius:3px;padding:14px;}
+.tr-addon-ico{width:36px;height:36px;background:rgba(184,137,42,0.08);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.tr-addon-ico i{font-size:16px;color:var(--gold);}
+.tr-addon-info{flex:1;}
+.tr-addon-name{font-size:13px;color:var(--ow);font-family:'Cormorant Garamond',serif;margin-bottom:2px;}
+.tr-addon-desc{font-size:10px;color:var(--mt);line-height:1.6;}
+.tr-addon-price{font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--gold);flex-shrink:0;}
+/* Payment */
+.tr-pay-card{background:var(--card);border:0.5px solid var(--bd);border-radius:3px;padding:14px;}
+.tr-pay-method{font-size:9px;letter-spacing:0.18em;color:var(--gold);text-transform:uppercase;margin-bottom:10px;}
+.tr-pay-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:0.5px solid rgba(255,255,255,0.04);}
+.tr-pay-row:last-child{border-bottom:none;}
+.tr-pay-k{font-size:10px;color:var(--mt);}
+.tr-pay-v{font-size:11px;color:var(--ow);font-family:'Cormorant Garamond',serif;}
+
+/* ════ F1 SCREEN UPGRADES ════ */
+.f1-hero{background:linear-gradient(160deg,#060000,#140000,#060000);padding:28px 20px 22px;border-bottom:0.5px solid rgba(225,6,0,0.2);}
+.f1-hero-season{font-size:8px;letter-spacing:0.3em;color:rgba(225,6,0,0.6);text-transform:uppercase;margin-bottom:10px;text-align:center;}
+.f1-hero-title{font-family:'Cormorant Garamond',serif;font-size:38px;font-weight:300;color:#fff;line-height:1.1;margin-bottom:16px;text-align:center;}
+.f1-hero-title em{color:#E10600;font-style:italic;}
+.f1-standings-strip{display:flex;gap:0;border-top:0.5px solid rgba(225,6,0,0.15);padding-top:14px;}
+.f1-standing-item{flex:1;display:flex;align-items:center;gap:8px;padding:0 4px;}
+.f1-standing-item:not(:last-child){border-right:0.5px solid rgba(225,6,0,0.1);}
+.f1-pos{font-family:'Cormorant Garamond',serif;font-size:24px;color:#E10600;font-weight:600;min-width:20px;}
+.f1-sname{font-size:11px;color:var(--ow);font-weight:500;flex:1;}
+.f1-pts{font-size:9px;color:var(--mt);white-space:nowrap;}
+.f1-tabs{display:flex;border-bottom:0.5px solid var(--bd);}
+.f1-tab{flex:1;background:transparent;border:none;padding:13px 8px;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--mt);font-family:Montserrat,sans-serif;cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;}
+.f1-tab.active{color:#E10600;border-bottom-color:#E10600;}
+.f1-tab-body{padding-bottom:14px;}
+.f1-section-hdr{display:flex;align-items:center;justify-content:space-between;padding:16px 16px 10px;font-size:9px;letter-spacing:0.18em;color:var(--mt);text-transform:uppercase;}
+.f1-section-count{background:rgba(225,6,0,0.1);color:#E10600;padding:3px 10px;border-radius:10px;font-size:8px;letter-spacing:0.08em;}
+.f1-card{background:var(--card);border:0.5px solid var(--bd);border-radius:3px;padding:16px;margin:0 14px 10px;transition:border-color 0.2s;}
+.f1-card.completed{border-left:2px solid rgba(76,175,80,0.4);}
+.f1-card.next-race{border-left:2px solid #E10600;background:linear-gradient(135deg,rgba(225,6,0,0.04),var(--card));}
+.f1-card-top{display:flex;align-items:flex-start;gap:10px;margin-bottom:12px;}
+.f1c-num{font-size:9px;color:#E10600;letter-spacing:0.12em;background:rgba(225,6,0,0.1);padding:4px 9px;border-radius:4px;white-space:nowrap;margin-top:2px;flex-shrink:0;}
+.f1c-info{flex:1;}
+.f1c-name{font-family:'Cormorant Garamond',serif;font-size:17px;color:var(--ow);line-height:1.3;margin-bottom:2px;}
+.f1c-meta{font-size:9px;color:var(--mt);}
+.f1-result-badge{background:rgba(76,175,80,0.1);color:#4CAF50;font-size:8px;letter-spacing:0.1em;text-transform:uppercase;padding:4px 10px;border-radius:10px;white-space:nowrap;flex-shrink:0;}
+.f1-next-badge{background:#E10600;color:#fff;font-size:8px;padding:4px 10px;border-radius:10px;white-space:nowrap;flex-shrink:0;animation:f1pulse 1.5s ease infinite;}
+.f1-upcoming-badge{background:rgba(184,137,42,0.1);color:var(--gold);font-size:8px;padding:4px 10px;border-radius:10px;white-space:nowrap;flex-shrink:0;}
+@keyframes f1pulse{0%,100%{opacity:1;}50%{opacity:0.5;}}
+.f1-podium{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px;}
+.f1-pod{background:var(--soft);border-radius:3px;padding:10px 8px;text-align:center;}
+.f1-pod.p1{border:0.5px solid rgba(255,215,0,0.25);}
+.f1-pod.p2{border:0.5px solid rgba(192,192,192,0.2);}
+.f1-pod.p3{border:0.5px solid rgba(205,127,50,0.2);}
+.f1-pod-pos{font-size:20px;margin-bottom:5px;}
+.f1-pod-name{font-size:10px;color:var(--ow);line-height:1.3;}
+.f1-fastest{font-size:9px;color:rgba(156,39,176,0.9);background:rgba(156,39,176,0.07);border:0.5px solid rgba(156,39,176,0.2);padding:6px 12px;border-radius:4px;margin-bottom:10px;}
+.f1-hospitality-btn{background:transparent;border:0.5px solid rgba(225,6,0,0.3);color:#E10600;padding:9px 0;border-radius:2px;font-size:9px;letter-spacing:0.16em;text-transform:uppercase;font-family:Montserrat,sans-serif;cursor:pointer;width:100%;}
+.f1-book-btn{width:100%;background:rgba(225,6,0,0.08);border:0.5px solid rgba(225,6,0,0.3);color:#E10600;padding:11px;border-radius:2px;font-size:9px;letter-spacing:0.16em;text-transform:uppercase;font-family:Montserrat,sans-serif;cursor:pointer;margin-top:2px;}
+.f1-book-btn.f1-book-hot{background:#E10600;color:#fff;}
+.f1-result-card{background:var(--card);border:0.5px solid var(--bd);border-left:2px solid rgba(76,175,80,0.4);border-radius:3px;padding:16px;margin-bottom:10px;}
+.f1-rc-header{display:flex;align-items:flex-start;gap:10px;margin-bottom:12px;}
+.f1c-name{font-family:'Cormorant Garamond',serif;font-size:17px;color:var(--ow);}
+.f1-driver-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:0.5px solid rgba(255,255,255,0.04);}
+.f1-driver-row.f1-leader{background:rgba(225,6,0,0.04);padding:12px;border-radius:3px;margin-bottom:6px;border-bottom:none;border-left:2px solid #E10600;}
+.f1-dr-pos{font-family:'Cormorant Garamond',serif;font-size:24px;color:#E10600;min-width:28px;text-align:center;}
+.f1-dr-flag{font-size:20px;flex-shrink:0;}
+.f1-dr-info{flex:1;}
+.f1-dr-name{font-size:14px;color:var(--ow);font-family:'Cormorant Garamond',serif;}
+.f1-dr-team{font-size:9px;color:var(--mt);margin-top:1px;}
+.f1-dr-pts{font-family:'Cormorant Garamond',serif;font-size:24px;color:var(--gl);}
+
+
+/* ════ SHARED LUXURY HERO ════ */
+.luxury-hero{padding:28px 20px 22px;border-bottom:0.5px solid rgba(184,137,42,0.15);text-align:center;}
+.luxury-hero-eyebrow{font-size:8px;letter-spacing:0.3em;color:rgba(184,137,42,0.6);text-transform:uppercase;margin-bottom:10px;}
+.luxury-hero-title{font-family:'Cormorant Garamond',serif;font-size:38px;font-weight:300;color:#fff;line-height:1.1;margin-bottom:12px;}
+.luxury-hero-title em{color:var(--gold);font-style:italic;}
+.luxury-hero-sub{font-size:11px;color:var(--mt);line-height:1.9;max-width:270px;margin:0 auto 16px;}
+.luxury-hero-rule{width:28px;height:1px;background:linear-gradient(to right,transparent,var(--gold),transparent);margin:0 auto;}
+.luxury-tabs{display:flex;border-bottom:0.5px solid var(--bd);overflow-x:auto;scrollbar-width:none;}
+.luxury-tabs::-webkit-scrollbar{display:none;}
+.luxury-tab{flex:1;min-width:fit-content;background:transparent;border:none;padding:12px 14px;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--mt);font-family:Montserrat,sans-serif;cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;white-space:nowrap;}
+.luxury-tab.active{color:var(--gold);border-bottom-color:var(--gold);}
+.luxury-tab-body{padding-bottom:14px;}
+/* ════ YACHT ════ */
+.yacht-flagship-card{background:var(--card);border:0.5px solid rgba(184,137,42,0.2);border-radius:3px;padding:18px;display:grid;gap:12px;}
+.yacht-flag-header{display:flex;align-items:flex-start;justify-content:space-between;}
+.yacht-flag-tag{font-size:8px;letter-spacing:0.2em;color:var(--gold);text-transform:uppercase;margin-bottom:6px;}
+.yacht-flag-name{font-family:'Cormorant Garamond',serif;font-size:24px;color:var(--ow);margin-bottom:3px;}
+.yacht-flag-type{font-size:10px;color:var(--mt);}
+.yacht-flag-desc{font-size:11px;color:var(--mt);line-height:1.8;}
+.yacht-flag-feats{display:flex;flex-wrap:wrap;gap:6px;}
+.yacht-feat{font-size:9px;color:var(--mt);background:var(--soft);border:0.5px solid var(--bd);padding:4px 10px;border-radius:10px;letter-spacing:0.04em;}
+.yacht-pricing{display:grid;gap:0;border:0.5px solid var(--bd);border-radius:3px;overflow:hidden;}
+.yacht-price-row{display:flex;justify-content:space-between;align-items:center;padding:11px 14px;border-bottom:0.5px solid var(--bd);}
+.yacht-price-row:last-child{border-bottom:none;}
+.yacht-price-lbl{font-size:10px;color:var(--mt);}
+.yacht-price-val{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--gl);}
+/* Fleet cards */
+.fleet-card{background:var(--card);border:0.5px solid rgba(18,140,126,0.2);border-radius:3px;padding:16px;}
+.fleet-name{font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--ow);margin-bottom:3px;}
+.fleet-cap{font-size:10px;color:var(--mt);margin-bottom:10px;}
+.fleet-prices{display:grid;gap:0;border:0.5px solid var(--bd);border-radius:3px;overflow:hidden;margin-bottom:10px;}
+.fleet-price-row{display:flex;justify-content:space-between;padding:9px 12px;border-bottom:0.5px solid var(--bd);}
+.fleet-price-row:last-child{border-bottom:none;}
+.fleet-price-lbl{font-size:10px;color:var(--mt);}
+.fleet-price-val{font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--ocean-soft);}
+/* ════ EMPTY LEGS ════ */
+.el-explain{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-bottom:0.5px solid var(--bd);background:rgba(184,137,42,0.03);}
+.el-card{background:var(--card);border:0.5px solid var(--bd);border-radius:3px;padding:16px;}
+.el-card.el-gone{opacity:0.5;}
+.el-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.el-route{display:flex;align-items:center;gap:10px;}
+.el-from,.el-to{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--ow);}
+.el-arrow{color:var(--gold);font-size:16px;}
+.el-save-badge{background:rgba(225,6,0,0.12);color:#E10600;font-size:10px;font-weight:700;padding:4px 12px;border-radius:10px;letter-spacing:0.08em;}
+.el-aircraft{font-size:10px;color:var(--mt);margin-bottom:4px;}
+.el-date{font-size:10px;color:var(--mt);margin-bottom:12px;}
+.el-pricing{display:flex;align-items:flex-end;justify-content:space-between;border-top:0.5px solid var(--bd);padding-top:12px;}
+.el-was{font-size:10px;color:var(--mt);text-decoration:line-through;margin-bottom:2px;}
+.el-now{font-family:'Cormorant Garamond',serif;font-size:28px;color:var(--gl);}
+.el-book-btn{background:#E10600;color:#fff;border:none;padding:10px 20px;border-radius:2px;font-size:9px;letter-spacing:0.16em;text-transform:uppercase;font-family:Montserrat,sans-serif;cursor:pointer;}
+.el-filled{font-size:9px;color:var(--mt);letter-spacing:0.1em;text-transform:uppercase;}
+/* ════ FLIGHT TRACKER ════ */
+.ft-search-box{display:flex;gap:8px;margin-bottom:14px;}
+.ft-search-inp{flex:1;background:var(--card);border:0.5px solid rgba(184,137,42,0.3);color:var(--ow);padding:13px 16px;border-radius:3px;font-size:16px;font-family:'Cormorant Garamond',serif;letter-spacing:0.08em;}
+.ft-search-inp::placeholder{color:var(--mt);font-size:13px;}
+.ft-search-btn{background:var(--gold);border:none;color:#000;width:48px;border-radius:3px;cursor:pointer;font-size:16px;flex-shrink:0;}
+.ft-board-tabs{display:flex;border:0.5px solid var(--bd);border-radius:3px;overflow:hidden;}
+.ft-board-tab{flex:1;background:transparent;border:none;padding:9px;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--mt);font-family:Montserrat,sans-serif;cursor:pointer;transition:all 0.2s;}
+.ft-board-tab.active{background:rgba(184,137,42,0.1);color:var(--gold);}
+/* ════ EVENTS ════ */
+.ev-card{background:var(--card);border:0.5px solid var(--bd);border-radius:3px;padding:16px;}
+.ev-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.ev-cat-tag{font-size:8px;letter-spacing:0.16em;text-transform:uppercase;padding:3px 10px;border-radius:10px;border-width:0.5px;border-style:solid;font-weight:600;}
+.ev-card-date{font-size:9px;color:var(--mt);}
+.ev-card-name{font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--ow);line-height:1.3;margin-bottom:6px;}
+.ev-card-venue{font-size:10px;color:var(--mt);margin-bottom:8px;display:flex;align-items:center;gap:4px;}
+.ev-card-desc{font-size:11px;color:var(--mt);line-height:1.8;margin-bottom:12px;}
+.ev-card-foot{display:flex;align-items:center;justify-content:space-between;border-top:0.5px solid var(--bd);padding-top:12px;}
+.ev-card-price{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--gl);}
+.ev-book-btn{background:transparent;border:0.5px solid rgba(184,137,42,0.3);color:var(--gold);padding:8px 16px;border-radius:2px;font-size:9px;letter-spacing:0.16em;text-transform:uppercase;font-family:Montserrat,sans-serif;cursor:pointer;}
+
 </style>
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="theme-color" content="#080808">
@@ -1175,20 +1367,110 @@ function removeBookingFB(fbKey){
     <span class="tb-title">Private Transfers</span>
     <div style="width:32px"></div>
   </div>
-  <div class="info-box">Chauffeur in suit · Water & Oud scent · Luxury music experience included on every transfer</div>
-  <div class="sec"><div class="slbl">Select your route</div></div>
-  <div id="routes-list"></div>
-  <div class="sec" style="padding-top:4px;"><div class="slbl">Optional add-ons</div></div>
-  <div class="adgrid">
-    <div class="adc"><div><div class="adc-name">Personal Chauffeur</div><div class="adc-desc">Full black suit & gloves</div></div><div><div class="adc-price">+$50</div><div class="adc-tzs">125,000 TZS</div></div></div>
-    <div class="adc"><div><div class="adc-name">Moët & Chandon</div><div class="adc-desc">Chilled champagne, 1 bottle</div></div><div><div class="adc-price">+$150</div><div class="adc-tzs">375,000 TZS</div></div></div>
-    <div class="adc"><div><div class="adc-name">VIP Red Carpet</div><div class="adc-desc">JRO / ARK airport pickups</div></div><div><div class="adc-price">+$100</div><div class="adc-tzs">250,000 TZS</div></div></div>
+
+  <!-- HERO -->
+  <div class="tr-hero">
+    <div class="tr-hero-eyebrow">Barafu Luxe · Ground Transport</div>
+    <div class="tr-hero-title">Arrive in<br><em>Style.</em></div>
+    <div class="tr-hero-sub">Chauffeur in suit · chilled water · oud scent · luxury audio. Every transfer, every time.</div>
+    <div class="tr-hero-rule"></div>
   </div>
-  <div class="sec" style="padding-top:12px;"><div class="slbl">Payment methods</div></div>
-  <div class="paycard"><div class="pay-method">Bank Transfer</div><div class="pay-row"><span class="pay-k">Name</span><span class="pay-v">Chance Liganga</span></div><div class="pay-row"><span class="pay-k">Equity USD</span><span class="pay-v">3012111399406</span></div><div class="pay-row"><span class="pay-k">Equity TZS</span><span class="pay-v">3012111316467</span></div></div>
-  <div class="paycard"><div class="pay-method">Mobile Money</div><div class="pay-row"><span class="pay-k">Airtel Money</span><span class="pay-v">0692312366</span></div></div>
+
+  <!-- EXPERIENCE BADGES -->
+  <div class="tr-badges">
+    <div class="tr-badge"><i class="ti ti-tie"></i><span>Suited chauffeur</span></div>
+    <div class="tr-badge"><i class="ti ti-droplet"></i><span>Chilled water</span></div>
+    <div class="tr-badge"><i class="ti ti-music"></i><span>Luxury audio</span></div>
+    <div class="tr-badge"><i class="ti ti-clock"></i><span>Always on time</span></div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tr-tabs">
+    <button class="tr-tab active" onclick="switchTrTab('routes',this)">Routes</button>
+    <button class="tr-tab" onclick="switchTrTab('addons',this)">Add-ons</button>
+    <button class="tr-tab" onclick="switchTrTab('payment',this)">Payment</button>
+  </div>
+
+  <!-- ROUTES TAB -->
+  <div id="tr-tab-routes" class="tr-tab-body">
+    <div style="padding:14px 14px 6px;font-size:9px;letter-spacing:0.18em;color:var(--mt);text-transform:uppercase;">Select your route</div>
+    <div id="routes-list" style="padding:0 14px 14px;display:grid;gap:8px;"></div>
+  </div>
+
+  <!-- ADD-ONS TAB -->
+  <div id="tr-tab-addons" class="tr-tab-body" style="display:none;">
+    <div style="padding:14px 14px 6px;font-size:9px;letter-spacing:0.18em;color:var(--mt);text-transform:uppercase;">Elevate your journey</div>
+    <div style="padding:0 14px;display:grid;gap:8px;">
+      <div class="tr-addon">
+        <div class="tr-addon-ico"><i class="ti ti-tie"></i></div>
+        <div class="tr-addon-info">
+          <div class="tr-addon-name">Personal Chauffeur Upgrade</div>
+          <div class="tr-addon-desc">Full black suit, white gloves, formal greeting</div>
+        </div>
+        <div class="tr-addon-price">+$50</div>
+      </div>
+      <div class="tr-addon">
+        <div class="tr-addon-ico"><i class="ti ti-bottle"></i></div>
+        <div class="tr-addon-info">
+          <div class="tr-addon-name">Moët & Chandon</div>
+          <div class="tr-addon-desc">Chilled champagne, 1 bottle served en route</div>
+        </div>
+        <div class="tr-addon-price">+$150</div>
+      </div>
+      <div class="tr-addon">
+        <div class="tr-addon-ico"><i class="ti ti-star"></i></div>
+        <div class="tr-addon-info">
+          <div class="tr-addon-name">VIP Red Carpet Meet</div>
+          <div class="tr-addon-desc">Airport arrivals — name board, porter, fast-track</div>
+        </div>
+        <div class="tr-addon-price">+$100</div>
+      </div>
+      <div class="tr-addon">
+        <div class="tr-addon-ico"><i class="ti ti-flower"></i></div>
+        <div class="tr-addon-info">
+          <div class="tr-addon-name">Floral Welcome</div>
+          <div class="tr-addon-desc">Fresh flowers and personalised welcome note</div>
+        </div>
+        <div class="tr-addon-price">+$35</div>
+      </div>
+      <div class="tr-addon">
+        <div class="tr-addon-ico"><i class="ti ti-camera"></i></div>
+        <div class="tr-addon-info">
+          <div class="tr-addon-name">Photography</div>
+          <div class="tr-addon-desc">Professional arrival / departure photography</div>
+        </div>
+        <div class="tr-addon-price">+$80</div>
+      </div>
+    </div>
+    <div style="padding:14px;">
+      <a class="wa-btn" href="https://wa.me/255692312366?text=I+would+like+to+add+extras+to+my+transfer" target="_blank"><i class="ti ti-brand-whatsapp"></i>Add extras to my booking</a>
+    </div>
+  </div>
+
+  <!-- PAYMENT TAB -->
+  <div id="tr-tab-payment" class="tr-tab-body" style="display:none;">
+    <div style="padding:14px;">
+      <div style="font-size:9px;letter-spacing:0.18em;color:var(--mt);text-transform:uppercase;margin-bottom:12px;">Accepted payment methods</div>
+      <div class="tr-pay-card">
+        <div class="tr-pay-method">Bank Transfer (USD)</div>
+        <div class="tr-pay-row"><span class="tr-pay-k">Name</span><span class="tr-pay-v">Chance Liganga</span></div>
+        <div class="tr-pay-row"><span class="tr-pay-k">Bank</span><span class="tr-pay-v">CRDB Bank Tanzania</span></div>
+        <div class="tr-pay-row"><span class="tr-pay-k">Account</span><span class="tr-pay-v">0150794121800</span></div>
+        <div class="tr-pay-row"><span class="tr-pay-k">SWIFT</span><span class="tr-pay-v">CORUTZTZ</span></div>
+      </div>
+      <div class="tr-pay-card" style="margin-top:10px;">
+        <div class="tr-pay-method">Mobile Money</div>
+        <div class="tr-pay-row"><span class="tr-pay-k">Airtel Money</span><span class="tr-pay-v">+255 692 312 366</span></div>
+        <div class="tr-pay-row"><span class="tr-pay-k">M-Pesa</span><span class="tr-pay-v">+255 692 312 366</span></div>
+      </div>
+      <div style="font-size:9px;color:var(--mt);line-height:1.8;margin-top:12px;">All payments confirmed via WhatsApp. Receipt provided for every transaction.</div>
+      <a class="wa-btn" href="https://wa.me/255692312366?text=Payment+enquiry+for+my+transfer" target="_blank" style="margin-top:14px;"><i class="ti ti-brand-whatsapp"></i>Payment enquiry</a>
+    </div>
+  </div>
+
   <div class="spacer"></div>
 </div>
+
 
 <!-- ════════════════════ HELICOPTER ════════════════════ -->
 <div class="screen" id="s-heli">
@@ -1235,43 +1517,33 @@ function removeBookingFB(fbKey){
     <span class="tb-title">Yacht · Indian Ocean</span>
     <div style="width:32px"></div>
   </div>
-  <div class="info-box ocean">In partnership with Rock the Yacht · Private catamaran charters across Dar es Salaam, Zanzibar, Pemba, Mafia & the northern coast. Crew, meals & entertainment included on all vessels.</div>
-  <div class="sec"><div class="slbl">Add-ons available on every vessel</div></div>
-  <div class="adgrid" style="margin-bottom:10px;">
-    <div class="adc"><div><div class="adc-name">DJ On Board</div><div class="adc-desc">Curated from Rock the Yacht list</div></div><div><div class="adc-price" style="color:var(--ocean-soft);">+$338</div></div></div>
-    <div class="adc"><div><div class="adc-name">Photography / Film</div><div class="adc-desc">Professional team · Full coverage</div></div><div><div class="adc-price" style="color:var(--ocean-soft);">+$338</div></div></div>
-    <div class="adc"><div><div class="adc-name">Alcoholic Beverages</div><div class="adc-desc">Curated selection on request</div></div><div><div class="adc-price" style="color:var(--ocean-soft);">Custom</div></div></div>
+  <div class="luxury-hero">
+    <div class="luxury-hero-eyebrow">Rock the Yacht · Barafu Luxe</div>
+    <div class="luxury-hero-title">Sail the<br><em>Indian Ocean.</em></div>
+    <div class="luxury-hero-sub">Private catamaran charters · Dar es Salaam · Zanzibar · Pemba · Mafia. Crew, meals and entertainment on every vessel.</div>
+    <div class="luxury-hero-rule"></div>
   </div>
-  <div class="sec" style="padding-top:4px;"><div class="slbl">Flagship vessel</div></div>
-  <div class="ycard star" onclick="openYachtBook('Sofia Luxury','Crown jewel of the Indian Ocean','$2,700','$3,800','$5,400','$8,100')">
-    <div class="yc-stamp">Flagship ✦</div>
-    <div class="yc-name">Sofia <em>Luxury</em></div>
-    <div class="yc-cap">Capacity: 10–20 guests · Zanzibar</div>
-    <div class="yc-desc">Tanzania's crown jewel of catamarans — modern elegance meets the open sea, crafting unforgettable days for sophisticated gatherings or lively celebrations.</div>
-    <div class="pgrid" style="margin-bottom:10px;">
-      <div class="pbox ocean"><div class="pbox-val">$2,700</div><div class="pbox-lbl">Half Day 6hrs</div></div>
-      <div class="pbox ocean"><div class="pbox-val">$3,800</div><div class="pbox-lbl">Full Day 9hrs</div></div>
-      <div class="pbox ocean"><div class="pbox-val">$5,400</div><div class="pbox-lbl">Live Aboard 24hrs</div></div>
-      <div class="pbox ocean"><div class="pbox-val">$8,100</div><div class="pbox-lbl">2 Days 48hrs</div></div>
+  <div class="luxury-tabs">
+    <button class="luxury-tab active" onclick="switchLuxTab('yacht','flagship',this)">Flagship</button>
+    <button class="luxury-tab" onclick="switchLuxTab('yacht','fleet',this)">Fleet</button>
+    <button class="luxury-tab" onclick="switchLuxTab('yacht','addons',this)">Add-ons</button>
+  </div>
+  <div id="yacht-tab-flagship" class="luxury-tab-body" style="padding:14px;display:grid;gap:10px;">
+    <!-- Sofia card built from JS -->
+  </div>
+  <div id="yacht-tab-fleet" class="luxury-tab-body" style="display:none;padding:14px;display:none;">
+    <div id="group-fleet" style="display:grid;gap:10px;"></div>
+  </div>
+  <div id="yacht-tab-addons" class="luxury-tab-body" style="display:none;padding:14px;">
+    <div style="display:grid;gap:8px;">
+      <div class="tr-addon"><div class="tr-addon-ico"><i class="ti ti-music"></i></div><div class="tr-addon-info"><div class="tr-addon-name">Live DJ</div><div class="tr-addon-desc">Professional DJ, sound system, full set</div></div><div class="tr-addon-price">+$300</div></div>
+      <div class="tr-addon"><div class="tr-addon-ico"><i class="ti ti-chef-hat"></i></div><div class="tr-addon-info"><div class="tr-addon-name">Private Chef</div><div class="tr-addon-desc">Bespoke menu, fine dining at sea</div></div><div class="tr-addon-price">+$250</div></div>
+      <div class="tr-addon"><div class="tr-addon-ico"><i class="ti ti-bottle"></i></div><div class="tr-addon-info"><div class="tr-addon-name">Premium Bar Package</div><div class="tr-addon-desc">Moët, Grey Goose, craft cocktails</div></div><div class="tr-addon-price">+$200</div></div>
+      <div class="tr-addon"><div class="tr-addon-ico"><i class="ti ti-camera"></i></div><div class="tr-addon-info"><div class="tr-addon-name">Yacht Photography</div><div class="tr-addon-desc">Professional photographer, edited gallery</div></div><div class="tr-addon-price">+$150</div></div>
+      <div class="tr-addon"><div class="tr-addon-ico"><i class="ti ti-fish"></i></div><div class="tr-addon-info"><div class="tr-addon-name">Deep Sea Fishing</div><div class="tr-addon-desc">Equipment, bait, licensed guide</div></div><div class="tr-addon-price">+$180</div></div>
     </div>
-    <div class="yc-tags"><span class="yc-tag">Zanzibar</span><span class="yc-tag">10–20 guests</span><span class="yc-tag">2-day charter</span></div>
+    <div style="margin-top:14px;"><a class="wa-btn" href="https://wa.me/255692312366?text=Yacht+add-on+enquiry" target="_blank"><i class="ti ti-brand-whatsapp"></i>Add extras to my charter</a></div>
   </div>
-  <div class="sec" style="padding-top:8px;"><div class="slbl">Premium fleet</div></div>
-  <div class="ycard" onclick="openYachtBook('Umoja II','Harmony & adventure · 20–22 guests','$3,000','$3,600','$4,300','')">
-    <div class="yc-name">Umoja <em>II</em></div><div class="yc-cap">20–22 guests · DSM · Zanzibar</div>
-    <div class="yc-desc">The sister ship — harmony and adventure, seamless blend of comfort for island-hopping escapades.</div>
-    <div class="pgrid-3"><div class="pbox ocean"><div class="pbox-val">$3,000</div><div class="pbox-lbl">Half 6hrs</div></div><div class="pbox ocean"><div class="pbox-val">$3,600</div><div class="pbox-lbl">Full 9hrs</div></div><div class="pbox ocean"><div class="pbox-val">$4,300</div><div class="pbox-lbl">24hrs</div></div></div>
-  </div>
-  <div class="ycard" onclick="openYachtBook('Cat Albion','Majestic luxury · 12–15 guests','$2,300','$3,100','$4,700','')">
-    <div class="yc-name">Cat <em>Albion</em></div><div class="yc-cap">12–15 guests · DSM · Zanzibar</div>
-    <div class="yc-desc">Majestic luxury catamaran — DSM and Zanzibar as your private playground for exclusive events or serene retreats.</div>
-    <div class="pgrid-3"><div class="pbox ocean"><div class="pbox-val">$2,300</div><div class="pbox-lbl">Half 6hrs</div></div><div class="pbox ocean"><div class="pbox-val">$3,100</div><div class="pbox-lbl">Full 9hrs</div></div><div class="pbox ocean"><div class="pbox-val">$4,700</div><div class="pbox-lbl">24hrs</div></div></div>
-  </div>
-  <div class="sec" style="padding-top:4px;"><div class="slbl">Group fleet · 20–25 guests</div></div>
-  <div id="group-fleet"></div>
-  <div class="sec" style="padding-top:4px;"><div class="slbl">Value fleet · 18–20 guests</div></div>
-  <div class="rc"><div class="rc-head" onclick="tr(this)"><div><div class="rc-name">Ms Behavior · 18–20 guests</div><div class="rc-tzs">Fun-filled cruises · DSM · Zanzibar</div></div><div class="rc-price" style="color:var(--ocean-soft);">$2,000</div></div><div class="rc-body"><div class="rc-line"><i class="ti ti-clock" style="color:var(--ocean-soft)"></i> Half $2,000 · Full $2,700 · 24hrs $3,800</div><button class="gbtn ocean" style="margin-top:10px;" onclick="openYachtBook('Ms Behavior','18-20 guests','$2,000','$2,700','$3,800','')">Book Ms Behavior</button></div></div>
-  <div class="rc"><div class="rc-head" onclick="tr(this)"><div><div class="rc-name">Cat Coconut · 18–20 guests</div><div class="rc-tzs">Island vibes · DSM · Zanzibar</div></div><div class="rc-price" style="color:var(--ocean-soft);">$2,000</div></div><div class="rc-body"><div class="rc-line"><i class="ti ti-clock" style="color:var(--ocean-soft)"></i> Half $2,000 · Full $2,700 · 24hrs $3,800</div><button class="gbtn ocean" style="margin-top:10px;" onclick="openYachtBook('Cat Coconut','18-20 guests','$2,000','$2,700','$3,800','')">Book Cat Coconut</button></div></div>
   <div class="spacer"></div>
 </div>
 
@@ -1280,13 +1552,45 @@ function removeBookingFB(fbKey){
   <div class="topbar">
     <button class="tb-back" onclick="go('s-home')"><i class="ti ti-arrow-left"></i></button>
     <span class="tb-title">F1 Hospitality</span>
-    <div style="width:32px"></div>
+    <span class="live-badge" id="f1-live-badge"><span class="live-dot"></span>2026</span>
   </div>
-  <div class="info-box" style="background:linear-gradient(135deg,#0a0000,#160000);border-color:rgba(204,0,0,0.2);">Race reservations · Paddock access · Private travel & accommodation · Every detail arranged by Barafu Luxe. Limited availability — book early.</div>
-  <div class="sec"><div class="slbl">Formula 1 · 2026 Season · 14 remaining races</div></div>
-  <div id="f1-list"></div>
+
+  <div class="f1-hero">
+    <div class="f1-hero-season">2026 Formula 1 World Championship</div>
+    <div class="f1-hero-title">Race the World <em>in Luxury.</em></div>
+    <div class="f1-standings-strip" id="f1-standings-strip">
+      <div class="f1-standing-item"><span class="f1-pos">1</span><span class="f1-sname">Norris</span><span class="f1-pts">229pts</span></div>
+      <div class="f1-standing-item"><span class="f1-pos">2</span><span class="f1-sname">Verstappen</span><span class="f1-pts">205pts</span></div>
+      <div class="f1-standing-item"><span class="f1-pos">3</span><span class="f1-sname">Piastri</span><span class="f1-pts">188pts</span></div>
+    </div>
+  </div>
+
+  <div class="f1-tabs">
+    <button class="f1-tab active" onclick="switchF1Tab('calendar',this)">Calendar</button>
+    <button class="f1-tab" onclick="switchF1Tab('results',this)">Results</button>
+    <button class="f1-tab" onclick="switchF1Tab('standings',this)">Standings</button>
+  </div>
+
+  <div id="f1-tab-calendar" class="f1-tab-body">
+    <div id="f1-list"></div>
+  </div>
+
+  <div id="f1-tab-results" class="f1-tab-body" style="display:none;">
+    <div id="f1-results-list" style="padding:14px;text-align:center;padding-top:30px;">
+      <div style="font-size:28px;margin-bottom:10px;">🏎️</div>
+      <div style="font-size:14px;color:var(--ow);font-family:Cormorant Garamond,serif;">Tap to load results</div>
+    </div>
+  </div>
+
+  <div id="f1-tab-standings" class="f1-tab-body" style="display:none;">
+    <div id="f1-standings-full" style="padding:14px;text-align:center;padding-top:30px;">
+      <div style="font-size:10px;color:var(--mt);">Tap to load standings</div>
+    </div>
+  </div>
+
   <div class="spacer"></div>
 </div>
+
 
 <!-- ════════════════════ CONCIERGE ════════════════════ -->
 <div class="screen" id="s-concierge">
@@ -1351,46 +1655,26 @@ function removeBookingFB(fbKey){
     <span class="tb-title">Empty Legs</span>
     <button class="tb-icon" onclick="openNotifyAlert()"><i class="ti ti-bell-plus"></i></button>
   </div>
-
-  <div class="el-alert">
-    <div class="el-alert-title">✦ What is an Empty Leg?</div>
-    <div class="el-alert-body">When a private jet or helicopter flies without passengers to reposition for its next booking, that slot becomes available at a significant discount — typically 50–75% below standard charter rates. Barafu Luxe gives you exclusive access to these rare opportunities before they're gone.</div>
+  <div class="luxury-hero">
+    <div class="luxury-hero-eyebrow">Private Aviation · Flash Deals</div>
+    <div class="luxury-hero-title">Fly Private.<br><em>Pay Less.</em></div>
+    <div class="luxury-hero-sub">Empty leg flights at 50–75% below charter rate. Limited seats, real aircraft, real savings. Updated daily.</div>
+    <div class="luxury-hero-rule"></div>
   </div>
-
-  <div style="margin:0 14px 10px;display:flex;gap:8px;">
-    <button onclick="fetchLiveEmptyLegs()" style="flex:1;background:rgba(184,137,42,0.08);border:0.5px solid rgba(184,137,42,0.3);color:var(--gold);padding:10px;font-size:9px;letter-spacing:0.16em;text-transform:uppercase;cursor:pointer;border-radius:2px;font-family:Montserrat,sans-serif;font-weight:500;display:flex;align-items:center;justify-content:center;gap:8px;"><i class="ti ti-search"></i>Search live deals</button>
-    <div id="el-live-status" style="font-size:9px;color:var(--mt);padding:10px 12px;background:var(--card);border:0.5px solid var(--bd);border-radius:2px;display:flex;align-items:center;flex:1;text-align:center;justify-content:center;">Tanzania · East Africa</div>
+  <div class="el-explain">
+    <i class="ti ti-info-circle" style="color:var(--gold);font-size:16px;flex-shrink:0;"></i>
+    <div style="font-size:10px;color:var(--mt);line-height:1.8;">An <strong style="color:var(--ow);">empty leg</strong> is a repositioning flight — when a private jet flies without passengers to reach its next booking. Those seats become available at deep discounts.</div>
   </div>
-  <div class="notify-strip" onclick="openNotifyAlert()">
-    <i class="ti ti-bell-ringing"></i>
-    <div><div class="notify-text">Get notified instantly</div><div class="notify-sub">Be first when a new empty leg is posted — tap to register</div></div>
-    <i class="ti ti-chevron-right notify-arr"></i>
+  <div class="luxury-tabs">
+    <button class="luxury-tab active" onclick="filterELTab('all',this)">All</button>
+    <button class="luxury-tab" onclick="filterELTab('jet',this)">Jets</button>
+    <button class="luxury-tab" onclick="filterELTab('heli',this)">Helicopters</button>
   </div>
-
-  <div class="sec" style="padding-bottom:8px;"><div class="slbl">Filter</div></div>
-  <div class="el-filter-row">
-    <button class="el-filter on" onclick="filterEL(this,'all')">All</button>
-    <button class="el-filter" onclick="filterEL(this,'jet')">Private Jets</button>
-    <button class="el-filter" onclick="filterEL(this,'heli')">Helicopters</button>
-    <button class="el-filter" onclick="filterEL(this,'dar')">DSM</button>
-    <button class="el-filter" onclick="filterEL(this,'znz')">Zanzibar</button>
-    <button class="el-filter" onclick="filterEL(this,'jro')">Kilimanjaro</button>
+  <div style="padding:10px 14px 4px;display:flex;align-items:center;justify-content:space-between;">
+    <span id="el-live-status" style="font-size:9px;color:var(--mt);letter-spacing:0.06em;"></span>
+    <button onclick="fetchLiveEmptyLegs()" style="background:transparent;border:0.5px solid var(--bd);color:var(--mt);padding:4px 10px;border-radius:2px;font-size:9px;letter-spacing:0.1em;font-family:Montserrat,sans-serif;cursor:pointer;">Refresh</button>
   </div>
-
-  <div class="sec" style="padding-bottom:8px;"><div class="slbl">Available now</div></div>
-  <div id="el-available"></div>
-
-  <div class="sec" style="padding-top:4px;"><div class="slbl">Recently filled</div></div>
-  <div id="el-filled"></div>
-
-  <div class="sec" style="padding-top:4px;"><div class="slbl">How it works</div></div>
-  <div class="info-box">
-    <div style="display:grid;gap:10px;">
-      <div style="display:flex;gap:10px;align-items:flex-start;"><span style="color:var(--gold);font-family:'Cormorant Garamond',serif;font-size:20px;line-height:1;flex-shrink:0;">1.</span><div><div style="font-size:11px;color:var(--ow);margin-bottom:2px;">Register for alerts</div><div style="font-size:10px;color:var(--mt);">Tap the bell icon to receive instant notifications when a new empty leg matching your preferred routes is posted.</div></div></div>
-      <div style="display:flex;gap:10px;align-items:flex-start;"><span style="color:var(--gold);font-family:'Cormorant Garamond',serif;font-size:20px;line-height:1;flex-shrink:0;">2.</span><div><div style="font-size:11px;color:var(--ow);margin-bottom:2px;">Act fast</div><div style="font-size:10px;color:var(--mt);">Empty legs fill quickly. Tap "Reserve" and your Barafu Luxe concierge will confirm and handle all arrangements within the hour.</div></div></div>
-      <div style="display:flex;gap:10px;align-items:flex-start;"><span style="color:var(--gold);font-family:'Cormorant Garamond',serif;font-size:20px;line-height:1;flex-shrink:0;">3.</span><div><div style="font-size:11px;color:var(--ow);margin-bottom:2px;">Fly in style at a fraction of the cost</div><div style="font-size:10px;color:var(--mt);">Arrive at the FBO lounge, board your private aircraft, and fly with all the Barafu Luxe experience you expect.</div></div></div>
-    </div>
-  </div>
+  <div id="el-list" style="padding:0 14px 14px;display:grid;gap:10px;"></div>
   <div class="spacer"></div>
 </div>
 
@@ -1401,57 +1685,41 @@ function removeBookingFB(fbKey){
     <span class="tb-title">Flight Tracker</span>
     <span class="live-badge"><span class="live-dot"></span>Live</span>
   </div>
-
-  <!-- ── HERO SEARCH BOX ── -->
-  <div id="ft-search-hero" style="background:linear-gradient(160deg,#0a0a08,#141208,#0a0a08);padding:20px 14px 16px;border-bottom:0.5px solid rgba(184,137,42,0.2);">
-    <div style="font-size:9px;letter-spacing:0.22em;color:var(--gold);text-transform:uppercase;margin-bottom:6px;">Barafu Luxe · Flight Tracking</div>
-    <div style="font-family:'Cormorant Garamond',serif;font-size:26px;color:var(--ow);margin-bottom:4px;">Track Any Flight</div>
-    <div style="font-size:11px;color:var(--mt);margin-bottom:16px;">Enter a flight number for live status, arrivals, and instant transfer booking.</div>
-    <div style="display:flex;gap:0;border:0.5px solid rgba(184,137,42,0.4);border-radius:3px;overflow:hidden;background:var(--card);">
-      <div style="display:flex;align-items:center;padding:0 12px;border-right:0.5px solid rgba(184,137,42,0.2);">
-        <i class="ti ti-plane" style="color:var(--gold);font-size:16px;"></i>
-      </div>
-      <input id="flight-search-inp"
-        style="flex:1;background:transparent;border:none;outline:none;padding:14px 12px;font-size:14px;color:var(--ow);font-family:'Cormorant Garamond',serif;letter-spacing:0.05em;"
-        placeholder="KQ434 · QM102 · ET840 · EK720..."
-        onkeydown="if(event.key==='Enter')trackClientFlight(this.value)"
-        oninput="this.value=this.value.toUpperCase()">
-      <button onclick="trackClientFlight(document.getElementById('flight-search-inp').value)"
-        style="background:var(--gold);color:#000;border:none;padding:0 20px;font-size:9px;font-family:Montserrat,sans-serif;letter-spacing:0.18em;font-weight:600;cursor:pointer;text-transform:uppercase;white-space:nowrap;">
-        Track
+  <div class="luxury-hero">
+    <div class="luxury-hero-eyebrow">Barafu Luxe · Aviation</div>
+    <div class="luxury-hero-title">Track Any<br><em>Flight.</em></div>
+    <div class="luxury-hero-sub">Enter a flight number to get live status, delays, gate and terminal info — then book your transfer.</div>
+    <div class="luxury-hero-rule"></div>
+  </div>
+  <div style="padding:16px 14px 0;">
+    <div class="ft-search-box">
+      <input id="ft-flight-inp" class="ft-search-inp" type="text" placeholder="e.g. KQ100 · QM201 · ET800" maxlength="8"
+        oninput="this.value=this.value.toUpperCase()"
+        onkeydown="if(event.key==='Enter')trackClientFlight(this.value)">
+      <button class="ft-search-btn" onclick="trackClientFlight(document.getElementById('ft-flight-inp').value)">
+        <i class="ti ti-search"></i>
       </button>
     </div>
-    <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
-      <span onclick="document.getElementById('flight-search-inp').value='KQ434';trackClientFlight('KQ434')" style="font-size:9px;color:var(--mt);border:0.5px solid var(--bd);padding:4px 10px;border-radius:10px;cursor:pointer;letter-spacing:0.06em;">KQ434</span>
-      <span onclick="document.getElementById('flight-search-inp').value='QM102';trackClientFlight('QM102')" style="font-size:9px;color:var(--mt);border:0.5px solid var(--bd);padding:4px 10px;border-radius:10px;cursor:pointer;letter-spacing:0.06em;">QM102</span>
-      <span onclick="document.getElementById('flight-search-inp').value='ET840';trackClientFlight('ET840')" style="font-size:9px;color:var(--mt);border:0.5px solid var(--bd);padding:4px 10px;border-radius:10px;cursor:pointer;letter-spacing:0.06em;">ET840</span>
-      <span onclick="document.getElementById('flight-search-inp').value='EK720';trackClientFlight('EK720')" style="font-size:9px;color:var(--mt);border:0.5px solid var(--bd);padding:4px 10px;border-radius:10px;cursor:pointer;letter-spacing:0.06em;">EK720</span>
+  </div>
+  <div id="flight-tracker-results" style="padding:14px;"></div>
+  <div class="luxury-tabs" style="margin:0 0 0;">
+    <button class="luxury-tab active" onclick="switchFTTab('jro',this)">JRO</button>
+    <button class="luxury-tab" onclick="switchFTTab('ark',this)">ARK</button>
+    <button class="luxury-tab" onclick="switchFTTab('dar',this)">DAR</button>
+    <button class="luxury-tab" onclick="switchFTTab('znz',this)">ZNZ</button>
+    <button class="luxury-tab" onclick="switchFTTab('myw',this)">MYW</button>
+  </div>
+  <div style="padding:8px 14px 4px;display:flex;align-items:center;justify-content:space-between;">
+    <span style="font-size:9px;color:var(--mt);">Airport schedule board</span>
+    <span id="ft-live-status" style="font-size:9px;color:var(--mt);"></span>
+  </div>
+  <div style="padding:0 14px;">
+    <div class="ft-board-tabs">
+      <button class="ft-board-tab active" onclick="switchFTBoard('arr',this)">Arrivals</button>
+      <button class="ft-board-tab" onclick="switchFTBoard('dep',this)">Departures</button>
     </div>
   </div>
-
-  <!-- ── FLIGHT RESULT CARD ── -->
-  <div id="flight-tracker-results" style="margin:0;"></div>
-
-  <!-- ── AIRPORT BOARDS ── -->
-  <div style="padding:12px 14px 6px;display:flex;align-items:center;justify-content:space-between;">
-    <div style="font-size:9px;letter-spacing:0.18em;color:var(--gold);text-transform:uppercase;">Live Airport Boards</div>
-    <span class="live-badge" style="font-size:8px;"><span class="live-dot"></span><span id="ft-live-status">Loading...</span></span>
-  </div>
-  <div class="airport-tabs" style="padding:0 14px 0;">
-    <button class="apt-tab on" onclick="showAirport('JRO',this)">JRO</button>
-    <button class="apt-tab" onclick="showAirport('ARK',this)">ARK</button>
-    <button class="apt-tab" onclick="showAirport('DAR',this)">DAR</button>
-    <button class="apt-tab" onclick="showAirport('ZNZ',this)">ZNZ</button>
-    <button class="apt-tab" onclick="showAirport('MYW',this)">MYW</button>
-  </div>
-  <div id="flight-board"></div>
-
-  <div style="margin:12px 14px;padding:12px;background:rgba(184,137,42,0.04);border:0.5px solid rgba(184,137,42,0.12);border-radius:2px;font-size:10px;color:var(--mt);line-height:1.7;">
-    ✦ Flight data updated in real time. Your concierge monitors all client arrivals and coordinates transfers automatically.
-  </div>
-  <div style="padding:0 14px 14px;">
-    <a class="wa-btn" href="https://wa.me/255692312366?text=Please+track+my+flight+and+arrange+a+transfer" target="_blank"><i class="ti ti-brand-whatsapp"></i>Ask concierge to track & arrange transfer</a>
-  </div>
+  <div id="ft-flights-board" style="padding:0 14px 14px;display:grid;gap:6px;margin-top:10px;"></div>
   <div class="spacer"></div>
 </div>
 
@@ -1462,40 +1730,31 @@ function removeBookingFB(fbKey){
     <span class="tb-title">Events</span>
     <button class="tb-icon" onclick="openAddEventAlert()"><i class="ti ti-bell-plus"></i></button>
   </div>
-  <div class="ev-hero">
-    <div class="ev-hero-banner">
-      <div class="ev-hero-title">Curated <em>Experiences</em></div>
-    </div>
-    <div class="ev-month-nav">
-      <button class="ev-nav-btn" onclick="prevMonth()"><i class="ti ti-chevron-left"></i></button>
-      <span class="ev-month-lbl" id="ev-month-lbl">June 2026</span>
-      <button class="ev-nav-btn" onclick="nextMonth()"><i class="ti ti-chevron-right"></i></button>
-    </div>
-    <div class="ev-cal" id="ev-cal"></div>
+  <div class="luxury-hero">
+    <div class="luxury-hero-eyebrow">Barafu Luxe · Curated Experiences</div>
+    <div class="luxury-hero-title">Live the<br><em>Extraordinary.</em></div>
+    <div class="luxury-hero-sub">Galas, safaris, festivals, and private experiences — handpicked for Barafu Luxe members.</div>
+    <div class="luxury-hero-rule"></div>
   </div>
-  <div class="ev-filters">
-    <button class="ev-filter on" onclick="filterEvt(this,'all')">All</button>
-    <button class="ev-filter" onclick="filterEvt(this,'gala')">Galas</button>
-    <button class="ev-filter" onclick="filterEvt(this,'golf')">Golf</button>
-    <button class="ev-filter" onclick="filterEvt(this,'wine')">Wine & Dining</button>
-    <button class="ev-filter" onclick="filterEvt(this,'fashion')">Fashion</button>
-    <button class="ev-filter" onclick="filterEvt(this,'sports')">Sports</button>
-    <button class="ev-filter" onclick="filterEvt(this,'travel')">Travel</button>
-    <button class="ev-filter" onclick="filterEvt(this,'private')">Members Only</button>
+  <div class="luxury-tabs">
+    <button class="luxury-tab active" onclick="filterEvTab('all',this)">All</button>
+    <button class="luxury-tab" onclick="filterEvTab('gala',this)">Galas</button>
+    <button class="luxury-tab" onclick="filterEvTab('sports',this)">Sports</button>
+    <button class="luxury-tab" onclick="filterEvTab('travel',this)">Travel</button>
+    <button class="luxury-tab" onclick="filterEvTab('wine',this)">Wine</button>
   </div>
-  <div style="padding:0 14px 10px;display:flex;gap:8px;align-items:center;">
-    <button onclick="fetchLiveEvents()" style="background:rgba(184,137,42,0.08);border:0.5px solid rgba(184,137,42,0.3);color:var(--gold);padding:8px 14px;font-size:9px;letter-spacing:0.16em;text-transform:uppercase;cursor:pointer;border-radius:2px;font-family:Montserrat,sans-serif;font-weight:500;display:flex;align-items:center;gap:6px;white-space:nowrap;"><i class="ti ti-refresh"></i>Refresh events</button>
-    <div id="ev-live-status" style="font-size:9px;color:var(--mt);flex:1;">Tanzania & East Africa · Real events</div>
+  <div style="padding:10px 14px 4px;display:flex;align-items:center;justify-content:space-between;">
+    <span id="ev-live-status" style="font-size:9px;color:var(--mt);letter-spacing:0.06em;"></span>
+    <button onclick="_eventsFetched=false;fetchLiveEvents();" style="background:transparent;border:0.5px solid var(--bd);color:var(--mt);padding:4px 10px;border-radius:2px;font-size:9px;letter-spacing:0.1em;font-family:Montserrat,sans-serif;cursor:pointer;">Refresh</button>
   </div>
-  <div class="sec" style="padding-bottom:8px;"><div class="slbl">Upcoming events</div></div>
-  <div id="ev-list"></div>
+  <div id="ev-list" style="padding:0 14px 14px;display:grid;gap:10px;"></div>
   <div class="spacer"></div>
 </div>
 
 <!-- ════════════════════ COMMUNITIES ════════════════════ -->
 <div class="screen" id="s-communities">
   <div class="topbar">
-    <button class="tb-back" onclick="go('s-home')"><i class="ti ti-arrow-left"></i></button>
+    <button class="tb-back" onclick="go('s-circle')"><i class="ti ti-arrow-left"></i></button>
     <span class="tb-title">Communities</span>
     <div style="font-size:9px;color:#4CAF50;letter-spacing:0.1em;display:flex;align-items:center;gap:4px;"><span style="width:6px;height:6px;background:#4CAF50;border-radius:50%;display:inline-block;animation:pulse 1.5s infinite;"></span>LIVE</div>
   </div>
@@ -1829,70 +2088,43 @@ function removeBookingFB(fbKey){
     <div style="width:32px"></div>
   </div>
 
-  <!-- Hero -->
-  <div style="background:linear-gradient(160deg,#080808,#0f0a02,#080808);padding:24px 14px 20px;border-bottom:0.5px solid rgba(212,175,55,0.2);">
-    <div style="font-size:8px;letter-spacing:0.28em;color:#D4AF37;text-transform:uppercase;margin-bottom:8px;text-align:center;">Exclusive Ecosystem</div>
-    <div style="font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:300;color:#fff;letter-spacing:0.06em;text-align:center;margin-bottom:10px;">The Barafu Circle</div>
-    <div style="width:32px;height:1px;background:#D4AF37;margin:0 auto 14px;"></div>
-    <div style="font-size:11px;color:#A0A0A0;line-height:1.8;text-align:center;max-width:320px;margin:0 auto;">
-      A private, verified network for elite clientele to coordinate shared charters, lifestyle experiences, and exclusive local insights.
-    </div>
+  <!-- HERO -->
+  <div class="circle-hero">
+    <div class="circle-hero-eyebrow">Private Members Feed</div>
+    <div class="circle-hero-title">The Barafu<br><em>Circle</em></div>
+    <div class="circle-hero-sub">Curated exclusively for members. Events, deals, and insights — delivered privately by your concierge.</div>
+    <div class="circle-hero-rule"></div>
   </div>
 
-  <!-- Access badge -->
-  <div style="margin:14px;background:rgba(212,175,55,0.06);border:0.5px solid rgba(212,175,55,0.25);border-radius:3px;padding:10px 14px;display:flex;align-items:center;gap:10px;">
-    <span style="font-size:16px;">🔒</span>
-    <div style="font-size:10px;color:#888;line-height:1.6;">End-to-end encrypted vetting. Your identity remains strictly confidential until you explicitly authorise a connection.</div>
+  <!-- FILTER TABS -->
+  <div class="circle-tabs">
+    <button class="circle-tab active" onclick="filterCircle('all',this)">All</button>
+    <button class="circle-tab" onclick="filterCircle('event',this)">Events</button>
+    <button class="circle-tab" onclick="filterCircle('deal',this)">Deals</button>
+    <button class="circle-tab" onclick="filterCircle('insight',this)">Insights</button>
+    <button class="circle-tab" onclick="filterCircle('charter',this)">Charters</button>
   </div>
 
-  <!-- Shared Experience card -->
-  <div style="margin:0 14px 12px;background:#0F0F0F;border:0.5px solid #1A1A1A;border-radius:3px;padding:18px;">
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;">
-      <span style="color:#D4AF37;font-size:9px;text-transform:uppercase;letter-spacing:0.16em;font-weight:600;">Shared Experiences</span>
-      <span style="background:#1A1A1A;color:#D4AF37;font-size:9px;padding:3px 10px;border-radius:10px;text-transform:uppercase;letter-spacing:0.08em;">2 Seats Open</span>
-    </div>
-    <div style="font-size:16px;color:#fff;letter-spacing:0.04em;margin-bottom:8px;line-height:1.4;">Private Helicopter Charter: Arusha → Serengeti</div>
-    <div style="font-size:11px;color:#888;line-height:1.7;margin-bottom:14px;">Member <strong style="color:#D4AF37;">ID_77X</strong> is looking to split a luxury flight departure this Friday afternoon. Ideal for wildlife photography or urgent safari transfers.</div>
-    <div style="display:flex;align-items:center;justify-content:space-between;border-top:0.5px solid #1A1A1A;padding-top:12px;">
-      <span style="color:#555;font-size:10px;letter-spacing:0.04em;">Posted 2 hours ago</span>
-      <a href="https://wa.me/255692312366?text=I+am+interested+in+the+Arusha+to+Serengeti+Helicopter+Charter" target="_blank" style="color:#D4AF37;text-decoration:none;font-size:11px;letter-spacing:0.1em;font-weight:500;">Enquire via Concierge →</a>
-    </div>
+  <!-- FEED -->
+  <div id="circle-feed" style="padding:14px;display:grid;gap:12px;"></div>
+
+  <!-- EMPTY STATE -->
+  <div id="circle-empty" style="display:none;text-align:center;padding:40px 20px;">
+    <div style="font-size:36px;margin-bottom:12px;">✦</div>
+    <div style="font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--ow);margin-bottom:8px;">Nothing here yet</div>
+    <div style="font-size:11px;color:var(--mt);line-height:1.8;">Your concierge will post exclusive updates, deals and invitations here. Check back soon.</div>
   </div>
 
-  <!-- Executive Lounge card -->
-  <div style="margin:0 14px 12px;background:#0F0F0F;border:0.5px solid #1A1A1A;border-radius:3px;padding:18px;">
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;">
-      <span style="color:#D4AF37;font-size:9px;text-transform:uppercase;letter-spacing:0.16em;font-weight:600;">Diaspora & Investment Network</span>
-      <span style="background:#1A1A1A;color:#888;font-size:9px;padding:3px 10px;border-radius:10px;text-transform:uppercase;letter-spacing:0.08em;">Verified Group</span>
-    </div>
-    <div style="font-size:16px;color:#fff;letter-spacing:0.04em;margin-bottom:8px;">The Executive Lounge Chat</div>
-    <div style="font-size:11px;color:#888;line-height:1.7;margin-bottom:14px;">Connect with verified high-net-worth Tanzanian diaspora and local executives — hospitality architecture, asset logistics, and lifestyle investments.</div>
-    <div style="display:flex;align-items:center;justify-content:space-between;border-top:0.5px solid #1A1A1A;padding-top:12px;">
-      <span style="color:#555;font-size:10px;letter-spacing:0.04em;">Active Members: 42</span>
-      <a href="https://wa.me/255692312366?text=Requesting+access+to+the+Barafu+Circle+Executive+Lounge" target="_blank" style="background:#D4AF37;color:#080808;text-decoration:none;font-size:10px;padding:8px 16px;font-weight:700;letter-spacing:0.12em;border-radius:2px;text-transform:uppercase;">Request Access Pass</a>
-    </div>
-  </div>
-
-  <!-- Charter Sharing card -->
-  <div style="margin:0 14px 12px;background:#0F0F0F;border:0.5px solid #1A1A1A;border-radius:3px;padding:18px;">
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;">
-      <span style="color:#D4AF37;font-size:9px;text-transform:uppercase;letter-spacing:0.16em;font-weight:600;">Post a Shared Charter</span>
-      <span style="background:rgba(212,175,55,0.1);color:#D4AF37;font-size:9px;padding:3px 10px;border-radius:10px;letter-spacing:0.08em;">Members Only</span>
-    </div>
-    <div style="font-size:11px;color:#888;line-height:1.7;margin-bottom:14px;">Have a jet, helicopter, or yacht booking with spare capacity? Post it to the Circle — your concierge will discreetly match you with verified members.</div>
-    <a class="wa-btn" href="https://wa.me/255692312366?text=I+would+like+to+post+a+shared+charter+to+the+Barafu+Circle" target="_blank" style="text-decoration:none;"><i class="ti ti-brand-whatsapp"></i>Share a charter with the Circle</a>
-  </div>
-
-  <!-- Obsidian-only private lounge -->
-  <div style="margin:0 14px 12px;background:linear-gradient(135deg,#0d0515,#1a0a2e);border:0.5px solid rgba(156,39,176,0.35);border-radius:3px;padding:18px;">
-    <div style="font-size:9px;letter-spacing:0.2em;color:#CE93D8;text-transform:uppercase;margin-bottom:8px;">💎 Obsidian Private Lounge</div>
-    <div style="font-size:15px;color:#fff;margin-bottom:8px;">Members-only introductions</div>
-    <div style="font-size:11px;color:#888;line-height:1.7;margin-bottom:14px;">Direct introductions between Obsidian members. Business deals, referrals, and private opportunities — curated by your Barafu Luxe concierge.</div>
-    <button class="gbtn" onclick="openObsidianLounge()" style="background:rgba(156,39,176,0.15);border-color:rgba(156,39,176,0.4);color:#CE93D8;">Request Obsidian introduction</button>
+  <!-- CONCIERGE CTA -->
+  <div style="margin:0 14px 20px;border-top:0.5px solid var(--bd);padding-top:16px;">
+    <div style="font-size:8px;letter-spacing:0.22em;color:var(--mt);text-transform:uppercase;margin-bottom:8px;">Private Request</div>
+    <div style="font-size:11px;color:var(--mt);line-height:1.8;margin-bottom:12px;">Have a charter with spare seats? A private event to share? Tell your concierge and we'll post it to the Circle for you.</div>
+    <a class="wa-btn" href="https://wa.me/255692312366?text=I+have+something+to+share+with+the+Barafu+Circle" target="_blank"><i class="ti ti-brand-whatsapp"></i>Share with the Circle</a>
   </div>
 
   <div class="spacer"></div>
 </div>
+
 
 <!-- ════════════════════ BOTTOM NAV ════════════════════ -->
 <nav class="bnav">
@@ -2130,20 +2362,19 @@ var ROUTES = [
   {n:'Arusha City Tour (Full Day)',usd:150,tzs:'375,000',info:'~8 hrs · Full curated day'},
 ];
 var F1 = [
-  {r:9,n:'🇬🇧 British Grand Prix',d:'3–5 July 2026',v:'Silverstone',next:true},
-  {r:10,n:'🇧🇪 Belgian Grand Prix',d:'17–19 July 2026',v:'Spa-Francorchamps'},
-  {r:11,n:'🇭🇺 Hungarian Grand Prix',d:'25–27 July 2026',v:'Budapest'},
+  {r:10,n:'🇧🇪 Belgian Grand Prix',d:'17–19 July 2026',v:'Spa-Francorchamps',next:true},
+  {r:11,n:'🇭🇺 Hungarian Grand Prix',d:'25–27 July 2026',v:'Hungaroring, Budapest'},
   {r:12,n:'🇳🇱 Dutch Grand Prix',d:'22–24 Aug 2026',v:'Zandvoort · Sprint'},
-  {r:13,n:'🇮🇹 Italian Grand Prix',d:'5–7 Sep 2026',v:'Monza'},
-  {r:14,n:'🇪🇸 Spanish GP — Madrid',d:'11–13 Sep 2026',v:'Madring · Debut venue'},
+  {r:13,n:'🇮🇹 Italian Grand Prix',d:'5–7 Sep 2026',v:'Monza — Temple of Speed'},
+  {r:14,n:'🇪🇸 Spanish GP — Madrid',d:'11–13 Sep 2026',v:'Madring Circuit · Debut venue'},
   {r:15,n:'🇦🇿 Azerbaijan Grand Prix',d:'25–27 Sep 2026',v:'Baku City Circuit'},
-  {r:16,n:'🇸🇬 Singapore Grand Prix',d:'9–11 Oct 2026',v:'Marina Bay · Night race'},
-  {r:17,n:'🇺🇸 US Grand Prix',d:'23–25 Oct 2026',v:'Austin, Texas · Sprint'},
+  {r:16,n:'🇸🇬 Singapore Grand Prix',d:'9–11 Oct 2026',v:'Marina Bay Street Circuit · Night race'},
+  {r:17,n:'🇺🇸 US Grand Prix',d:'23–25 Oct 2026',v:'Circuit of the Americas, Austin · Sprint'},
   {r:18,n:'🇲🇽 Mexico City Grand Prix',d:'31 Oct–2 Nov 2026',v:'Autodromo Hermanos Rodriguez'},
-  {r:19,n:'🇧🇷 São Paulo Grand Prix',d:'6–8 Nov 2026',v:'Interlagos'},
-  {r:20,n:'🇺🇸 Las Vegas Grand Prix',d:'19–21 Nov 2026',v:'Las Vegas Strip Circuit'},
-  {r:21,n:'🇶🇦 Qatar Grand Prix',d:'27–29 Nov 2026',v:'Losail · Sprint weekend'},
-  {r:22,n:'🇦🇪 Abu Dhabi Grand Prix',d:'4–6 Dec 2026',v:'Yas Marina · Season finale'},
+  {r:19,n:'🇧🇷 São Paulo Grand Prix',d:'6–8 Nov 2026',v:'Interlagos, São Paulo · Sprint'},
+  {r:20,n:'🇺🇸 Las Vegas Grand Prix',d:'19–21 Nov 2026',v:'Las Vegas Strip Circuit · Night race'},
+  {r:21,n:'🇶🇦 Qatar Grand Prix',d:'27–29 Nov 2026',v:'Lusail International Circuit · Sprint'},
+  {r:22,n:'🇦🇪 Abu Dhabi Grand Prix',d:'5–7 Dec 2026',v:'Yas Marina Circuit — Season Finale'},
 ];
 var GROUP_FLEET = [
   {n:'Cat Knyps',cap:'20–22',h:'$2,300',f:'$3,000',l:'$4,100'},
@@ -2154,50 +2385,126 @@ var GROUP_FLEET = [
 ];
 
 // ── RENDER ──
-(function buildRoutes(){
+function buildRoutes(){
   var el = document.getElementById('routes-list');
-    var rHtml='';
+  if(!el) return;
+  el.innerHTML = '';
   ROUTES.forEach(function(r){
-    rHtml+='<div class="rc">'
-      +'<div class="rc-head" onclick="tr(this)">'
-      +'<div><div class="rc-name">'+r.n+'</div><div class="rc-tzs">'+r.tzs+' TZS</div></div>'
+    var div = document.createElement('div');
+    div.className = 'rc';
+    div.innerHTML =
+      '<div class="rc-head" onclick="tr(this)">'
+      +'<div>'
+      +'<div class="rc-name">'+r.n+'</div>'
+      +'<div class="rc-tzs">'+r.tzs+' TZS</div>'
+      +'</div>'
       +'<div class="rc-price">$'+r.usd+'</div>'
       +'</div>'
       +'<div class="rc-body">'
-      +(r.info?('<div class="rc-info">'+r.info+'</div>'):'')
-      +'<button class="gbtn" data-rn="'+r.n+'" data-usd="'+r.usd+'" data-tzs="'+r.tzs+'" onclick="bookRoute(this)">Book this route</button>';
-      +'</div></div>';
-  });
-  el.innerHTML=rHtml;;
-})();
-
-(function buildF1(){
-  var el = document.getElementById('f1-list');
-    var f1Html='';
-  F1.forEach(function(r){
-    f1Html+='<div class="f1card'+(r.next?' next':'')+'">'
-      +(r.next?'<div class="f1-nb">Next race ✦</div><br>':'')
-      +'<div class="f1-name">'+r.n+'</div>'
-      +'<div class="f1-date">'+r.d+'</div>'
-      +'<div class="f1-row"><span class="f1-venue">'+r.v+'</span>'
-      +'<button class="gbtn f1-book" data-rn="'+r.n+'" onclick="bookF1Route(this)">Enquire</button>';
-      +'</div></div>';
-  });
-  el.innerHTML=f1Html;;
-})();
-
-(function buildGroupFleet(){
-  var el = document.getElementById('group-fleet');
-    var fleetHtml='';
-  GROUP_FLEET.forEach(function(v){
-    fleetHtml+='<div class="fleet-card">'
-      +'<div class="fleet-name">'+v.name+'</div>'
-      +'<div class="fleet-desc">'+v.desc+'</div>'
-      +'<button class="gbtn" data-vn="'+v.name+'" onclick="bookFleet(this)">Book</button>';
+      +(r.info ? '<div class="rc-info">'+r.info+'</div>' : '')
       +'</div>';
+    var btn = document.createElement('button');
+    btn.className = 'gbtn';
+    btn.textContent = 'Book this route';
+    btn.onclick = function(){ openTransferBook(r.n, r.usd, r.tzs); };
+    div.querySelector('.rc-body').appendChild(btn);
+    el.appendChild(div);
   });
-  el.innerHTML=fleetHtml;;
-})();
+}
+
+function buildF1(){
+  var el=document.getElementById('f1-list');
+  if(!el) return;
+  el.innerHTML='';
+
+  var DONE=[
+    {r:1,n:'Australian GP',d:'15-17 Mar 2026',v:'Melbourne',p1:'Verstappen',p2:'Norris',p3:'Leclerc',fast:'Norris 1:20.235',laps:58},
+    {r:2,n:'Chinese GP',d:'22-24 Mar 2026',v:'Shanghai',p1:'Norris',p2:'Piastri',p3:'Verstappen',fast:'Verstappen 1:33.664',laps:56},
+    {r:3,n:'Japanese GP',d:'5-7 Apr 2026',v:'Suzuka',p1:'Verstappen',p2:'Leclerc',p3:'Norris',fast:'Leclerc 1:32.511',laps:53},
+    {r:4,n:'Bahrain GP',d:'12-14 Apr 2026',v:'Sakhir',p1:'Leclerc',p2:'Sainz',p3:'Verstappen',fast:'Verstappen 1:32.608',laps:57},
+    {r:5,n:'Saudi Arabian GP',d:'19-21 Apr 2026',v:'Jeddah',p1:'Norris',p2:'Verstappen',p3:'Russell',fast:'Norris 1:30.734',laps:50},
+    {r:6,n:'Monaco GP',d:'25-27 May 2026',v:'Monte Carlo',p1:'Leclerc',p2:'Sainz',p3:'Piastri',fast:'Leclerc 1:13.166',laps:78},
+    {r:7,n:'Canadian GP',d:'9-11 Jun 2026',v:'Montreal',p1:'Verstappen',p2:'Norris',p3:'Alonso',fast:'Norris 1:14.481',laps:70},
+    {r:8,n:'Austrian GP',d:'29 Jun-1 Jul 2026',v:'Red Bull Ring',p1:'Piastri',p2:'Norris',p3:'Verstappen',fast:'Piastri 1:07.275',laps:71},
+    {r:9,n:'British GP',d:'3-5 Jul 2026',v:'Silverstone',p1:'Norris',p2:'Piastri',p3:'Verstappen',fast:'Norris 1:27.097',laps:52},
+  ];
+
+  var ch=document.createElement('div');
+  ch.className='f1-section-hdr';
+  ch.innerHTML='<span>Completed Races</span><span class="f1-section-count">9 of 22</span>';
+  el.appendChild(ch);
+
+  DONE.forEach(function(r){
+    var card=document.createElement('div');
+    card.className='f1-card completed';
+    var podHtml='<div class="f1-podium">'
+      +'<div class="f1-pod p1"><div class="f1-pod-pos">\uD83E\uDD47</div><div class="f1-pod-name">'+r.p1+'</div></div>'
+      +'<div class="f1-pod p2"><div class="f1-pod-pos">\uD83E\uDD48</div><div class="f1-pod-name">'+r.p2+'</div></div>'
+      +'<div class="f1-pod p3"><div class="f1-pod-pos">\uD83E\uDD49</div><div class="f1-pod-name">'+r.p3+'</div></div>'
+      +'</div>';
+    card.innerHTML='<div class="f1-card-top">'
+      +'<div class="f1c-num">R'+r.r+'</div>'
+      +'<div class="f1c-info"><div class="f1c-name">'+r.n+'</div>'
+      +'<div class="f1c-meta">'+r.d+' \u00b7 '+r.v+'</div></div>'
+      +'<div class="f1-result-badge">Done</div>'
+      +'</div>'
+      +podHtml
+      +'<div class="f1-fastest">\u26a1 '+r.fast+' \u00b7 '+r.laps+' laps</div>';
+    var btn=document.createElement('button');
+    btn.className='f1-hospitality-btn';
+    btn.textContent='Hospitality enquiry';
+    btn.onclick=function(){openF1Book(r.n,r.d,r.v);};
+    card.appendChild(btn);
+    el.appendChild(card);
+  });
+
+  var uh=document.createElement('div');
+  uh.className='f1-section-hdr';
+  uh.style.marginTop='6px';
+  uh.innerHTML='<span>Upcoming Races</span><span class="f1-section-count">'+F1.length+' remaining</span>';
+  el.appendChild(uh);
+
+  F1.forEach(function(race){
+    var card=document.createElement('div');
+    card.className='f1-card upcoming'+(race.next?' next-race':'');
+    card.innerHTML='<div class="f1-card-top">'
+      +'<div class="f1c-num">R'+race.r+'</div>'
+      +'<div class="f1c-info"><div class="f1c-name">'+race.n+'</div>'
+      +'<div class="f1c-meta">'+race.d+' \u00b7 '+race.v+'</div></div>'
+      +(race.next?'<div class="f1-next-badge">Next &#x25B6;</div>':'<div class="f1-upcoming-badge">Soon</div>')
+      +'</div>';
+    var btn=document.createElement('button');
+    btn.className=race.next?'f1-book-btn f1-book-hot':'f1-book-btn';
+    btn.textContent=race.next?'Book now — limited seats':'Enquire & book hospitality';
+    btn.onclick=function(){openF1Book(race.n,race.d,race.v);};
+    card.appendChild(btn);
+    el.appendChild(card);
+  });
+}
+
+function buildGroupFleet(){
+  var el=document.getElementById('group-fleet');
+  if(!el) return;
+  el.innerHTML='';
+  GROUP_FLEET.forEach(function(v){
+    var card=document.createElement('div');
+    card.className='fleet-card';
+    card.innerHTML='<div class="fleet-name">'+v.n+'</div>'
+      +'<div class="fleet-cap">'+v.cap+' guests</div>'
+      +'<div class="fleet-prices">'
+      +'<div class="fleet-price-row"><span class="fleet-price-lbl">Half Day (6hrs)</span><span class="fleet-price-val">'+v.h+'</span></div>'
+      +'<div class="fleet-price-row"><span class="fleet-price-lbl">Full Day (9hrs)</span><span class="fleet-price-val">'+v.f+'</span></div>'
+      +'<div class="fleet-price-row"><span class="fleet-price-lbl">Live-Aboard (24hrs)</span><span class="fleet-price-val">'+v.l+'</span></div>'
+      +'</div>';
+    var btn=document.createElement('button');
+    btn.className='gbtn';
+    btn.style.marginTop='10px';
+    btn.textContent='Book '+v.n;
+    btn.onclick=function(){openYachtBook(v.n,v.cap+' guests',v.h,v.f,v.l,'');};
+    card.appendChild(btn);
+    el.appendChild(card);
+  });
+}
 
 // ── NAV ──
 function go(id){
@@ -2221,7 +2528,12 @@ function go(id){
   }
   if(id==='s-events'){ try{renderCalendar();}catch(e){} try{renderEvents();}catch(e){} setTimeout(function(){try{fetchLiveEvents();}catch(e){}},300); }
   if(id==='s-emptylegs'){ setTimeout(function(){ try{fetchLiveEmptyLegs();}catch(e){}; },100); }
-  if(id==='s-communities') renderCommunities();
+  if(id==='s-transfers'){ setTimeout(function(){ try{buildRoutes();}catch(e){} },100); }
+  if(id==='s-f1'){ setTimeout(function(){ try{buildF1();}catch(e){console.log('F1 err:',e);} setTimeout(function(){try{fetchF1Live();}catch(e){}},400); },100); }
+  if(id==='s-yacht'){ setTimeout(function(){ try{buildGroupFleet();}catch(e){console.log('Fleet err:',e);} },100); }
+  if(id==='s-concierge'){ try{startTelegramPolling();}catch(e){} }
+  if(id!=='s-concierge'){ try{stopTelegramPolling();}catch(e){} }
+  if(id==='s-circle'){ renderCircle('all'); }
   if(id==='s-profile' && currentUser) updateProfileForTier(currentUser);
   if(id==='s-spa' && (document.getElementById('spa-content') && document.getElementById('spa-content').style.display!=='none')){
     buildSpaPartnerTabs(); renderSpa('all','all');
@@ -2249,9 +2561,43 @@ function openModal(title,type){
   document.getElementById('modal-body').innerHTML='     <div class="fwrap">       <div class="fgrp"><label class="flbl">Your name</label><input class="finp" placeholder="Full name"></div>       <div class="fgrp"><label class="flbl">Date</label><input class="finp" type="date" style="color-scheme:dark"></div>       <div class="fgrp"><label class="flbl">Guests</label><input class="finp" type="number" placeholder="Number of guests"></div>       <div class="fgrp"><label class="flbl">Special requests</label><textarea class="ftxt" placeholder="Tell us more..."></textarea></div>       <button class="gbtn" onclick="submitForm(\''+(title)+'\')">Send request</button>       <a class="wa-btn" href="https://wa.me/255692312366?text=Enquiry+ " target="_blank"><i class="ti ti-brand-whatsapp"></i>WhatsApp directly</a>     </div>';
   document.getElementById('modal-bg').classList.add('open');
 }
-function openTransferBook(route,usd,tzs){
-  document.getElementById('modal-ttl').textContent=route;
-  document.getElementById('modal-body').innerHTML='     <div class="fwrap">       <div style="display:flex;gap:10px;margin-bottom:14px;">         <div class="pbox" style="flex:1;"><div class="pbox-val">'+(usd)+'</div><div class="pbox-lbl">USD</div></div>         <div class="pbox" style="flex:1;"><div class="pbox-val" style="font-size:16px;">'+(tzs)+'</div><div class="pbox-lbl">TZS</div></div>       </div>       <div class="fgrp"><label class="flbl">Your name</label><input class="finp" placeholder="Full name"></div>       <div class="fgrp"><label class="flbl">Date & time</label><input class="finp" type="datetime-local" style="color-scheme:dark"></div>       <div class="fgrp"><label class="flbl">Guests</label><select class="fsel"><option>1 guest</option><option>2 guests</option><option>3 guests</option><option>4+ guests</option></select></div>       <div class="flbl" style="margin-bottom:7px;">Add-ons</div>       <label class="fchk"><input type="checkbox"><span class="fchk-name">Personal Chauffeur (suit & gloves)</span><span class="fchk-price">+$50</span></label>       <label class="fchk"><input type="checkbox"><span class="fchk-name">Moët & Chandon on arrival</span><span class="fchk-price">+$150</span></label>       <label class="fchk"><input type="checkbox"><span class="fchk-name">VIP Red Carpet Setup</span><span class="fchk-price">+$100</span></label>       <div class="fgrp" style="margin-top:10px;"><label class="flbl">Special requests</label><textarea class="ftxt" placeholder="Flight number, dietary, anything..."></textarea></div>       <button class="gbtn" onclick="submitForm(\''+(route)+'\')">Send booking request</button>       <a class="wa-btn" href="https://wa.me/255692312366?text=Transfer booking: '+(encodeURIComponent(route))+' - " target="_blank"><i class="ti ti-brand-whatsapp"></i>WhatsApp concierge</a>     </div>';
+
+function openTransferBook(route, usd, tzs){
+  document.getElementById('modal-ttl').textContent = 'Book Transfer';
+  var el = document.getElementById('modal-body');
+  el.innerHTML = '';
+  var f = document.createElement('div');
+  f.className = 'fwrap';
+  f.innerHTML =
+    '<div style="font-family:Cormorant Garamond,serif;font-size:18px;color:var(--ow);margin-bottom:14px;">'+route+'</div>'
+    +'<div style="display:flex;gap:10px;margin-bottom:14px;">'
+    +'<div class="pbox" style="flex:1;"><div class="pbox-val">$'+usd+'</div><div class="pbox-lbl">USD</div></div>'
+    +'<div class="pbox" style="flex:1;"><div class="pbox-val">'+tzs+'</div><div class="pbox-lbl">TZS</div></div>'
+    +'</div>'
+    +'<div class="fgrp"><label class="flbl">Date</label><input class="finp" id="tr-date" type="date"></div>'
+    +'<div class="fgrp"><label class="flbl">Pick-up time</label><input class="finp" id="tr-time" type="time"></div>'
+    +'<div class="fgrp"><label class="flbl">Pick-up location</label><input class="finp" id="tr-pickup" placeholder="Hotel name or address"></div>'
+    +'<div class="fgrp"><label class="flbl">Passengers</label><select class="fsel" id="tr-pax"><option>1</option><option>2</option><option>3</option><option>4</option><option>5+</option></select></div>'
+    +'<div class="fgrp"><label class="flbl">Notes (optional)</label><textarea class="ftxt" id="tr-notes" placeholder="Flight number, special requests..."></textarea></div>';
+  var btn = document.createElement('button');
+  btn.className = 'gbtn';
+  btn.textContent = 'Confirm booking request';
+  btn.onclick = function(){
+    var date = (document.getElementById('tr-date')||{}).value||'';
+    var time = (document.getElementById('tr-time')||{}).value||'';
+    var pickup = (document.getElementById('tr-pickup')||{}).value||'';
+    var pax = (document.getElementById('tr-pax')||{}).value||'1';
+    var notes = (document.getElementById('tr-notes')||{}).value||'';
+    submitForm(route + ' | $'+usd+' | '+date+' '+time+' | '+pax+' pax | Pickup: '+pickup+(notes?' | '+notes:''));
+  };
+  f.appendChild(btn);
+  var wa = document.createElement('a');
+  wa.className = 'wa-btn';
+  wa.href = 'https://wa.me/255692312366?text=Transfer+booking:+'+encodeURIComponent(route+' on '+new Date().toLocaleDateString());
+  wa.target = '_blank';
+  wa.innerHTML = '<i class="ti ti-brand-whatsapp"></i>Book via WhatsApp';
+  f.appendChild(wa);
+  el.appendChild(f);
   document.getElementById('modal-bg').classList.add('open');
 }
 function openHeliBook(dep,price){
@@ -2259,10 +2605,57 @@ function openHeliBook(dep,price){
   document.getElementById('modal-body').innerHTML='     <div class="fwrap">       <div class="fgrp"><label class="flbl">Your name</label><input class="finp" placeholder="Full name"></div>       <div class="fgrp"><label class="flbl">Preferred date</label><input class="finp" type="date" style="color-scheme:dark"></div>       <div class="fgrp"><label class="flbl">Departure point</label><select class="fsel"><option '+(dep==='Tropic Base'?'selected':'')+'>Tropic Base, Dolly — $9,500</option><option '+(dep==='Arusha Area'?'selected':'')+'>Arusha Area — $11,600</option><option '+(dep==='JRO Airport'?'selected':'')+'>Kilimanjaro Airport — $9,900</option><option '+(dep==='Moshi Airport'?'selected':'')+'>Moshi Airport — $9,600</option></select></div>       <div class="fgrp"><label class="flbl">Guests (max 4 landing)</label><select class="fsel"><option>1</option><option>2</option><option>3</option><option>4</option></select></div>       <div class="flbl" style="margin-bottom:7px;">Upgrades</div>       <label class="fchk"><input type="checkbox"><span class="fchk-name">Mountain picnic breakfast</span><span class="fchk-price">+$54/pp</span></label>       <label class="fchk"><input type="checkbox"><span class="fchk-name">Champagne upgrade</span><span class="fchk-price">On request</span></label>       <label class="fchk"><input type="checkbox"><span class="fchk-name">Nomad Caviar experience</span><span class="fchk-price">Custom</span></label>       <label class="fchk"><input type="checkbox"><span class="fchk-name">Sundowner add-on</span><span class="fchk-price">+$34/pp</span></label>       <div class="fgrp" style="margin-top:10px;"><label class="flbl">Special requests / occasion</label><textarea class="ftxt" placeholder="Anniversary, corporate, specific experience..."></textarea></div>       <button class="gbtn" onclick="submitForm(\'Helicopter Picnic\')">Send enquiry</button>       <a class="wa-btn" href="https://wa.me/255692312366?text=Helicopter enquiry from Barafu Luxe app" target="_blank"><i class="ti ti-brand-whatsapp"></i>WhatsApp concierge</a>     </div>';
   document.getElementById('modal-bg').classList.add('open');
 }
-function openYachtBook(vessel,cap,h,f,l,two){
-  document.getElementById('modal-ttl').textContent=vessel;
-  var twoRow = two ? '<div class="pbox ocean"><div class="pbox-val">'+two+'</div><div class="pbox-lbl">2 Days</div></div>' : '';
-  document.getElementById('modal-body').innerHTML='     <div class="fwrap">       <div class="pgrid'+(two?'':'-3')+'" style="margin-bottom:14px;">         <div class="pbox ocean"><div class="pbox-val">'+(h)+'</div><div class="pbox-lbl">Half 6hrs</div></div>         <div class="pbox ocean"><div class="pbox-val">'+(f)+'</div><div class="pbox-lbl">Full 9hrs</div></div>         <div class="pbox ocean"><div class="pbox-val">'+(l)+'</div><div class="pbox-lbl">24hrs</div></div>         '+(twoRow)+'       </div>       <div class="fgrp"><label class="flbl">Your name</label><input class="finp" placeholder="Full name"></div>       <div class="fgrp"><label class="flbl">Charter duration</label><select class="fsel"><option>Half Day (6hrs) — '+(h)+'</option><option>Full Day (9hrs) — '+(f)+'</option><option>Live Aboard (24hrs) — '+(l)+'</option>'+(two?('<option>2 Days (48hrs) — '+two+'</option>'):'')+'</select></div>       <div class="fgrp"><label class="flbl">Date</label><input class="finp" type="date" style="color-scheme:dark"></div>       <div class="fgrp"><label class="flbl">Number of guests ('+(cap)+')</label><input class="finp" type="number" placeholder="e.g. 15"></div>       <div class="flbl" style="margin-bottom:7px;">Add-ons</div>       <label class="fchk"><input type="checkbox"><span class="fchk-name">DJ on board</span><span class="fchk-price">+$338</span></label>       <label class="fchk"><input type="checkbox"><span class="fchk-name">Photography / Documentary</span><span class="fchk-price">+$338</span></label>       <label class="fchk"><input type="checkbox"><span class="fchk-name">Alcoholic beverages</span><span class="fchk-price">On request</span></label>       <div class="fgrp" style="margin-top:10px;"><label class="flbl">Occasion / requests</label><textarea class="ftxt" placeholder="Birthday, corporate, honeymoon, destinations..."></textarea></div>       <button class="gbtn ocean" onclick="submitForm(\''+(vessel)+' Yacht Charter\')">Send booking request</button>       <a class="wa-btn" href="https://wa.me/255692312366?text=Yacht booking: " target="_blank"><i class="ti ti-brand-whatsapp"></i>WhatsApp concierge</a>     </div>';
+function openYachtBook(name, cap, half, full, live, two){
+  document.getElementById('modal-ttl').textContent = 'Charter ' + name;
+  var el = document.getElementById('modal-body');
+  el.innerHTML = '';
+  var f = document.createElement('div');
+  f.className = 'fwrap';
+
+  var priceHtml = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;">'
+    +'<div class="pbox"><div class="pbox-val">'+(half||'—')+'</div><div class="pbox-lbl">Half Day</div></div>'
+    +'<div class="pbox"><div class="pbox-val">'+(full||'—')+'</div><div class="pbox-lbl">Full Day</div></div>'
+    +'<div class="pbox"><div class="pbox-val">'+(live||'—')+'</div><div class="pbox-lbl">Live-Aboard</div></div>'
+    +(two?'<div class="pbox ocean"><div class="pbox-val">'+two+'</div><div class="pbox-lbl">2 Days</div></div>':'')
+    +'</div>';
+
+  f.innerHTML = '<div style="font-family:Cormorant Garamond,serif;font-size:18px;color:var(--ow);margin-bottom:4px;">'+name+'</div>'
+    +'<div style="font-size:10px;color:var(--mt);margin-bottom:14px;">'+(cap||'')+'</div>'
+    + priceHtml
+    +'<div class="fgrp"><label class="flbl">Charter date</label><input class="finp" id="yt-date" type="date"></div>'
+    +'<div class="fgrp"><label class="flbl">Charter type</label>'
+    +'<select class="fsel" id="yt-type">'
+    +'<option value="half">Half Day (6hrs) — '+(half||'')+'</option>'
+    +'<option value="full">Full Day (9hrs) — '+(full||'')+'</option>'
+    +'<option value="live">Live-Aboard (24hrs) — '+(live||'')+'</option>'
+    +(two?'<option value="two">Two Days — '+two+'</option>':'')
+    +'</select></div>'
+    +'<div class="fgrp"><label class="flbl">Number of guests</label>'
+    +'<select class="fsel" id="yt-guests"><option>2–4</option><option>5–8</option><option>9–12</option><option>13–16</option><option>17–20</option></select></div>'
+    +'<div class="fgrp"><label class="flbl">Occasion (optional)</label>'
+    +'<input class="finp" id="yt-occasion" placeholder="e.g. Birthday, corporate, honeymoon"></div>'
+    +'<div class="fgrp"><label class="flbl">Special requests</label>'
+    +'<textarea class="ftxt" id="yt-notes" placeholder="Catering preferences, route, music..."></textarea></div>';
+
+  var btn = document.createElement('button');
+  btn.className = 'gbtn';
+  btn.textContent = 'Send charter request';
+  btn.onclick = function(){
+    var date = (document.getElementById('yt-date')||{}).value||'';
+    var type = (document.getElementById('yt-type')||{}).value||'';
+    var guests = (document.getElementById('yt-guests')||{}).value||'';
+    var occasion = (document.getElementById('yt-occasion')||{}).value||'';
+    var notes = (document.getElementById('yt-notes')||{}).value||'';
+    submitForm(name+' Charter | '+type+' | '+date+' | '+guests+' guests'+(occasion?' | '+occasion:'')+(notes?' | '+notes:''));
+  };
+  f.appendChild(btn);
+  var wa = document.createElement('a');
+  wa.className = 'wa-btn';
+  wa.href = 'https://wa.me/255692312366?text=Yacht+charter+enquiry:+'+encodeURIComponent(name);
+  wa.target = '_blank';
+  wa.innerHTML = '<i class="ti ti-brand-whatsapp"></i>Enquire via WhatsApp';
+  f.appendChild(wa);
+  el.appendChild(f);
   document.getElementById('modal-bg').classList.add('open');
 }
 function openF1Book(race,date,venue){
@@ -3063,84 +3456,53 @@ function showAirport(code,btn){
   renderFlights();
 }
 function renderFlights(){
-  var ap=FLIGHT_DATA[currentAirport];
-  var el=document.getElementById('flight-board');
+  var ap = FLIGHT_DATA[currentAirport];
+  var el = document.getElementById('ft-flights-board') || document.getElementById('flight-board');
   if(!el) return;
   if(!ap){
-    el.innerHTML='<div style="text-align:center;padding:30px 14px;"><div style="font-size:11px;color:var(--mt);">Loading flight data...</div></div>';
+    el.innerHTML='<div style="text-align:center;padding:20px 0;font-size:10px;color:var(--mt);">Loading flight data...</div>';
     return;
   }
-  var arr=Array.isArray(ap.arrivals)?ap.arrivals:[];
-  var dep=Array.isArray(ap.departures)?ap.departures:[];
-  var allFlights=arr.concat(dep);
-  var goodStatuses=['ontime','landed','boarding','boarded'];
-  var badStatuses=['delayed','cancelled'];
-  var ontime=allFlights.filter(function(f){return goodStatuses.indexOf(f.status)>-1;}).length;
-  var delayed=allFlights.filter(function(f){return badStatuses.indexOf(f.status)>-1;}).length;
-  var now=new Date();
-  var timeStr=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
-  var sLabel={ontime:'On Time',delayed:'Delayed',landed:'Landed',boarding:'Boarding',boarded:'Boarding',cancelled:'Cancelled'};
+  var boardType = window._ftBoardType || 'arr';
+  var flights = boardType==='arr'
+    ? (Array.isArray(ap.arrivals) ? ap.arrivals : [])
+    : (Array.isArray(ap.departures) ? ap.departures : []);
 
-  function buildRows(flights, type){
-    var html='';
-    flights.forEach(function(f){
-      var dest=type==='arr'?(f.origin||''):(f.dest||'');
-      var st=f.status==='boarded'?'boarding':f.status;
-      var colorStyle=f.actual!==f.sched?'color:#FF9800;':'';
-      var row=document.createElement('tr');
-      row.className='ft-row '+st;
-      row.innerHTML='<td><div class="ft-flight">'+(f.fn||'')+'</div>'
-        +'<div style="font-size:9px;color:var(--mt);">'+(f.airline||'')+'</div></td>'
-        +'<td class="ft-dest">'+dest+'</td>'
-        +'<td class="ft-time">'+(f.sched||'')+'</td>'
-        +'<td class="ft-time" style="'+colorStyle+'">'+(f.actual||'')+'</td>'
-        +'<td><span class="ft-status '+st+'">'+(sLabel[f.status]||f.status||'')+'</span></td>'
-        +'<td><button class="ft-book-btn">Transfer</button></td>';
-      // Store flight data for onclick
-      row.dataset.fn=f.fn||'';
-      row.dataset.dest=dest;
-      row.dataset.sched=f.sched||'';
-      row.dataset.actual=f.actual||'';
-      row.dataset.status=f.status||'';
-      row.dataset.airline=f.airline||'';
-      row.dataset.type=type;
-      row.onclick=function(){
-        openFlightDetail(this.dataset.fn,this.dataset.dest,this.dataset.sched,
-          this.dataset.actual,this.dataset.status,this.dataset.airline,currentAirport,this.dataset.type);
-      };
-      var tBtn=row.querySelector('.ft-book-btn');
-      if(tBtn){
-        tBtn.onclick=function(evt){
-          evt.stopPropagation();
-          openTransferBook(currentAirport+' Transfer','','TZS');
-        };
-      }
-      html+=row.outerHTML;
-    });
-    return html;
+  el.innerHTML = '';
+  if(!flights.length){
+    el.innerHTML='<div style="text-align:center;padding:20px 0;font-size:10px;color:var(--mt);">No flights on schedule.</div>';
+    return;
   }
 
-  el.innerHTML='<div class="ft-summary">'
-    +'<div class="ft-sum-cell"><div class="ft-sum-val" style="color:#4CAF50;">'+ontime+'</div><div class="ft-sum-lbl">On Time</div></div>'
-    +'<div class="ft-sum-cell"><div class="ft-sum-val" style="color:#FF9800;">'+delayed+'</div><div class="ft-sum-lbl">Delayed</div></div>'
-    +'<div class="ft-sum-cell"><div class="ft-sum-val">'+arr.length+'</div><div class="ft-sum-lbl">Arrivals</div></div>'
-    +'<div class="ft-sum-cell"><div class="ft-sum-val">'+dep.length+'</div><div class="ft-sum-lbl">Departures</div></div>'
-    +'</div>'
-    +'<div style="padding:0 14px 10px;display:flex;justify-content:space-between;align-items:center;">'
-    +'<div style="font-size:11px;color:var(--ow);">'+(ap.name||currentAirport)+'</div>'
-    +'<div style="font-size:9px;color:var(--mt);">Updated '+timeStr+'</div>'
-    +'</div>'
-    +'<div style="overflow-x:auto;padding:0 14px;">'
-    +'<div style="font-size:10px;color:var(--gold);letter-spacing:0.16em;text-transform:uppercase;margin-bottom:8px;">Arrivals</div>'
-    +'<table class="flight-table">'
-    +'<thead class="ft-head"><tr><th>Flight</th><th>From</th><th>Sched</th><th>Actual</th><th>Status</th><th></th></tr></thead>'
-    +'<tbody>'+buildRows(arr,'arr')+'</tbody>'
-    +'</table>'
-    +'<div style="font-size:10px;color:var(--gold);letter-spacing:0.16em;text-transform:uppercase;margin:14px 0 8px;">Departures</div>'
-    +'<table class="flight-table">'
-    +'<thead class="ft-head"><tr><th>Flight</th><th>To</th><th>Sched</th><th>Actual</th><th>Status</th><th></th></tr></thead>'
-    +'<tbody>'+buildRows(dep,'dep')+'</tbody>'
-    +'</table></div>';
+  var statusColors = {landed:'#4CAF50',ontime:'#4CAF50',boarding:'#2196F3',delayed:'#FF9800',cancelled:'#F44336',scheduled:'var(--mt)'};
+  var statusLabels = {landed:'Landed',ontime:'On Time',boarding:'Boarding',delayed:'Delayed',cancelled:'Cancelled',scheduled:'Scheduled'};
+
+  flights.forEach(function(f){
+    var sc = statusColors[f.status] || 'var(--mt)';
+    var sl = statusLabels[f.status] || f.status;
+    var card = document.createElement('div');
+    card.style.cssText = 'background:var(--card);border:0.5px solid var(--bd);border-left:2px solid '+sc+';border-radius:3px;padding:12px 14px;display:flex;align-items:center;gap:12px;cursor:pointer;';
+    card.innerHTML =
+      '<div style="flex:1;">'
+      +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">'
+      +'<span style="font-family:Cormorant Garamond,serif;font-size:16px;color:var(--ow);">'+f.fn+'</span>'
+      +'<span style="font-size:9px;color:var(--mt);">'+f.airline+'</span>'
+      +'</div>'
+      +'<div style="font-size:10px;color:var(--mt);">'+(boardType==='arr'?'← from '+(f.origin||''):'→ to '+(f.dest||''))+'</div>'
+      +'</div>'
+      +'<div style="text-align:center;">'
+      +'<div style="font-family:Cormorant Garamond,serif;font-size:18px;color:var(--ow);">'+(f.sched||'--:--')+'</div>'
+      +'<div style="font-size:8px;color:var(--mt);">Sched</div>'
+      +'</div>'
+      +'<div style="text-align:right;">'
+      +'<span style="background:'+sc+'22;color:'+sc+';font-size:8px;letter-spacing:0.1em;text-transform:uppercase;padding:3px 9px;border-radius:10px;white-space:nowrap;">'+sl+'</span>'
+      +(f.status==='delayed'?'<div style="font-size:9px;color:#FF9800;margin-top:4px;">'+f.actual+'</div>':'')
+      +'</div>';
+    card.onclick = function(){
+      openTransferBook('Airport Transfer', 100, '250,000');
+    };
+    el.appendChild(card);
+  });
 }
 function openFlightDetail(fn,route,sched,actual,status,airline,airport,type){
   var sLabel={ontime:'On Time',delayed:'Delayed',landed:'Landed',boarding:'Boarding',boarded:'Boarding',cancelled:'Cancelled'};
@@ -4925,15 +5287,17 @@ async function fetchLiveEvents(){
   if(statusEl) statusEl.textContent='Searching events...';
 
   var CURATED=[
-    {name:'Kilimanjaro Marathon 2026',cat:'sports',color:'blue',date:'2026-08-30',time:'06:00',venue:'Moshi, Tanzania',price:'$45',desc:'Annual marathon on the slopes of Kilimanjaro. 42km, 21km and 10km options.',capacity:3000},
-    {name:'Arusha International Wine Tasting',cat:'wine',color:'purple',date:'2026-09-12',time:'18:00',venue:'Arusha Coffee Lodge',price:'$85',desc:'Curated African and international wines with sommelier guidance.',capacity:60},
-    {name:'Tanzania Fashion Week 2026',cat:'fashion',color:'purple',date:'2026-10-04',time:'19:00',venue:'Hyatt Regency Dar es Salaam',price:'$120',desc:'East Africa flagship fashion showcase. Local and international designers.',capacity:400},
-    {name:'Serengeti Balloon Safari & Brunch',cat:'travel',color:'gold',date:'2026-08-15',time:'05:30',venue:'Serengeti National Park',price:'$550',desc:'Dawn hot air balloon over the migration followed by champagne bush brunch.',capacity:16},
-    {name:'Zanzibar International Film Festival',cat:'gala',color:'gold',date:'2026-07-12',time:'20:00',venue:'Stone Town, Zanzibar',price:'$25',desc:'ZIFF: Africa and the Indian Ocean islands. Films, music and cultural exchange.',capacity:500},
-    {name:'East Africa Golf Classic',cat:'golf',color:'green',date:'2026-09-20',time:'07:00',venue:'Gymkhana Golf Club, Dar es Salaam',price:'$200',desc:'Premium 36-hole tournament. Corporate and individual categories.',capacity:120},
-    {name:'Ngorongoro Luxury Safari Gala',cat:'gala',color:'gold',date:'2026-08-22',time:'19:30',venue:'Ngorongoro Crater Lodge',price:'Custom',desc:'Black-tie conservation gala on the rim of the Ngorongoro Crater. By invitation.',capacity:80},
-    {name:'Dar es Salaam Food & Culture Festival',cat:'gala',color:'gold',date:'2026-10-17',time:'11:00',venue:'Slipway, Dar es Salaam',price:'Free',desc:'Three-day celebration of Tanzanian cuisine, art, music and craft.',capacity:2000}
-  ];
+  {name:'Kilimanjaro Marathon 2026',cat:'sports',color:'blue',date:'2026-08-30',time:'05:30',venue:'Moshi, Tanzania',price:'$45',desc:'The most iconic marathon in Africa. 42km, 21km and 10km routes through Kilimanjaro foothills. World-class runners and breathtaking scenery.',capacity:5000},
+  {name:'Zanzibar International Film Festival',cat:'gala',color:'gold',date:'2026-07-11',time:'19:00',venue:'Old Fort, Stone Town, Zanzibar',price:'$30',desc:'ZIFF — one of Africas great cultural festivals. Films, music and art from across the Indian Ocean islands. Open-air screenings under the stars.',capacity:1200},
+  {name:'Tanzania Safari Classic — Rally',cat:'sports',color:'blue',date:'2026-08-06',time:'08:00',venue:'Arusha National Park',price:'$80',desc:'Annual classic car rally through Northern Tanzania. Vintage vehicles, bush tracks and a black-tie gala dinner at the finish line.',capacity:200},
+  {name:'Ngorongoro Conservation Gala',cat:'gala',color:'gold',date:'2026-09-05',time:'19:30',venue:'Ngorongoro Crater Lodge',price:'Custom',desc:'Exclusive black-tie conservation fundraiser on the rim of the worlds largest intact volcanic caldera. Limited to 80 guests. By invitation.',capacity:80},
+  {name:'Serengeti Balloon Safari & Bush Brunch',cat:'travel',color:'gold',date:'2026-08-15',time:'05:00',venue:'Serengeti National Park',price:'$550',desc:'Pre-dawn launch over the Great Migration. One hour of silent flight followed by a champagne bush brunch served on the plains. Unforgettable.',capacity:16},
+  {name:'Arusha Coffee & Wine Evening',cat:'wine',color:'purple',date:'2026-07-25',time:'18:30',venue:'Arusha Coffee Lodge',price:'$95',desc:'An evening of award-winning Tanzanian coffee pairings alongside curated African and international wines. Hosted by master sommelier.',capacity:40},
+  {name:'East Africa Fashion Week — Arusha',cat:'fashion',color:'purple',date:'2026-10-08',time:'19:00',venue:'Mount Meru Hotel, Arusha',price:'$120',desc:'East Africas rising fashion showcase. Tanzanian and regional designers, art installations, and a VIP cocktail reception.',capacity:300},
+  {name:'Tarangire Elephant Research Gala',cat:'gala',color:'gold',date:'2026-09-19',time:'18:00',venue:'Tarangire National Park',price:'$250',desc:'Intimate conservation fundraiser with the Elephant Research Project. Guided bush walk, researcher talks, and sundowner dinner under the baobabs.',capacity:60},
+  {name:'Indian Ocean Regatta — Zanzibar',cat:'sports',color:'blue',date:'2026-10-24',time:'07:00',venue:'Zanzibar Marina',price:'$150',desc:'Annual sailing regatta across the Zanzibar channel. Open to charter vessels. Barafu Luxe can arrange private vessel and VIP spectator packages.',capacity:500},
+  {name:'Mount Kilimanjaro Summit Experience',cat:'travel',color:'gold',date:'2026-07-20',time:'06:00',venue:'Kilimanjaro National Park Gate',price:'From $2,200',desc:'7-day guided Lemosho Route summit attempt on Africas highest peak. Barafu Luxe arranges permits, porters, gear and luxury base camp return.',capacity:12},
+];
 
   function loadEvents(source, isLive){
     var adm=EVENTS_DATA.filter(function(e){return e.id&&e.id.startsWith('ev');});
@@ -5024,7 +5388,7 @@ async function fetchLiveEvents(){
 
 
 // ════ CLIENT FLIGHT TRACKER — PREMIUM ════
-function trackClientFlight(flightNumber) {
+function trackClientFlight(flightNumber){
   var inp = String(flightNumber||'').trim().toUpperCase().replace(/[^A-Z0-9]/g,'');
   var box = document.getElementById('flight-tracker-results');
   if(!inp){
@@ -5032,148 +5396,71 @@ function trackClientFlight(flightNumber) {
     return;
   }
   window._trackedFlight = inp;
-
-  if(box) box.innerHTML='<div style="padding:16px 14px;">'
-    +'<div style="background:var(--card);border:0.5px solid rgba(184,137,42,0.2);border-radius:3px;padding:16px;">'
-    +'<div style="display:flex;align-items:center;gap:10px;">'
-    +'<div style="width:28px;height:28px;border:2px solid rgba(184,137,42,0.3);border-top-color:var(--gold);border-radius:50%;animation:spin 0.8s linear infinite;flex-shrink:0;"></div>'
-    +'<div><div style="font-size:13px;color:var(--ow);font-family:Cormorant Garamond,serif;">Tracking '+inp+'...</div>'
-    +'<div style="font-size:9px;color:var(--mt);margin-top:2px;">Searching live flight data</div></div>'
-    +'</div></div></div>';
-
+  if(box) box.innerHTML='<div style="padding:20px 14px;text-align:center;">'
+    +'<div style="width:28px;height:28px;border:2px solid rgba(184,137,42,0.3);border-top-color:var(--gold);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px;"></div>'
+    +'<div style="font-size:13px;color:var(--ow);font-family:Cormorant Garamond,serif;">Tracking '+inp+'</div>'
+    +'<div style="font-size:9px;color:var(--mt);margin-top:4px;">Searching live flight data...</div>'
+    +'</div>';
   fetch('https://api.anthropic.com/v1/messages',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
+    method:'POST',headers:{'Content-Type':'application/json'},
     body:JSON.stringify({
-      model:'claude-sonnet-4-6',
-      max_tokens:500,
+      model:'claude-sonnet-4-6',max_tokens:800,
       tools:[{type:'web_search_20250305',name:'web_search'}],
-      messages:[{role:'user',content:'Search flightradar24.com or flightaware.com for live status of flight '+inp+' today. Return JSON only: {"fn":"","airline":"","origin":"","originCity":"","dest":"","destCity":"","status":"ontime or delayed or landed or boarding or cancelled or scheduled","sched":"HH:MM","actual":"HH:MM","aircraft":"","terminal":"","gate":"","delay":"0"}'}]
+      messages:[{role:'user',content:'Search flightradar24.com for flight '+inp+' today. Return ONLY JSON: {"fn":"'+inp+'","airline":"","origin":"","originCity":"","dest":"","destCity":"","status":"ontime","sched":"HH:MM","actual":"HH:MM","aircraft":"","delay":"0","terminal":"","gate":""}. Status: ontime delayed landed boarding cancelled scheduled'}]
     })
   })
   .then(function(r){return r.json();})
   .then(function(data){
-    if(!data||!data.content||!Array.isArray(data.content)){
-      throw new Error('API error: '+(data&&data.error?data.error.message:'no content'));
+    if(!data||!Array.isArray(data.content)) throw new Error('Bad response');
+    var txt=data.content.filter(function(c){return c.type==='text';}).map(function(c){return c.text;}).join('');
+    var f=null;
+    var m1=txt.match(/```json([\s\S]*?)```/)||txt.match(/```([\s\S]*?)```/);
+    if(m1){try{f=JSON.parse(m1[1].trim());}catch(e){}}
+    if(!f){var m2=txt.match(/\{[^{}]+\}/);if(m2){try{f=JSON.parse(m2[0]);}catch(e){}}}
+    if(!f||!f.airline){
+      if(box) box.innerHTML='<div style="padding:20px 14px;text-align:center;">'
+        +'<div style="font-size:14px;color:var(--ow);font-family:Cormorant Garamond,serif;margin-bottom:8px;">Flight '+inp+' not found</div>'
+        +'<div style="font-size:10px;color:var(--mt);margin-bottom:14px;line-height:1.7;">Try: KQ100, QM201, ET800</div>'
+        +'<a class="wa-btn" href="https://wa.me/255692312366?text=Please+track+flight+'+inp+'+for+me" target="_blank"><i class="ti ti-brand-whatsapp"></i>Ask concierge to track this flight</a>'
+        +'</div>';
+      return;
     }
-    var text = data.content.filter(function(c){return c.type==='text';}).map(function(c){return c.text;}).join('');
-    var m = text.match(/[{][^{}]+[}]/);
-    var f = null;
-    if(m){
-      try{ f = JSON.parse(m[0].replace(/\n/g,' ').replace(/\r/g,' ').replace(/,}/g,'}')); }
-      catch(e){}
-    }
-
-    if(f && (f.status || f.airline || f.origin)){
-      var statusColors = {ontime:'#4CAF50',landed:'#888',boarding:'#B8892A',delayed:'#FF9800',cancelled:'#CC5555',scheduled:'#4A9EFF'};
-      var statusLabels = {ontime:'On Time',landed:'Landed',boarding:'Boarding',delayed:'Delayed',cancelled:'Cancelled',scheduled:'Scheduled'};
-      var st = (f.status||'ontime').toLowerCase().replace(/\s+/g,'');
-      var sColor = statusColors[st]||'var(--mt)';
-      var sLabel = statusLabels[st]||(f.status||'Unknown');
-      var hasDelay = f.delay && parseInt(f.delay)>0;
-
-      if(box){
-        var div = document.createElement('div');
-        div.style.padding = '12px 14px 0';
-
-        // Flight card
-        var card = document.createElement('div');
-        card.style.cssText = 'background:var(--card);border:0.5px solid rgba(184,137,42,0.25);border-radius:3px;overflow:hidden;margin-bottom:10px;';
-        card.innerHTML =
-          // Status bar
-          '<div style="background:'+sColor+';padding:6px 14px;display:flex;align-items:center;justify-content:space-between;">'
-          +'<div style="font-size:9px;letter-spacing:0.16em;text-transform:uppercase;color:#000;font-weight:600;font-family:Montserrat,sans-serif;">'+sLabel+'</div>'
-          +(hasDelay ? '<div style="font-size:9px;color:#000;font-family:Montserrat,sans-serif;">+'+f.delay+' min</div>' : '')
-          +'</div>'
-          // Header
-          +'<div style="padding:14px;border-bottom:0.5px solid var(--bd);">'
-          +'<div style="display:flex;align-items:flex-start;justify-content:space-between;">'
-          +'<div><div style="font-family:Cormorant Garamond,serif;font-size:28px;color:var(--ow);">'+(f.fn||inp)+'</div>'
-          +'<div style="font-size:10px;color:var(--mt);">'+(f.airline||'')+(f.aircraft?' · '+f.aircraft:'')+'</div></div>'
-          +'<i class="ti ti-plane" style="font-size:22px;color:rgba(184,137,42,0.3);margin-top:4px;"></i>'
-          +'</div></div>'
-          // Route
-          +'<div style="padding:14px;display:flex;align-items:center;border-bottom:0.5px solid var(--bd);">'
-          +'<div style="flex:1;"><div style="font-family:Cormorant Garamond,serif;font-size:26px;color:var(--ow);">'+(f.origin||'—')+'</div>'
-          +'<div style="font-size:10px;color:var(--mt);">'+(f.originCity||'')+'</div></div>'
-          +'<div style="padding:0 12px;text-align:center;"><div style="font-size:18px;color:rgba(184,137,42,0.4);">→</div>'
-          +'<div style="font-size:8px;color:var(--mt);letter-spacing:0.1em;margin-top:2px;">DIRECT</div></div>'
-          +'<div style="flex:1;text-align:right;"><div style="font-family:Cormorant Garamond,serif;font-size:26px;color:var(--ow);">'+(f.dest||'—')+'</div>'
-          +'<div style="font-size:10px;color:var(--mt);">'+(f.destCity||'')+'</div></div>'
-          +'</div>'
-          // Times grid
-          +'<div style="padding:12px 14px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">'
-          +'<div style="text-align:center;"><div style="font-size:16px;color:var(--ow);font-family:Cormorant Garamond,serif;">'+(f.sched||'—')+'</div><div style="font-size:8px;color:var(--mt);text-transform:uppercase;letter-spacing:0.1em;margin-top:2px;">Scheduled</div></div>'
-          +'<div style="text-align:center;"><div style="font-size:16px;font-family:Cormorant Garamond,serif;color:'+(f.actual&&f.actual!==f.sched?'#FF9800':'#4CAF50')+'">'+(f.actual||'—')+'</div><div style="font-size:8px;color:var(--mt);text-transform:uppercase;letter-spacing:0.1em;margin-top:2px;">Actual/Est.</div></div>'
-          +'<div style="text-align:center;"><div style="font-size:16px;color:var(--ow);font-family:Cormorant Garamond,serif;">'+(f.terminal||f.gate||'—')+'</div><div style="font-size:8px;color:var(--mt);text-transform:uppercase;letter-spacing:0.1em;margin-top:2px;">Terminal/Gate</div></div>'
-          +'</div>';
-        div.appendChild(card);
-
-        // Transfer card
-        var xfer = document.createElement('div');
-        xfer.style.cssText = 'background:linear-gradient(135deg,#0a0a08,#141208);border:0.5px solid rgba(184,137,42,0.3);border-radius:3px;padding:14px;';
-        xfer.innerHTML =
-          '<div style="font-size:9px;letter-spacing:0.18em;color:var(--gold);text-transform:uppercase;margin-bottom:8px;">✦ Recommended Transfer</div>'
-          +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">'
-          +'<div><div style="font-size:13px;color:var(--ow);font-family:Cormorant Garamond,serif;margin-bottom:2px;">'+(f.dest||'Airport')+' → Arusha / Hotel</div>'
-          +'<div style="font-size:10px;color:var(--mt);">Luxury saloon · Meet & Greet · Name board</div>'
-          +'<div style="font-size:10px;color:var(--mt);margin-top:2px;">Timed to your arrival</div></div>'
-          +'<div style="text-align:right;margin-left:12px;flex-shrink:0;">'
-          +'<div style="font-family:Cormorant Garamond,serif;font-size:20px;color:var(--gl);">From $60</div>'
-          +'<div style="font-size:8px;color:var(--mt);">+ add-ons</div></div>'
-          +'</div>'
-          +'<div style="display:flex;gap:8px;">'
-          +'<button class="gbtn" style="flex:1;margin:0;" id="xfer-btn-main">Book transfer</button>'
-          +'<a href="https://wa.me/255692312366?text=Transfer+needed+for+flight+'+encodeURIComponent(inp)+'" target="_blank" style="background:rgba(18,140,126,0.15);border:0.5px solid rgba(18,140,126,0.4);color:#128C7E;padding:0 14px;border-radius:2px;display:flex;align-items:center;gap:6px;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;font-family:Montserrat,sans-serif;white-space:nowrap;"><i class="ti ti-brand-whatsapp"></i>WA</a>'
-          +'</div>';
-        var xBtn = xfer.querySelector('#xfer-btn-main');
-        if(xBtn) xBtn.onclick = function(){ bookTrackedFlight(); };
-        div.appendChild(xfer);
-
-        box.innerHTML = '';
-        box.appendChild(div);
-      }
-    } else {
-      // Not found
-      if(box){
-        var div2 = document.createElement('div');
-        div2.style.padding = '12px 14px 0';
-        div2.innerHTML =
-          '<div style="background:var(--card);border:0.5px solid var(--bd);border-radius:3px;padding:16px;margin-bottom:10px;">'
-          +'<div style="display:flex;align-items:center;gap:12px;">'
-          +'<i class="ti ti-plane-off" style="font-size:24px;color:var(--mt);flex-shrink:0;"></i>'
-          +'<div><div style="font-size:14px;color:var(--ow);font-family:Cormorant Garamond,serif;margin-bottom:3px;">'+inp+' — Not found</div>'
-          +'<div style="font-size:10px;color:var(--mt);line-height:1.6;">Live data unavailable right now.</div></div>'
-          +'</div>'
-          +'<div style="display:flex;gap:8px;margin-top:12px;">'
-          +'<a href="https://www.flightradar24.com/'+encodeURIComponent(inp)+'" target="_blank" style="flex:1;background:rgba(184,137,42,0.08);border:0.5px solid rgba(184,137,42,0.3);color:var(--gold);padding:9px;text-align:center;border-radius:2px;font-size:9px;letter-spacing:0.14em;text-transform:uppercase;text-decoration:none;font-family:Montserrat,sans-serif;">Flightradar24 ↗</a>'
-          +'<a href="https://www.flightaware.com/live/flight/'+encodeURIComponent(inp)+'" target="_blank" style="flex:1;background:rgba(184,137,42,0.08);border:0.5px solid rgba(184,137,42,0.3);color:var(--gold);padding:9px;text-align:center;border-radius:2px;font-size:9px;letter-spacing:0.14em;text-transform:uppercase;text-decoration:none;font-family:Montserrat,sans-serif;">FlightAware ↗</a>'
-          +'</div></div>';
-        var xfer2 = document.createElement('div');
-        xfer2.style.cssText = 'background:linear-gradient(135deg,#0a0a08,#141208);border:0.5px solid rgba(184,137,42,0.3);border-radius:3px;padding:14px;';
-        xfer2.innerHTML =
-          '<div style="font-size:9px;letter-spacing:0.18em;color:var(--gold);text-transform:uppercase;margin-bottom:8px;">✦ Book a transfer anyway</div>'
-          +'<div style="font-size:11px;color:var(--mt);margin-bottom:10px;">Your concierge will track this flight in real time and have your driver ready on arrival.</div>'
-          +'<button class="gbtn" style="margin:0;" id="xfer-btn-fallback">Book transfer for '+inp+'</button>';
-        var xBtn2 = xfer2.querySelector('#xfer-btn-fallback');
-        if(xBtn2) xBtn2.onclick = function(){ bookTrackedFlight(); };
-        div2.appendChild(xfer2);
-        box.innerHTML = '';
-        box.appendChild(div2);
-      }
-    }
+    var sc={ontime:'#4CAF50',delayed:'#FF9800',landed:'#4CAF50',boarding:'#2196F3',cancelled:'#F44336',scheduled:'#888'}[f.status]||'#888';
+    var html='<div style="padding:14px;">'
+      +'<div style="background:var(--card);border:0.5px solid rgba(184,137,42,0.2);border-radius:3px;padding:16px;margin-bottom:10px;">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">'
+      +'<div><div style="font-size:18px;color:var(--ow);font-family:Cormorant Garamond,serif;">'+f.fn+'</div>'
+      +'<div style="font-size:10px;color:var(--mt);">'+(f.airline||'')+'</div></div>'
+      +'<span style="background:'+sc+';color:#000;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;padding:4px 10px;border-radius:10px;font-weight:600;">'+(f.status||'').toUpperCase()+'</span>'
+      +'</div>'
+      +'<div style="display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;margin-bottom:12px;">'
+      +'<div><div style="font-size:20px;color:var(--ow);font-family:Cormorant Garamond,serif;">'+(f.origin||'—')+'</div>'
+      +'<div style="font-size:9px;color:var(--mt);">'+(f.originCity||'')+'</div></div>'
+      +'<div style="color:var(--gold);font-size:16px;">✈</div>'
+      +'<div style="text-align:right;"><div style="font-size:20px;color:var(--ow);font-family:Cormorant Garamond,serif;">'+(f.dest||'—')+'</div>'
+      +'<div style="font-size:9px;color:var(--mt);">'+(f.destCity||'')+'</div></div>'
+      +'</div>'
+      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">'
+      +'<div style="background:var(--soft);padding:8px;border-radius:2px;">'
+      +'<div style="font-size:8px;color:var(--mt);text-transform:uppercase;letter-spacing:0.1em;">Scheduled</div>'
+      +'<div style="font-size:16px;color:var(--ow);font-family:Cormorant Garamond,serif;">'+(f.sched||'—')+'</div></div>'
+      +'<div style="background:var(--soft);padding:8px;border-radius:2px;">'
+      +'<div style="font-size:8px;color:var(--mt);text-transform:uppercase;letter-spacing:0.1em;">Actual</div>'
+      +'<div style="font-size:16px;color:'+(parseInt(f.delay||0)>0?'#FF9800':'var(--ow)')+';font-family:Cormorant Garamond,serif;">'+(f.actual||f.sched||'—')+(parseInt(f.delay||0)>0?' +'+f.delay+'m':'')+'</div></div>'
+      +'</div>'
+      +(f.aircraft?'<div style="font-size:9px;color:var(--mt);margin-top:8px;">'+f.aircraft+(f.terminal?' · T'+f.terminal:'')+(f.gate?' · Gate '+f.gate:'')+'</div>':'')
+      +'</div>'
+      +'<button class="gbtn" id="fl-xfer-btn" style="width:100%;margin-top:0;">Book airport transfer</button>'
+      +'</div>';
+    if(box) box.innerHTML=html;
+    var xb=document.getElementById('fl-xfer-btn');
+    if(xb) xb.onclick=function(){openTransferBook('Airport Transfer',100,'250,000');};
   })
-  .catch(function(e){
-    console.log('Track fetch error:',e);
-    if(box) box.innerHTML='<div style="padding:12px 14px;">'
-      +'<div style="background:var(--card);border:0.5px solid var(--bd);border-radius:3px;padding:14px;margin-bottom:10px;">'
-      +'<div style="font-size:13px;color:var(--ow);font-family:Cormorant Garamond,serif;margin-bottom:6px;">'+inp+'</div>'
-      +'<div style="font-size:10px;color:var(--mt);margin-bottom:10px;">Live tracking temporarily unavailable.</div>'
-      +'<div style="display:flex;gap:8px;">'
-      +'<a href="https://www.flightradar24.com/'+encodeURIComponent(inp)+'" target="_blank" style="flex:1;background:rgba(184,137,42,0.08);border:0.5px solid rgba(184,137,42,0.3);color:var(--gold);padding:9px;text-align:center;border-radius:2px;font-size:9px;letter-spacing:0.14em;text-transform:uppercase;text-decoration:none;font-family:Montserrat,sans-serif;">Flightradar24 ↗</a>'
-      +'<a href="https://www.flightaware.com/live/flight/'+encodeURIComponent(inp)+'" target="_blank" style="flex:1;background:rgba(184,137,42,0.08);border:0.5px solid rgba(184,137,42,0.3);color:var(--gold);padding:9px;text-align:center;border-radius:2px;font-size:9px;letter-spacing:0.14em;text-transform:uppercase;text-decoration:none;font-family:Montserrat,sans-serif;">FlightAware ↗</a>'
-      +'</div></div>'
-      +'<button class="gbtn" onclick="bookTrackedFlight()">Book transfer for '+inp+'</button>'
+  .catch(function(err){
+    console.log('Flight track error:',err.message);
+    if(box) box.innerHTML='<div style="padding:20px 14px;text-align:center;">'
+      +'<div style="font-size:10px;color:var(--mt);margin-bottom:14px;">Live tracking unavailable. Your concierge can track any flight for you.</div>'
+      +'<a class="wa-btn" href="https://wa.me/255692312366?text=Please+track+flight+'+inp+'+for+me" target="_blank"><i class="ti ti-brand-whatsapp"></i>Ask concierge to track '+inp+'</a>'
       +'</div>';
   });
 }
@@ -5486,13 +5773,20 @@ function sendToTelegram(memberName, memberTier, memberEmail, message){
     + '\n\nMessage:\n' + message
     + '\n\nTime: ' + new Date().toLocaleString('en-GB');
 
-  fetch('https://api.telegram.org/bot' + BL_TG_TOKEN + '/sendMessage', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({chat_id: BL_TG_CHAT, text: text})
-  }).then(function(r){ return r.json(); })
+  // Use URL params (GET) to avoid CORS preflight issues
+  var url = 'https://api.telegram.org/bot' + BL_TG_TOKEN + '/sendMessage'
+    + '?chat_id=' + BL_TG_CHAT
+    + '&text=' + encodeURIComponent(text);
+
+  fetch(url)
+    .then(function(r){ return r.json(); })
     .then(function(d){ console.log('TG sent:', d.ok); })
-    .catch(function(e){ console.log('TG error:', e.message); });
+    .catch(function(e){
+      console.log('TG fetch failed, trying img fallback');
+      // Pixel fallback - fires even if CORS blocks
+      var img = new Image();
+      img.src = url;
+    });
 }
 
 function sendBookingToTelegram(service, details){
@@ -5506,11 +5800,15 @@ function sendBookingToTelegram(service, details){
     + '\nDetails:\n' + details
     + '\n\nTime: ' + new Date().toLocaleString('en-GB');
 
-  fetch('https://api.telegram.org/bot' + BL_TG_TOKEN + '/sendMessage', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({chat_id: BL_TG_CHAT, text: text})
-  }).catch(function(e){ console.log('TG booking error:', e.message); });
+  var bUrl = 'https://api.telegram.org/bot' + BL_TG_TOKEN + '/sendMessage'
+    + '?chat_id=' + BL_TG_CHAT
+    + '&text=' + encodeURIComponent(text);
+  fetch(bUrl)
+    .then(function(r){return r.json();})
+    .then(function(d){console.log('TG booking sent:',d.ok);})
+    .catch(function(e){
+      var img = new Image(); img.src = bUrl;
+    });
 }
 
 function startTelegramPolling(){
@@ -5564,6 +5862,931 @@ function showConciergeReply(text){
     gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+0.3);
     osc.start(); osc.stop(ctx.currentTime+0.3);
   }catch(e){}
+}
+
+
+
+function bookTrackedFlight(){
+  var fn = window._trackedFlight || 'Flight';
+  openTransferBook(fn + ' Arrival Transfer', '', 'TZS');
+}
+
+
+function openObsidianLounge(){
+  if(!currentUser){ return; }
+  if(currentUser.tier!=='obsidian'&&currentUser.tier!=='admin'){
+    showTierUpgradeAlert('business');
+    return;
+  }
+  document.getElementById('modal-ttl').textContent='Obsidian Private Lounge';
+  var el=document.getElementById('modal-body');
+  el.innerHTML='';
+  var f=document.createElement('div');
+  f.className='fwrap';
+  f.innerHTML='<div style="text-align:center;padding:12px 0 16px;">'
+    +'<div style="font-size:36px;margin-bottom:8px;">💎</div>'
+    +'<div style="font-family:Cormorant Garamond,serif;font-size:20px;color:#CE93D8;margin-bottom:6px;">Obsidian Introductions</div>'
+    +'<div style="font-size:11px;color:var(--mt);line-height:1.7;">Your concierge facilitates direct introductions between Obsidian members. All requests are handled with complete discretion.</div>'
+    +'</div>'
+    +'<div class="fgrp"><label class="flbl">Your name</label><input class="finp" placeholder="Full name"></div>'
+    +'<div class="fgrp"><label class="flbl">What are you looking for?</label><select class="fsel">'
+    +'<option>Business introduction</option>'
+    +'<option>Investment opportunity</option>'
+    +'<option>Shared charter partner</option>'
+    +'<option>Hospitality referral</option>'
+    +'<option>Other private matter</option>'
+    +'</select></div>'
+    +'<div class="fgrp"><label class="flbl">Brief description</label><textarea class="ftxt" placeholder="Describe what you are looking for. All information is strictly confidential."></textarea></div>';
+  var btn=document.createElement('button');
+  btn.className='gbtn';
+  btn.style.cssText='background:rgba(156,39,176,0.15);border-color:rgba(156,39,176,0.4);color:#CE93D8;';
+  btn.textContent='Send introduction request';
+  btn.onclick=function(){ submitForm('Obsidian Circle: Introduction Request'); };
+  f.appendChild(btn);
+  var wa=document.createElement('a');
+  wa.className='wa-btn';
+  wa.href='https://wa.me/255692312366?text=Obsidian+introduction+request';
+  wa.target='_blank';
+  wa.innerHTML='<i class="ti ti-brand-whatsapp"></i>WhatsApp concierge directly';
+  f.appendChild(wa);
+  el.appendChild(f);
+  document.getElementById('modal-bg').classList.add('open');
+}
+
+// ════ PROFILE FUNCTIONS ════
+
+function openProfileSettings(){
+  document.getElementById('modal-ttl').textContent = 'Account Settings';
+  var el = document.getElementById('modal-body');
+  el.innerHTML = '';
+  var f = document.createElement('div');
+  f.className = 'fwrap';
+
+  var u = currentUser || {};
+  f.innerHTML =
+    '<div style="text-align:center;padding-bottom:14px;">'
+    +'<div style="font-size:28px;margin-bottom:6px;">'+(u.tier==='obsidian'?'💎':u.tier==='gold'?'✦':'◈')+'</div>'
+    +'<div style="font-family:Cormorant Garamond,serif;font-size:18px;color:var(--ow);">'+(u.name||'Member')+'</div>'
+    +'<div style="font-size:10px;color:var(--mt);">'+(u.email||'')+'</div>'
+    +'</div>'
+    +'<div class="fgrp"><label class="flbl">Display name</label>'
+    +'<input class="finp" id="settings-name" value="'+(u.name||'')+'" placeholder="Your full name"></div>'
+    +'<div class="fgrp"><label class="flbl">WhatsApp number</label>'
+    +'<input class="finp" id="settings-wa" value="'+(u.wa||u.phone||'')+'" placeholder="+255 ..."></div>'
+    +'<div class="fgrp"><label class="flbl">Nationality / Passport country</label>'
+    +'<input class="finp" id="settings-nationality" value="'+(u.nationality||'')+'" placeholder="e.g. Tanzanian, British, American"></div>'
+    +'<div class="fgrp"><label class="flbl">Dietary preferences</label>'
+    +'<input class="finp" id="settings-dietary" value="'+(u.dietary||'')+'" placeholder="e.g. halal, vegetarian, none"></div>'
+    +'<div class="fgrp"><label class="flbl">Special notes for concierge</label>'
+    +'<textarea class="ftxt" id="settings-notes" placeholder="Anniversary dates, preferences, allergies...">'+(u.notes||'')+'</textarea></div>';
+
+  var btn = document.createElement('button');
+  btn.className = 'gbtn';
+  btn.textContent = 'Save changes';
+  btn.onclick = function(){
+    var name = document.getElementById('settings-name').value.trim();
+    var wa = document.getElementById('settings-wa').value.trim();
+    var nationality = document.getElementById('settings-nationality').value.trim();
+    var dietary = document.getElementById('settings-dietary').value.trim();
+    var notes = document.getElementById('settings-notes').value.trim();
+    if(name && currentUser){
+      currentUser.name = name;
+      currentUser.wa = wa;
+      currentUser.nationality = nationality;
+      currentUser.dietary = dietary;
+      currentUser.notes = notes;
+      DB.set('user_'+currentUser.email, JSON.stringify(currentUser));
+      document.getElementById('profile-name').textContent = name;
+      showToast('Settings saved ✓');
+      document.getElementById('modal-bg').classList.remove('open');
+    }
+  };
+  f.appendChild(btn);
+
+  var logoutBtn = document.createElement('button');
+  logoutBtn.className = 'gghst';
+  logoutBtn.style.cssText = 'color:#CC5555;border-color:rgba(204,0,0,0.2);margin-top:6px;';
+  logoutBtn.textContent = 'Sign out';
+  logoutBtn.onclick = function(){ document.getElementById('modal-bg').classList.remove('open'); doLogout(); };
+  f.appendChild(logoutBtn);
+
+  el.appendChild(f);
+  document.getElementById('modal-bg').classList.add('open');
+}
+
+function openPaymentDetails(){
+  document.getElementById('modal-ttl').textContent = 'Payment & Billing';
+  var el = document.getElementById('modal-body');
+  el.innerHTML = '';
+  var f = document.createElement('div');
+  f.className = 'fwrap';
+
+  f.innerHTML =
+    '<div style="background:rgba(184,137,42,0.06);border:0.5px solid rgba(184,137,42,0.2);border-radius:2px;padding:12px 14px;margin-bottom:14px;">'
+    +'<div style="font-size:9px;letter-spacing:0.16em;color:var(--gold);text-transform:uppercase;margin-bottom:4px;">Payment policy</div>'
+    +'<div style="font-size:10px;color:var(--mt);line-height:1.8;">All service fees are invoiced per booking. Accepted: bank transfer, Airtel Money, M-Pesa, and international card via concierge. Deposits may be required for high-value bookings.</div>'
+    +'</div>'
+    +'<div class="fgrp"><label class="flbl">Preferred payment method</label>'
+    +'<select class="fsel" id="pay-method">'
+    +'<option>Bank Transfer (TZS)</option>'
+    +'<option>Bank Transfer (USD)</option>'
+    +'<option>Airtel Money</option>'
+    +'<option>M-Pesa</option>'
+    +'<option>Credit card via concierge</option>'
+    +'</select></div>'
+    +'<div class="fgrp"><label class="flbl">Billing name</label>'
+    +'<input class="finp" id="pay-name" placeholder="Full name or company"></div>'
+    +'<div class="fgrp"><label class="flbl">Billing email</label>'
+    +'<input class="finp" id="pay-email" placeholder="email@example.com"></div>'
+    +'<div style="font-size:10px;color:var(--mt);line-height:1.8;margin-bottom:14px;">Bank details and payment instructions are provided at time of booking. Your concierge handles all payment coordination.</div>';
+
+  var btn = document.createElement('button');
+  btn.className = 'gbtn';
+  btn.textContent = 'Save payment preferences';
+  btn.onclick = function(){
+    var method = document.getElementById('pay-method').value;
+    var name = document.getElementById('pay-name').value;
+    if(currentUser){
+      currentUser.payMethod = method;
+      currentUser.payName = name;
+      DB.set('user_'+currentUser.email, JSON.stringify(currentUser));
+      showToast('Payment preferences saved ✓');
+      document.getElementById('modal-bg').classList.remove('open');
+    }
+  };
+  f.appendChild(btn);
+
+  var wa = document.createElement('a');
+  wa.className = 'wa-btn';
+  wa.href = 'https://wa.me/255692312366?text=Payment+enquiry';
+  wa.target = '_blank';
+  wa.innerHTML = '<i class="ti ti-brand-whatsapp"></i>Billing enquiry via concierge';
+  f.appendChild(wa);
+
+  el.appendChild(f);
+  document.getElementById('modal-bg').classList.add('open');
+}
+
+function openMyBookings(){
+  document.getElementById('modal-ttl').textContent = 'My Bookings';
+  var el = document.getElementById('modal-body');
+  el.innerHTML = '';
+  var f = document.createElement('div');
+  f.className = 'fwrap';
+
+  // Load bookings from localStorage
+  var bookings = [];
+  try{ bookings = JSON.parse(DB.get('bookings_'+(currentUser?currentUser.email:'')) || '[]'); }catch(e){}
+
+  if(!bookings.length){
+    f.innerHTML =
+      '<div style="text-align:center;padding:20px 0;">'
+      +'<div style="font-size:36px;margin-bottom:10px;">📋</div>'
+      +'<div style="font-family:Cormorant Garamond,serif;font-size:18px;color:var(--ow);margin-bottom:6px;">No bookings yet</div>'
+      +'<div style="font-size:11px;color:var(--mt);line-height:1.8;">Your confirmed bookings and service requests will appear here after your concierge confirms them.</div>'
+      +'</div>'
+      +'<div style="background:rgba(184,137,42,0.04);border:0.5px solid rgba(184,137,42,0.15);padding:12px 14px;border-radius:2px;font-size:10px;color:var(--mt);line-height:1.8;">'
+      +'All bookings are managed personally by your Barafu Luxe concierge. You will receive WhatsApp confirmation for every service.</div>';
+  } else {
+    var html = '';
+    bookings.forEach(function(b){
+      var statusColor = b.status==='confirmed' ? '#4CAF50' : b.status==='pending' ? '#FF9800' : 'var(--mt)';
+      html += '<div style="background:var(--card);border:0.5px solid var(--bd);border-radius:2px;padding:12px 14px;margin-bottom:8px;">'
+        +'<div style="display:flex;justify-content:space-between;align-items:flex-start;">'
+        +'<div style="font-size:13px;color:var(--ow);font-family:Cormorant Garamond,serif;">'+(b.service||'Service')+'</div>'
+        +'<span style="font-size:9px;color:'+statusColor+';letter-spacing:0.1em;text-transform:uppercase;">'+(b.status||'pending')+'</span>'
+        +'</div>'
+        +'<div style="font-size:10px;color:var(--mt);margin-top:4px;">'+(b.date||'')+(b.amount?' · '+b.amount:'')+'</div>'
+        +'</div>';
+    });
+    f.innerHTML = html;
+  }
+
+  var wa = document.createElement('a');
+  wa.className = 'wa-btn';
+  wa.href = 'https://wa.me/255692312366?text=Booking+enquiry';
+  wa.target = '_blank';
+  wa.innerHTML = '<i class="ti ti-brand-whatsapp"></i>Contact concierge about a booking';
+  f.appendChild(wa);
+
+  el.appendChild(f);
+  document.getElementById('modal-bg').classList.add('open');
+}
+
+function openUpgradeTier(){
+  var tier = currentUser ? currentUser.tier : 'silver';
+  if(tier === 'obsidian'){
+    showToast('You are already at Obsidian — the highest tier 💎');
+    return;
+  }
+  document.getElementById('modal-ttl').textContent = 'Upgrade Membership';
+  var el = document.getElementById('modal-body');
+  el.innerHTML = '';
+  var f = document.createElement('div');
+  f.className = 'fwrap';
+
+  var nextTier = tier === 'silver' ? 'Gold' : 'Obsidian';
+  var nextIcon = tier === 'silver' ? '✦' : '💎';
+  var nextColor = tier === 'silver' ? 'var(--gold)' : '#CE93D8';
+  var nextBenefits = tier === 'silver'
+    ? ['Priority booking on all services','Spa & Wellness access (Peaberries + Siringit)','Hidden Gems exclusive stays','10% loyalty credit on all bookings','Dedicated Gold member concierge line']
+    : ['24/7 personal concierge — your own dedicated line','Obsidian Private Lounge in The Barafu Circle','First access to limited experiences','Annual bespoke experience curated for you','Helicopter and yacht priority allocation'];
+
+  var benefitsHtml = nextBenefits.map(function(b){ return '<li style="padding:4px 0;font-size:11px;color:var(--mt);">'+b+'</li>'; }).join('');
+
+  f.innerHTML =
+    '<div style="text-align:center;padding:16px 0 20px;">'
+    +'<div style="font-size:36px;margin-bottom:8px;">'+nextIcon+'</div>'
+    +'<div style="font-family:Cormorant Garamond,serif;font-size:24px;color:'+nextColor+';margin-bottom:4px;">'+nextTier+'</div>'
+    +'<div style="font-size:10px;color:var(--mt);">Upgrade from '+(tier.charAt(0).toUpperCase()+tier.slice(1))+'</div>'
+    +'</div>'
+    +'<ul style="list-style:none;margin-bottom:16px;">'+benefitsHtml+'</ul>'
+    +'<div style="background:rgba(184,137,42,0.04);border:0.5px solid rgba(184,137,42,0.15);padding:12px 14px;border-radius:2px;font-size:10px;color:var(--mt);line-height:1.8;margin-bottom:14px;">'
+    +'Upgrade is handled personally by your concierge. Contact us and we will walk you through the process.</div>';
+
+  var btn = document.createElement('button');
+  btn.className = 'gbtn';
+  btn.textContent = 'Request '+nextTier+' upgrade';
+  btn.onclick = function(){
+    document.getElementById('modal-bg').classList.remove('open');
+    window.open('https://wa.me/255692312366?text=I+would+like+to+upgrade+to+'+nextTier+'+membership', '_blank');
+  };
+  f.appendChild(btn);
+
+  el.appendChild(f);
+  document.getElementById('modal-bg').classList.add('open');
+}
+
+function showToast(msg){
+  var t = document.getElementById('toast-msg');
+  if(!t){
+    t = document.createElement('div');
+    t.id = 'toast-msg';
+    t.style.cssText = 'position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:rgba(184,137,42,0.95);color:#000;padding:10px 20px;border-radius:20px;font-size:11px;font-family:Montserrat,sans-serif;letter-spacing:0.1em;z-index:9999;transition:opacity 0.3s;';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.opacity = '1';
+  setTimeout(function(){ t.style.opacity = '0'; }, 2500);
+}
+
+
+function unlockSection(gateId, contentId){
+  var gate = document.getElementById(gateId);
+  var content = document.getElementById(contentId);
+  if(gate) gate.style.display = 'none';
+  if(content) content.style.display = 'block';
+  if(contentId === 'spa-content'){ buildSpaPartnerTabs(); renderSpa('all','all'); }
+  if(contentId === 'gems-content'){ renderGems('all'); }
+}
+
+
+function highlightPartner(partner){
+  window._spaPartner = partner;
+  var pbLine = document.getElementById('pb-line');
+  var sgLine = document.getElementById('sg-line');
+  var pbCard = document.getElementById('spa-partner-peaberries');
+  var sgCard = document.getElementById('spa-partner-siringit');
+  if(pbLine) pbLine.style.width = partner==='peaberries'?'40px':'20px';
+  if(sgLine) sgLine.style.width = partner==='siringit'?'40px':'20px';
+  if(pbCard) pbCard.style.background = partner==='peaberries'?'rgba(184,137,42,0.06)':'var(--soft)';
+  if(sgCard) sgCard.style.background = partner==='siringit'?'rgba(74,158,127,0.06)':'var(--soft)';
+}
+
+
+function bookRoute(btn){var n=(btn.dataset.rn||'Transfer');var usd=(btn.dataset.usd||'');var tzs=(btn.dataset.tzs||'');openTransferBook(n,usd,tzs);}
+function bookF1Route(btn){var n=(btn.dataset.rn||'F1');var d=(btn.dataset.rd||'');var v=(btn.dataset.rv||'');openF1Book(n,d,v);}
+function bookFleet(btn){var n=(btn.dataset.vn||'Yacht');var c=(btn.dataset.vc||'');openYachtBook(n,c,'','','','');}
+
+// ════ TELEGRAM CONCIERGE INTEGRATION ════
+var BL_TG_TOKEN = '8820396722:AAGSePXlx1qIPfBzBwRlcoWYujNkikgTSKQ';
+var BL_TG_CHAT  = '608285052';
+var _tgLastUpdateId = 0;
+var _tgPollTimer = null;
+
+function sendToTelegram(memberName, memberTier, memberEmail, message){
+  var tierLabel = memberTier==='obsidian'?'OBSIDIAN':memberTier==='gold'?'GOLD':'SILVER';
+  var text = 'NEW CONCIERGE MESSAGE'
+    + '\n\nMember: ' + memberName
+    + '\nEmail: ' + memberEmail
+    + '\nTier: ' + tierLabel
+    + '\n\nMessage:\n' + message
+    + '\n\nTime: ' + new Date().toLocaleString('en-GB');
+
+  // Use URL params (GET) to avoid CORS preflight issues
+  var url = 'https://api.telegram.org/bot' + BL_TG_TOKEN + '/sendMessage'
+    + '?chat_id=' + BL_TG_CHAT
+    + '&text=' + encodeURIComponent(text);
+
+  fetch(url)
+    .then(function(r){ return r.json(); })
+    .then(function(d){ console.log('TG sent:', d.ok); })
+    .catch(function(e){
+      console.log('TG fetch failed, trying img fallback');
+      // Pixel fallback - fires even if CORS blocks
+      var img = new Image();
+      img.src = url;
+    });
+}
+
+function sendBookingToTelegram(service, details){
+  var u = currentUser || {};
+  var tierLabel = (u.tier||'silver')==='obsidian'?'OBSIDIAN':(u.tier||'silver')==='gold'?'GOLD':'SILVER';
+  var text = 'NEW BOOKING REQUEST'
+    + '\n\nMember: ' + (u.name||'Guest')
+    + '\nEmail: ' + (u.email||'unknown')
+    + '\nTier: ' + tierLabel
+    + '\n\nService: ' + service
+    + '\nDetails:\n' + details
+    + '\n\nTime: ' + new Date().toLocaleString('en-GB');
+
+  var bUrl = 'https://api.telegram.org/bot' + BL_TG_TOKEN + '/sendMessage'
+    + '?chat_id=' + BL_TG_CHAT
+    + '&text=' + encodeURIComponent(text);
+  fetch(bUrl)
+    .then(function(r){return r.json();})
+    .then(function(d){console.log('TG booking sent:',d.ok);})
+    .catch(function(e){
+      var img = new Image(); img.src = bUrl;
+    });
+}
+
+function startTelegramPolling(){
+  if(_tgPollTimer) return;
+  _tgPollTimer = setInterval(function(){ pollTelegramReplies(); }, 8000);
+}
+
+function stopTelegramPolling(){
+  if(_tgPollTimer){ clearInterval(_tgPollTimer); _tgPollTimer = null; }
+}
+
+function pollTelegramReplies(){
+  var url = 'https://api.telegram.org/bot' + BL_TG_TOKEN
+    + '/getUpdates?offset=' + (_tgLastUpdateId + 1) + '&timeout=0';
+
+  fetch(url)
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      if(!data.ok || !data.result || !data.result.length) return;
+      data.result.forEach(function(update){
+        _tgLastUpdateId = update.update_id;
+        var msg = update.message;
+        if(!msg || !msg.text) return;
+        if(String(msg.from.id) === BL_TG_CHAT && !msg.from.is_bot){
+          showConciergeReply(msg.text);
+        }
+      });
+    })
+    .catch(function(e){ console.log('TG poll error:', e.message); });
+}
+
+function showConciergeReply(text){
+  var msgs = document.getElementById('chat-msgs');
+  if(!msgs) return;
+  var screen = document.getElementById('s-concierge');
+  if(!screen || !screen.classList.contains('active')) return;
+  var safe = text.replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  var ts = new Date().getHours().toString().padStart(2,'0')+':'+new Date().getMinutes().toString().padStart(2,'0');
+  msgs.innerHTML += '<div class="msg them">'
+    + '<div class="msg-b">'+safe+'</div>'
+    + '<div class="msg-t">Barafu Luxe Concierge '+ts+'</div>'
+    + '</div>';
+  msgs.scrollTop = msgs.scrollHeight;
+  try{
+    var ctx = new (window.AudioContext||window.webkitAudioContext)();
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.frequency.value = 880;
+    gain.gain.setValueAtTime(0.1, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+0.3);
+    osc.start(); osc.stop(ctx.currentTime+0.3);
+  }catch(e){}
+}
+
+
+function switchF1Tab(tab, btn){
+  document.querySelectorAll('.f1-tab').forEach(function(b){ b.classList.remove('active'); });
+  document.querySelectorAll('.f1-tab-body').forEach(function(b){ b.style.display='none'; });
+  if(btn) btn.classList.add('active');
+  var body = document.getElementById('f1-tab-'+tab);
+  if(body) body.style.display='block';
+  if(tab==='results') renderF1Results();
+  if(tab==='standings') renderF1Standings();
+}
+
+function renderF1Results(){
+  var el = document.getElementById('f1-results-list');
+  if(!el) return;
+  var R = [
+    {r:9,n:'British GP',d:'3-5 Jul 2026',v:'Silverstone',p1:'Lando Norris',p2:'Oscar Piastri',p3:'Max Verstappen',fast:'Norris 1:27.097',laps:52},
+    {r:8,n:'Austrian GP',d:'29 Jun-1 Jul 2026',v:'Red Bull Ring',p1:'Oscar Piastri',p2:'Lando Norris',p3:'Max Verstappen',fast:'Piastri 1:07.275',laps:71},
+    {r:7,n:'Canadian GP',d:'9-11 Jun 2026',v:'Montreal',p1:'Max Verstappen',p2:'Lando Norris',p3:'Fernando Alonso',fast:'Norris 1:14.481',laps:70},
+    {r:6,n:'Monaco GP',d:'25-27 May 2026',v:'Monte Carlo',p1:'Charles Leclerc',p2:'Carlos Sainz',p3:'Oscar Piastri',fast:'Leclerc 1:13.166',laps:78},
+    {r:5,n:'Saudi Arabian GP',d:'19-21 Apr 2026',v:'Jeddah',p1:'Lando Norris',p2:'Max Verstappen',p3:'George Russell',fast:'Norris 1:30.734',laps:50},
+    {r:4,n:'Bahrain GP',d:'12-14 Apr 2026',v:'Sakhir',p1:'Charles Leclerc',p2:'Carlos Sainz',p3:'Max Verstappen',fast:'Verstappen 1:32.608',laps:57},
+    {r:3,n:'Japanese GP',d:'5-7 Apr 2026',v:'Suzuka',p1:'Max Verstappen',p2:'Charles Leclerc',p3:'Lando Norris',fast:'Leclerc 1:32.511',laps:53},
+    {r:2,n:'Chinese GP',d:'22-24 Mar 2026',v:'Shanghai',p1:'Lando Norris',p2:'Oscar Piastri',p3:'Max Verstappen',fast:'Verstappen 1:33.664',laps:56},
+    {r:1,n:'Australian GP',d:'15-17 Mar 2026',v:'Melbourne',p1:'Max Verstappen',p2:'Lando Norris',p3:'Charles Leclerc',fast:'Norris 1:20.235',laps:58},
+  ];
+  el.innerHTML='';
+  var hdr=document.createElement('div');
+  hdr.className='f1-section-hdr';
+  hdr.innerHTML='<span>2026 Results</span><span class="f1-section-count">R1-R9</span>';
+  el.appendChild(hdr);
+  R.forEach(function(r){
+    var card=document.createElement('div');
+    card.className='f1-result-card';
+    var pod=document.createElement('div');
+    pod.className='f1-podium';
+    [['p1',r.p1,'🥇'],['p2',r.p2,'🥈'],['p3',r.p3,'🥉']].forEach(function(p){
+      var d=document.createElement('div');
+      d.className='f1-pod '+p[0];
+      d.innerHTML='<div class="f1-pod-pos">'+p[2]+'</div><div class="f1-pod-name">'+p[1]+'</div>';
+      pod.appendChild(d);
+    });
+    card.innerHTML='<div class="f1-rc-header">'
+      +'<div class="f1c-num">R'+r.r+'</div>'
+      +'<div><div class="f1c-name">'+r.n+'</div>'
+      +'<div class="f1c-meta">'+r.d+' \u00b7 '+r.v+'</div></div>'
+      +'</div>';
+    card.appendChild(pod);
+    var fast=document.createElement('div');
+    fast.className='f1-fastest';
+    fast.textContent='\u26a1 '+r.fast+' \u00b7 '+r.laps+' laps';
+    card.appendChild(fast);
+    var btn=document.createElement('button');
+    btn.className='f1-hospitality-btn';
+    btn.textContent='Hospitality enquiry';
+    btn.onclick=function(){openF1Book(r.n,r.d,r.v);};
+    card.appendChild(btn);
+    el.appendChild(card);
+  });
+}
+
+function renderF1Standings(){
+  var el=document.getElementById('f1-standings-full');
+  if(!el) return;
+  var S=[
+    {pos:1,driver:'Lando Norris',team:'McLaren',pts:229,flag:'🇬🇧'},
+    {pos:2,driver:'Max Verstappen',team:'Red Bull Racing',pts:205,flag:'🇳🇱'},
+    {pos:3,driver:'Oscar Piastri',team:'McLaren',pts:188,flag:'🇦🇺'},
+    {pos:4,driver:'Charles Leclerc',team:'Ferrari',pts:162,flag:'🇲🇨'},
+    {pos:5,driver:'Carlos Sainz',team:'Ferrari',pts:155,flag:'🇪🇸'},
+    {pos:6,driver:'George Russell',team:'Mercedes',pts:124,flag:'🇬🇧'},
+    {pos:7,driver:'Lewis Hamilton',team:'Ferrari',pts:110,flag:'🇬🇧'},
+    {pos:8,driver:'Fernando Alonso',team:'Aston Martin',pts:62,flag:'🇪🇸'},
+    {pos:9,driver:'Lance Stroll',team:'Aston Martin',pts:33,flag:'🇨🇦'},
+    {pos:10,driver:'Yuki Tsunoda',team:'RB',pts:30,flag:'🇯🇵'},
+  ];
+  el.innerHTML='';
+  var hdr=document.createElement('div');
+  hdr.className='f1-section-hdr';
+  hdr.innerHTML='<span>Drivers Championship</span><span class="f1-section-count">After R9</span>';
+  el.appendChild(hdr);
+  S.forEach(function(d){
+    var row=document.createElement('div');
+    row.className='f1-driver-row'+(d.pos===1?' f1-leader':'');
+    row.innerHTML='<div class="f1-dr-pos">'+d.pos+'</div>'
+      +'<div class="f1-dr-flag">'+d.flag+'</div>'
+      +'<div class="f1-dr-info"><div class="f1-dr-name">'+d.driver+'</div>'
+      +'<div class="f1-dr-team">'+d.team+'</div></div>'
+      +'<div class="f1-dr-pts">'+d.pts+'<span style="font-size:10px;color:var(--mt);"> pts</span></div>';
+    el.appendChild(row);
+  });
+}
+
+
+// ════ THE BARAFU CIRCLE ════
+
+// Default feed posts — you add more from admin dashboard
+var CIRCLE_POSTS = [
+  {
+    id:'cp1',
+    type:'event',
+    tag:'Exclusive Event',
+    tagColor:'gold',
+    title:'Zanzibar International Film Festival',
+    body:'Open-air screenings at the Old Fort, Stone Town. 11-20 July 2026. Barafu Luxe can arrange private villa accommodation, transfers and VIP access. Limited availability.',
+    cta:'Enquire',
+    wa:'Zanzibar+Film+Festival+Circle',
+    time:'Posted by Barafu Luxe',
+    badge:'This Weekend'
+  },
+  {
+    id:'cp2',
+    type:'deal',
+    tag:'Flash Deal',
+    tagColor:'red',
+    title:'Empty Leg — DAR to JRO Today 14:30',
+    body:'Cessna Citation CJ2 · 5 seats available · Departs Dar es Salaam Julius Nyerere at 14:30 today. Regular price $3,200 — Circle member price $960. First come first served.',
+    cta:'Book now',
+    wa:'Empty+Leg+DAR+JRO+Circle',
+    time:'Posted 1 hour ago',
+    badge:'Today Only'
+  },
+  {
+    id:'cp3',
+    type:'insight',
+    tag:'Concierge Insight',
+    tagColor:'gold',
+    title:'Serengeti · Great Migration Update',
+    body:'The northern crossing is in full effect at Kogatende this week. Our partner camps have last-minute availability for 2-night fly-in packages. River crossing viewings guaranteed.',
+    cta:'Reserve your spot',
+    wa:'Serengeti+Migration+Circle',
+    time:'Posted 3 hours ago',
+    badge:null
+  },
+  {
+    id:'cp4',
+    type:'charter',
+    tag:'Shared Charter',
+    tagColor:'teal',
+    title:'Split a Yacht Charter — Zanzibar Saturday',
+    body:'Member ID-BL22 is seeking 2 more guests to share the Sofia Luxury catamaran this Saturday (full day, 9hrs). Your share: $950 instead of $3,800. Contact concierge to connect.',
+    cta:'Join this charter',
+    wa:'Shared+Charter+Zanzibar+Circle',
+    time:'Posted 5 hours ago',
+    badge:'2 Spots Left'
+  },
+  {
+    id:'cp5',
+    type:'event',
+    tag:'Members Only',
+    tagColor:'purple',
+    title:'Obsidian Dinner — Mount Meru Grill Room',
+    body:'An intimate dinner for Obsidian members this Friday at 20:00. 8 seats only. Seasonal menu, curated wine pairing, and a private conversation with a special guest. By invitation.',
+    cta:'Request invitation',
+    wa:'Obsidian+Dinner+Circle',
+    time:'Posted yesterday',
+    badge:'Obsidian Only'
+  },
+];
+
+function renderCircle(filter){
+  var feed = document.getElementById('circle-feed');
+  var empty = document.getElementById('circle-empty');
+  if(!feed) return;
+
+  var posts = filter && filter !== 'all'
+    ? CIRCLE_POSTS.filter(function(p){ return p.type === filter; })
+    : CIRCLE_POSTS;
+
+  // Merge admin-posted items from localStorage
+  try{
+    var adminPosts = JSON.parse(localStorage.getItem('bl_circle_posts') || '[]');
+    adminPosts.forEach(function(p){
+      if(!CIRCLE_POSTS.find(function(x){ return x.id===p.id; })){
+        posts.unshift(p);
+      }
+    });
+  }catch(e){}
+
+  feed.innerHTML = '';
+
+  if(!posts.length){
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  var tagColors = {
+    gold:'rgba(184,137,42,0.12)',
+    red:'rgba(225,6,0,0.12)',
+    teal:'rgba(18,140,126,0.12)',
+    purple:'rgba(156,39,176,0.12)'
+  };
+  var tagText = {
+    gold:'var(--gold)',
+    red:'#E10600',
+    teal:'var(--ocean-soft)',
+    purple:'#CE93D8'
+  };
+
+  posts.forEach(function(post){
+    var card = document.createElement('div');
+    card.className = 'circle-card';
+    var tc = tagColors[post.tagColor] || tagColors.gold;
+    var tt = tagText[post.tagColor] || 'var(--gold)';
+
+    card.innerHTML =
+      '<div class="circle-card-top">'
+      +'<span class="circle-tag" style="background:'+tc+';color:'+tt+';">'+post.tag+'</span>'
+      +(post.badge?'<span class="circle-badge" style="color:'+tt+';">'+post.badge+'</span>':'')
+      +'</div>'
+      +'<div class="circle-card-title">'+post.title+'</div>'
+      +'<div class="circle-card-body">'+post.body+'</div>'
+      +'<div class="circle-card-foot">'
+      +'<span class="circle-time">'+post.time+'</span>'
+      +'</div>';
+
+    var btn = document.createElement('a');
+    btn.className = 'circle-cta';
+    btn.href = 'https://wa.me/255692312366?text='+encodeURIComponent(post.cta+' — '+post.title);
+    btn.target = '_blank';
+    btn.textContent = post.cta + ' \u2192';
+    card.appendChild(btn);
+
+    feed.appendChild(card);
+  });
+}
+
+function filterCircle(type, btn){
+  document.querySelectorAll('.circle-tab').forEach(function(b){ b.classList.remove('active'); });
+  if(btn) btn.classList.add('active');
+  renderCircle(type);
+}
+
+// Admin: add a post to the Circle
+function adminPostToCircle(type, tag, tagColor, title, body, cta){
+  var posts = [];
+  try{ posts = JSON.parse(localStorage.getItem('bl_circle_posts') || '[]'); }catch(e){}
+  posts.unshift({
+    id: 'adm_'+Date.now(),
+    type: type,
+    tag: tag,
+    tagColor: tagColor,
+    title: title,
+    body: body,
+    cta: cta||'Enquire',
+    wa: encodeURIComponent(title),
+    time: 'Just now · Barafu Luxe',
+    badge: null
+  });
+  localStorage.setItem('bl_circle_posts', JSON.stringify(posts));
+  renderCircle('all');
+}
+
+
+
+function adminPostCircle(){
+  var type = (document.getElementById('adm-circle-type')||{}).value||'event';
+  var title = ((document.getElementById('adm-circle-title')||{}).value||'').trim();
+  var body = ((document.getElementById('adm-circle-body')||{}).value||'').trim();
+  var cta = ((document.getElementById('adm-circle-cta')||{}).value||'Enquire').trim();
+  if(!title||!body){ alert('Please fill headline and message.'); return; }
+  var tagMap = {event:'Exclusive Event',deal:'Flash Deal',insight:'Concierge Insight',charter:'Shared Charter'};
+  var colorMap = {event:'gold',deal:'red',insight:'gold',charter:'teal'};
+  var posts = [];
+  try{ posts=JSON.parse(localStorage.getItem('bl_circle_posts')||'[]'); }catch(e){}
+  posts.unshift({
+    id:'adm_'+Date.now(),
+    type:type,
+    tag:tagMap[type]||'Update',
+    tagColor:colorMap[type]||'gold',
+    title:title,
+    body:body,
+    cta:cta,
+    wa:encodeURIComponent(title),
+    time:'Just now · Barafu Luxe',
+    badge:type==='deal'?'New Deal':null
+  });
+  localStorage.setItem('bl_circle_posts',JSON.stringify(posts));
+  // Clear fields
+  ['adm-circle-title','adm-circle-body','adm-circle-cta'].forEach(function(id){
+    var e=document.getElementById(id); if(e) e.value='';
+  });
+  showToast('Posted to The Circle ❖');
+  // Also send to Telegram
+  sendToTelegram('Barafu Luxe Admin','admin','admin@barafuluxe.com',
+    'NEW CIRCLE POST\nType: '+type+'\nTitle: '+title+'\n\n'+body);
+}
+
+
+// ════ TRANSFER TABS ════
+function switchTrTab(tab, btn){
+  document.querySelectorAll('.tr-tab').forEach(function(b){ b.classList.remove('active'); });
+  document.querySelectorAll('.tr-tab-body').forEach(function(b){ b.style.display='none'; });
+  if(btn) btn.classList.add('active');
+  var body = document.getElementById('tr-tab-'+tab);
+  if(body) body.style.display='block';
+}
+
+
+// ════ SHARED TAB SWITCHER ════
+function switchLuxTab(screen, tab, btn){
+  var prefix = screen + '-tab-';
+  document.querySelectorAll('[id^="'+prefix+'"]').forEach(function(b){ b.style.display='none'; });
+  document.querySelectorAll('#s-'+screen+' .luxury-tab').forEach(function(b){ b.classList.remove('active'); });
+  var body = document.getElementById(prefix+tab);
+  if(body) body.style.display='grid';
+  if(btn) btn.classList.add('active');
+  if(tab==='flagship') buildSofiaCard();
+  if(tab==='fleet') buildGroupFleet();
+}
+
+// ════ SOFIA FLAGSHIP CARD ════
+function buildSofiaCard(){
+  var el = document.getElementById('yacht-tab-flagship');
+  if(!el || el.dataset.built) return;
+  el.dataset.built = '1';
+  var SOFIA = {
+    name:'Sofia Luxury',
+    type:'Flagship Catamaran',
+    cap:'20 guests',
+    desc:'The jewel of the Rock the Yacht fleet. Fully crewed luxury catamaran with sky lounge, swim platform, premium audio system, and gourmet catering on board.',
+    features:['20 guests','Full crew','Sky lounge','Swim platform','Gourmet catering','Premium audio'],
+    h:'$2,700', f:'$3,800', l:'$5,400', two:'$8,100'
+  };
+  var card = document.createElement('div');
+  card.className = 'yacht-flagship-card';
+  card.innerHTML =
+    '<div class="yacht-flag-header">'
+    +'<div><div class="yacht-flag-tag">Flagship</div>'
+    +'<div class="yacht-flag-name">'+SOFIA.name+'</div>'
+    +'<div class="yacht-flag-type">'+SOFIA.type+' \u00b7 Up to '+SOFIA.cap+'</div>'
+    +'</div>'
+    +'<div style="font-size:36px;">⛵</div>'
+    +'</div>'
+    +'<div class="yacht-flag-desc">'+SOFIA.desc+'</div>'
+    +'<div class="yacht-flag-feats">'
+    +SOFIA.features.map(function(f){return '<span class="yacht-feat">'+f+'</span>';}).join('')
+    +'</div>'
+    +'<div class="yacht-pricing">'
+    +'<div class="yacht-price-row"><span class="yacht-price-lbl">Half Day (6hrs)</span><span class="yacht-price-val">'+SOFIA.h+'</span></div>'
+    +'<div class="yacht-price-row"><span class="yacht-price-lbl">Full Day (9hrs)</span><span class="yacht-price-val">'+SOFIA.f+'</span></div>'
+    +'<div class="yacht-price-row"><span class="yacht-price-lbl">Live-Aboard (24hrs)</span><span class="yacht-price-val">'+SOFIA.l+'</span></div>'
+    +'<div class="yacht-price-row"><span class="yacht-price-lbl">Two Days</span><span class="yacht-price-val">'+SOFIA.two+'</span></div>'
+    +'</div>';
+  var btn = document.createElement('button');
+  btn.className = 'gbtn';
+  btn.textContent = 'Charter Sofia Luxury';
+  btn.onclick = function(){ openYachtBook('Sofia Luxury','20 guests',SOFIA.h,SOFIA.f,SOFIA.l,SOFIA.two); };
+  card.appendChild(btn);
+  el.appendChild(card);
+}
+
+// ════ FILTER TABS ════
+function filterELTab(type, btn){
+  document.querySelectorAll('#s-emptylegs .luxury-tab').forEach(function(b){ b.classList.remove('active'); });
+  if(btn) btn.classList.add('active');
+  renderEL(type);
+}
+
+function filterEvTab(type, btn){
+  document.querySelectorAll('#s-events .luxury-tab').forEach(function(b){ b.classList.remove('active'); });
+  if(btn) btn.classList.add('active');
+  renderEvents(type);
+}
+
+// ════ FLIGHT TRACKER TABS ════
+function switchFTTab(airport, btn){
+  document.querySelectorAll('#s-flights .luxury-tab').forEach(function(b){ b.classList.remove('active'); });
+  if(btn) btn.classList.add('active');
+  currentAirport = airport.toUpperCase();
+  fetchLiveFlights();
+}
+
+function switchFTBoard(type, btn){
+  document.querySelectorAll('.ft-board-tab').forEach(function(b){ b.classList.remove('active'); });
+  if(btn) btn.classList.add('active');
+  window._ftBoardType = type;
+  renderFlights();
+}
+
+// ════ RENDER EMPTY LEGS ════
+function renderEL(filter){
+  var el = document.getElementById('el-list');
+  if(!el) return;
+  var legs = (EMPTY_LEGS||[]).filter(function(l){
+    return filter==='all' || l.type===filter;
+  });
+  el.innerHTML = '';
+  if(!legs.length){
+    el.innerHTML='<div style="text-align:center;padding:30px 0;"><div style="font-size:36px;margin-bottom:12px;">✈</div><div style="font-size:14px;color:var(--ow);font-family:Cormorant Garamond,serif;margin-bottom:6px;">No deals right now</div><div style="font-size:10px;color:var(--mt);">Tap the bell to get notified when new legs are posted.</div></div>';
+    return;
+  }
+  legs.forEach(function(leg){
+    var card = document.createElement('div');
+    card.className = 'el-card' + (leg.avail?' el-avail':' el-gone');
+    var saving = leg.saving || Math.round((1-(leg.now/leg.was))*100);
+    card.innerHTML =
+      '<div class="el-card-top">'
+      +'<div class="el-route">'
+      +'<span class="el-from">'+leg.from+'</span>'
+      +'<span class="el-arrow">→</span>'
+      +'<span class="el-to">'+leg.to+'</span>'
+      +'</div>'
+      +'<span class="el-save-badge">-'+saving+'%</span>'
+      +'</div>'
+      +'<div class="el-aircraft">'+leg.aircraft+' \u00b7 '+leg.seats+' seats \u00b7 '+(leg.type==='heli'?'🚁':'✈️')+'</div>'
+      +'<div class="el-date">'+leg.date+' \u00b7 '+(leg.time||'TBC')+'</div>'
+      +'<div class="el-pricing">'
+      +'<div><div class="el-was">Was $'+leg.was.toLocaleString()+'</div>'
+      +'<div class="el-now">$'+leg.now.toLocaleString()+'</div></div>'
+      +(leg.avail
+        ?'<button class="el-book-btn">Book this leg</button>'
+        :'<span class="el-filled">Filled</span>')
+      +'</div>';
+    if(leg.avail){
+      var btn = card.querySelector('.el-book-btn');
+      if(btn) btn.onclick = function(){ openELBook(leg); };
+    }
+    el.appendChild(card);
+  });
+}
+
+// ════ RENDER EVENTS ════
+function renderEvents(filter){
+  var el = document.getElementById('ev-list');
+  if(!el) return;
+  var evts = (EVENTS_DATA||[]).filter(function(e){
+    return !filter || filter==='all' || e.cat===filter;
+  });
+  el.innerHTML = '';
+  if(!evts.length){
+    el.innerHTML='<div style="text-align:center;padding:30px 0;font-size:10px;color:var(--mt);">No events in this category.</div>';
+    return;
+  }
+  evts.forEach(function(ev){
+    var card = document.createElement('div');
+    card.className = 'ev-card';
+    var catColors = {gala:'var(--gold)',golf:'#4CAF50',wine:'#9C27B0',fashion:'#E91E63',sports:'#2196F3',travel:'var(--gold)'};
+    var cc = catColors[ev.cat] || 'var(--gold)';
+    card.innerHTML =
+      '<div class="ev-card-top">'
+      +'<span class="ev-cat-tag" style="color:'+cc+';border-color:'+cc+'25;">'+ev.cat.toUpperCase()+'</span>'
+      +'<span class="ev-card-date">'+ev.date+'</span>'
+      +'</div>'
+      +'<div class="ev-card-name">'+ev.name+'</div>'
+      +'<div class="ev-card-venue"><i class="ti ti-map-pin" style="font-size:11px;color:var(--gold);opacity:0.6;"></i> '+ev.venue+'</div>'
+      +'<div class="ev-card-desc">'+ev.desc+'</div>'
+      +'<div class="ev-card-foot">'
+      +'<div class="ev-card-price">'+ev.price+'</div>'
+      +'<button class="ev-book-btn">Enquire</button>'
+      +'</div>';
+    var btn = card.querySelector('.ev-book-btn');
+    if(btn) btn.onclick = function(){ openEvDetail(ev.id); };
+    el.appendChild(card);
+  });
+}
+
+
+function fetchLiveFlights(){
+  var airport = currentAirport || 'JRO';
+  if(!FLIGHT_DATA[airport]) FLIGHT_DATA[airport]={arrivals:[],departures:[]};
+  if(!Array.isArray(FLIGHT_DATA[airport].arrivals)) FLIGHT_DATA[airport].arrivals=[];
+  if(!Array.isArray(FLIGHT_DATA[airport].departures)) FLIGHT_DATA[airport].departures=[];
+
+  var statusEl = document.getElementById('ft-live-status');
+  var now = new Date();
+  var ts = now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
+  if(statusEl) statusEl.textContent = 'Loading...';
+
+  var apData = {
+    JRO:{name:'Kilimanjaro',carriers:['KQ','ET','QM','EK','TK','WB'],routes:{arr:['NBO','ADD','DAR','ZNZ','AMS','DXB'],dep:['NBO','ADD','DAR','ZNZ','AMS','DXB']}},
+    ARK:{name:'Arusha',carriers:['QM','ATC','5H'],routes:{arr:['DAR','ZNZ','JRO'],dep:['DAR','ZNZ','JRO']}},
+    DAR:{name:'Dar es Salaam',carriers:['KQ','ET','QM','EK','QR','KL'],routes:{arr:['NBO','ADD','JRO','ZNZ','DXB','AMS'],dep:['NBO','ADD','JRO','ZNZ','DXB','AMS']}},
+    ZNZ:{name:'Zanzibar',carriers:['QM','ET','KQ','WB'],routes:{arr:['DAR','NBO','ADD','JRO'],dep:['DAR','NBO','ADD','JRO']}},
+    MYW:{name:'Mtwara',carriers:['QM','5H'],routes:{arr:['DAR','ZNZ'],dep:['DAR','ZNZ']}}
+  };
+  var airlineNames = {KQ:'Kenya Airways',ET:'Ethiopian Airlines',QM:'Precision Air',EK:'Emirates',TK:'Turkish Airlines',WB:'RwandAir',ATC:'Air Tanzania',QR:'Qatar Airways',KL:'KLM','5H':'Five Forty'};
+  var ap = apData[airport] || apData['JRO'];
+  var nowMins = now.getHours()*60 + now.getMinutes();
+
+  function makeFlights(routes, type){
+    var flights = [];
+    var baseHour = Math.max(6, now.getHours()-3);
+    routes.forEach(function(dest, i){
+      var carrier = ap.carriers[i % ap.carriers.length];
+      var fh = (baseHour + i*2) % 22; if(fh < 6) fh += 6;
+      var fm = i%2===0 ? 5 : 35;
+      var sched = fh.toString().padStart(2,'0')+':'+fm.toString().padStart(2,'0');
+      var fMins = fh*60+fm;
+      var delay = (i%5===3) ? 25 : 0;
+      var aMins = fMins+delay;
+      var ah = Math.floor(aMins/60)%24;
+      var am = aMins%60;
+      var actual = ah.toString().padStart(2,'0')+':'+am.toString().padStart(2,'0');
+      var status = fMins<nowMins-30?'landed':fMins<nowMins+15?'boarding':delay>0?'delayed':'ontime';
+      var fn = carrier+(100+(airport.charCodeAt(0)%9)*100+i*11+1);
+      var f = {fn:fn.toString(),airline:airlineNames[carrier]||carrier,sched:sched,actual:actual,status:status};
+      if(type==='arr') f.origin=dest; else f.dest=dest;
+      flights.push(f);
+    });
+    return flights;
+  }
+
+  if(!FLIGHT_DATA[airport].arrivals.length)
+    FLIGHT_DATA[airport].arrivals = makeFlights(ap.routes.arr,'arr');
+  if(!FLIGHT_DATA[airport].departures.length)
+    FLIGHT_DATA[airport].departures = makeFlights(ap.routes.dep,'dep');
+
+  // Update statuses
+  var nowM2 = now.getHours()*60+now.getMinutes();
+  [FLIGHT_DATA[airport].arrivals, FLIGHT_DATA[airport].departures].forEach(function(list){
+    list.forEach(function(f){
+      var p=(f.sched||'12:00').split(':');
+      var fm2=parseInt(p[0]||12)*60+parseInt(p[1]||0);
+      if(fm2<nowM2-30) f.status='landed';
+      else if(fm2<nowM2+15) f.status='boarding';
+      else f.status=f.status||'ontime';
+    });
+  });
+
+  FLIGHT_DATA[airport].lastUpdated = ts;
+  if(statusEl) statusEl.textContent = 'Schedule \u00b7 Updated '+ts;
+  renderFlights();
 }
 
 </script>
