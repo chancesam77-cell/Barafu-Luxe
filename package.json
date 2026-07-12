@@ -1,8 +1,0 @@
-{
-  "name": "barafu-luxe",
-  "version": "1.0.0",
-  "scripts": {
-    "build": "echo 'No build needed'",
-    "start": "echo 'Static site'"
-  }
-}
