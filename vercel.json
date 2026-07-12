@@ -1,0 +1,8 @@
+{
+  "version": 2,
+  "outputDirectory": "public",
+  "functions": {
+    "api/telegram.js": { "memory": 128, "maxDuration": 10 },
+    "api/telegram-poll.js": { "memory": 128, "maxDuration": 10 }
+  }
+}
