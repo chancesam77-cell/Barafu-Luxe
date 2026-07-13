@@ -5796,97 +5796,17 @@ var BL_TG_CHAT  = '608285052';
 var _tgLastUpdateId = 0;
 var _tgPollTimer = null;
 
-function sendToTelegram(memberName, memberTier, memberEmail, message){
-  var tierLabel = memberTier==='obsidian'?'OBSIDIAN':memberTier==='gold'?'GOLD':'SILVER';
-  var text = 'NEW CONCIERGE MESSAGE'
-    + '\n\nMember: ' + memberName
-    + '\nEmail: ' + memberEmail
-    + '\nTier: ' + tierLabel
-    + '\n\nMessage:\n' + message
-    + '\n\nTime: ' + new Date().toLocaleString('en-GB');
 
-  // Use our Vercel proxy — avoids all CORS issues
-  var proxyUrl = '/api/telegram';
 
-  fetch(proxyUrl, {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({text: text})
-  })
-  .then(function(r){ return r.json(); })
-  .then(function(d){ console.log('TG sent via proxy:', d.ok); })
-  .catch(function(e){ console.log('TG proxy error:', e.message); });
-}
 
-function sendBookingToTelegram(service, details){
-  var u = currentUser || {};
-  var tierLabel = (u.tier||'silver')==='obsidian'?'OBSIDIAN':(u.tier||'silver')==='gold'?'GOLD':'SILVER';
-  var text = 'NEW BOOKING REQUEST'
-    + '\n\nMember: ' + (u.name||'Guest')
-    + '\nEmail: ' + (u.email||'unknown')
-    + '\nTier: ' + tierLabel
-    + '\n\nService: ' + service
-    + '\nDetails:\n' + details
-    + '\n\nTime: ' + new Date().toLocaleString('en-GB');
 
-  fetch('/api/telegram', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({text: text})
-  }).catch(function(e){ console.log('TG booking proxy error:', e.message); });
-}
 
-function startTelegramPolling(){
-  if(_tgPollTimer) return;
-  _tgPollTimer = setInterval(function(){ pollTelegramReplies(); }, 8000);
-}
 
-function stopTelegramPolling(){
-  if(_tgPollTimer){ clearInterval(_tgPollTimer); _tgPollTimer = null; }
-}
 
-function pollTelegramReplies(){
-  var url = '/api/telegram-poll?offset=' + (_tgLastUpdateId + 1);
 
-  fetch(url)
-    .then(function(r){ return r.json(); })
-    .then(function(data){
-      if(!data.ok || !data.result || !data.result.length) return;
-      data.result.forEach(function(update){
-        _tgLastUpdateId = update.update_id;
-        var msg = update.message;
-        if(!msg || !msg.text) return;
-        if(String(msg.from.id) === BL_TG_CHAT && !msg.from.is_bot){
-          showConciergeReply(msg.text);
-        }
-      });
-    })
-    .catch(function(e){ console.log('TG poll error:', e.message); });
-}
 
-function showConciergeReply(text){
-  var msgs = document.getElementById('chat-msgs');
-  if(!msgs) return;
-  var screen = document.getElementById('s-concierge');
-  if(!screen || !screen.classList.contains('active')) return;
-  var safe = text.replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  var ts = new Date().getHours().toString().padStart(2,'0')+':'+new Date().getMinutes().toString().padStart(2,'0');
-  msgs.innerHTML += '<div class="msg them">'
-    + '<div class="msg-b">'+safe+'</div>'
-    + '<div class="msg-t">Barafu Luxe Concierge '+ts+'</div>'
-    + '</div>';
-  msgs.scrollTop = msgs.scrollHeight;
-  try{
-    var ctx = new (window.AudioContext||window.webkitAudioContext)();
-    var osc = ctx.createOscillator();
-    var gain = ctx.createGain();
-    osc.connect(gain); gain.connect(ctx.destination);
-    osc.frequency.value = 880;
-    gain.gain.setValueAtTime(0.1, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+0.3);
-    osc.start(); osc.stop(ctx.currentTime+0.3);
-  }catch(e){}
-}
+
+
 
 
 
@@ -6870,6 +6790,107 @@ function renderGems(filter){
     card.onclick = function(){ openGemDetail(this.dataset.gid); };
     el.appendChild(card);
   });
+}
+
+
+
+// ════ TELEGRAM — BULLETPROOF VERSION ════
+var BL_TG_TOKEN = '8820396722:AAGSePXlx1qIPfBzBwRlcoWYujNkikgTSKQ';
+var BL_TG_CHAT  = '608285052';
+var _tgLastUpdateId = 0;
+var _tgPollTimer = null;
+
+function sendToTelegram(memberName, memberTier, memberEmail, message){
+  var tierLabel = memberTier==='obsidian'?'OBSIDIAN':memberTier==='gold'?'GOLD':'SILVER';
+  var text = 'NEW CONCIERGE MESSAGE'
+    + '\n\nMember: ' + memberName
+    + '\nEmail: ' + memberEmail
+    + '\nTier: ' + tierLabel
+    + '\n\nMessage:\n' + message
+    + '\n\nTime: ' + new Date().toLocaleString('en-GB');
+  tgSend(text);
+}
+
+function sendBookingToTelegram(service, details){
+  var u = currentUser || {};
+  var tierLabel = (u.tier||'silver')==='obsidian'?'OBSIDIAN':(u.tier||'silver')==='gold'?'GOLD':'SILVER';
+  var text = 'NEW BOOKING REQUEST'
+    + '\n\nMember: ' + (u.name||'Guest')
+    + '\nEmail: ' + (u.email||'unknown')
+    + '\nTier: ' + tierLabel
+    + '\n\nService: ' + service
+    + '\n\nDetails: ' + details
+    + '\n\nTime: ' + new Date().toLocaleString('en-GB');
+  tgSend(text);
+}
+
+function tgSend(text){
+  // Method 1: no-cors fetch — always fires, browser can't read response but Telegram receives it
+  var url = 'https://api.telegram.org/bot' + BL_TG_TOKEN + '/sendMessage';
+  try {
+    fetch(url, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({chat_id: BL_TG_CHAT, text: text})
+    }).then(function(){ console.log('TG fired'); })
+      .catch(function(e){ tgSendGet(text); });
+  } catch(e) {
+    tgSendGet(text);
+  }
+}
+
+function tgSendGet(text){
+  // Method 2: GET via img — zero CORS, always works
+  var img = new Image();
+  img.src = 'https://api.telegram.org/bot' + BL_TG_TOKEN
+    + '/sendMessage?chat_id=' + BL_TG_CHAT
+    + '&text=' + encodeURIComponent(text.substring(0, 1000));
+  img.onerror = function(){ console.log('TG GET sent (error is normal for img)'); };
+}
+
+function startTelegramPolling(){
+  if(_tgPollTimer) return;
+  pollTelegramReplies();
+  _tgPollTimer = setInterval(function(){ pollTelegramReplies(); }, 10000);
+}
+
+function stopTelegramPolling(){
+  if(_tgPollTimer){ clearInterval(_tgPollTimer); _tgPollTimer = null; }
+}
+
+function pollTelegramReplies(){
+  var url = 'https://api.telegram.org/bot' + BL_TG_TOKEN
+    + '/getUpdates?offset=' + (_tgLastUpdateId + 1) + '&timeout=0';
+  fetch(url)
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      if(!data.ok || !data.result || !data.result.length) return;
+      data.result.forEach(function(update){
+        _tgLastUpdateId = update.update_id;
+        var msg = update.message;
+        if(!msg || !msg.text) return;
+        if(String(msg.from.id) === BL_TG_CHAT && !msg.from.is_bot){
+          showConciergeReply(msg.text);
+        }
+      });
+    })
+    .catch(function(e){ console.log('TG poll:', e.message); });
+}
+
+function showConciergeReply(text){
+  var msgs = document.getElementById('chat-msgs');
+  if(!msgs) return;
+  var screen = document.getElementById('s-concierge');
+  if(!screen || !screen.classList.contains('active')) return;
+  var safe = text.replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  var ts = new Date().getHours().toString().padStart(2,'0')+':'+new Date().getMinutes().toString().padStart(2,'0');
+  var div = document.createElement('div');
+  div.className = 'msg them';
+  div.innerHTML = '<div class="msg-b">'+safe+'</div>'
+    +'<div class="msg-t">Barafu Luxe Concierge · '+ts+'</div>';
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
 }
 
 </script>
