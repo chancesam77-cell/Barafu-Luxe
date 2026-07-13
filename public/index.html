@@ -3463,21 +3463,76 @@ function closeModal(e){
 
 // ════ CONCIERGE CHAT ════
 function sendMsg(){
-  var inp=document.getElementById('chat-inp');
-  var txt=inp.value.trim();
+  var inp = document.getElementById('chat-inp');
+  var txt = inp.value.trim();
   if(!txt) return;
-  var msgs=document.getElementById('chat-msgs');
-  var safeCTxt=txt.replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  var ts=new Date().getHours().toString().padStart(2,'0')+':'+new Date().getMinutes().toString().padStart(2,'0');
-  msgs.innerHTML+='<div class="msg me"><div class="msg-b">'+safeCTxt+'</div><div class="msg-t">You '+ts+'</div></div>';
-  inp.value='';
-  msgs.scrollTop=msgs.scrollHeight;
-  var u=currentUser||{};
+
+  var msgs = document.getElementById('chat-msgs');
+  var safe = txt.replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  var ts = new Date().getHours().toString().padStart(2,'0')+':'+new Date().getMinutes().toString().padStart(2,'0');
+
+  // Show member's message
+  var div = document.createElement('div');
+  div.className = 'msg me';
+  div.innerHTML = '<div class="msg-b">'+safe+'</div><div class="msg-t">You · '+ts+'</div>';
+  msgs.appendChild(div);
+  inp.value = '';
+  msgs.scrollTop = msgs.scrollHeight;
+
+  // Fire Telegram (best effort)
+  var u = currentUser || {};
   sendToTelegram(u.name||'Member', u.tier||'silver', u.email||'unknown', txt);
+
+  // Show receipt + WhatsApp fallback after 3 seconds
   setTimeout(function(){
-    msgs.innerHTML+='<div class="msg them"><div class="msg-b">Message received. Your Barafu Luxe concierge will respond shortly.</div><div class="msg-t">Barafu Luxe Concierge '+ts+'</div></div>';
-    msgs.scrollTop=msgs.scrollHeight;
-  },1000);
+    var u2 = currentUser || {};
+    var waText = 'Concierge message from ' + (u2.name||'Member') + ' (' + (u2.tier||'silver').toUpperCase() + '): ' + txt;
+
+    var reply = document.createElement('div');
+    reply.className = 'msg them';
+    reply.innerHTML = '<div class="msg-b">Your message has been received ❖ '
+      + 'Your concierge will respond shortly. '
+      + 'For urgent requests, tap below.</div>'
+      + '<div class="msg-t">Barafu Luxe · '+ts+'</div>';
+    msgs.appendChild(reply);
+
+    // WhatsApp button as guaranteed backup
+    var waBtn = document.createElement('a');
+    waBtn.href = 'https://wa.me/255692312366?text=' + encodeURIComponent(waText);
+    waBtn.target = '_blank';
+    waBtn.className = 'wa-btn';
+    waBtn.style.cssText = 'margin:8px 0 0 0;display:flex;';
+    waBtn.innerHTML = '<i class="ti ti-brand-whatsapp"></i>Continue on WhatsApp';
+    msgs.appendChild(waBtn);
+    msgs.scrollTop = msgs.scrollHeight;
+  }, 1500);
+}
+
+function blSendEmail(name, email, tier, message){
+  // EmailJS — free service, works cross-origin by design
+  // Uses fetch to EmailJS API which allows CORS from any origin
+  var serviceId  = 'service_barafuluxe';
+  var templateId = 'template_concierge';
+  var userId     = 'YOUR_EMAILJS_PUBLIC_KEY';
+
+  fetch('https://api.emailjs.com/api/v1.0/email/send', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      service_id:  serviceId,
+      template_id: templateId,
+      user_id:     userId,
+      template_params: {
+        from_name:    name,
+        from_email:   email,
+        member_tier:  tier,
+        message:      message,
+        reply_to:     'barafuluxe@gmail.com',
+        sent_time:    new Date().toLocaleString('en-GB')
+      }
+    })
+  }).then(function(r){ console.log('Email sent:', r.status); })
+    .catch(function(e){ console.log('Email error:', e.message); });
 }
 
 // ════ FLIGHT TRACKER ════
@@ -6825,19 +6880,33 @@ function sendBookingToTelegram(service, details){
 }
 
 function tgSend(text){
-  // Method 1: no-cors fetch — always fires, browser can't read response but Telegram receives it
-  var url = 'https://api.telegram.org/bot' + BL_TG_TOKEN + '/sendMessage';
-  try {
-    fetch(url, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({chat_id: BL_TG_CHAT, text: text})
-    }).then(function(){ console.log('TG fired'); })
-      .catch(function(e){ tgSendGet(text); });
-  } catch(e) {
-    tgSendGet(text);
-  }
+  var token = BL_TG_TOKEN;
+  var chat  = BL_TG_CHAT;
+
+  // FormData POST — no JSON, no preflight, works from ALL browsers cross-origin
+  var form = new FormData();
+  form.append('chat_id', chat);
+  form.append('text', text);
+
+  fetch('https://api.telegram.org/bot' + token + '/sendMessage', {
+    method: 'POST',
+    body: form
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(d){
+    if(d.ok) console.log('TG delivered ✓');
+    else console.log('TG rejected:', d.description);
+  })
+  .catch(function(e){
+    // Final fallback: script tag injection — bypasses all CORS
+    var s = document.createElement('script');
+    s.src = 'https://api.telegram.org/bot' + token + '/sendMessage'
+      + '?chat_id=' + encodeURIComponent(chat)
+      + '&text=' + encodeURIComponent(text.substring(0, 800));
+    s.onload = function(){ document.head.removeChild(s); };
+    s.onerror = function(){ document.head.removeChild(s); };
+    document.head.appendChild(s);
+  });
 }
 
 function tgSendGet(text){
