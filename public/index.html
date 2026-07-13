@@ -365,6 +365,26 @@
 .gem-prop-per{font-size:9px;color:var(--mt);margin-top:4px;letter-spacing:0.04em;}
 .gem-enquire-btn{background:transparent;border:0.5px solid rgba(184,137,42,0.4);color:var(--gold);padding:10px 20px;border-radius:2px;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;font-family:Montserrat,Georgia,sans-serif;cursor:pointer;white-space:nowrap;}
 
+
+/* ════ HIDDEN GEMS ════ */
+.gem-hero-wrap{padding:28px 20px 22px;border-bottom:0.5px solid rgba(184,137,42,0.15);text-align:center;background:linear-gradient(160deg,#080808,#0b0a06,#080808);}
+.gem-prop-card{padding:24px 0;border-bottom:0.5px solid rgba(255,255,255,0.05);cursor:pointer;}
+.gem-prop-card:last-child{border-bottom:none;}
+.gem-prop-inner{position:relative;}
+.gem-new-badge{display:inline-block;font-size:8px;letter-spacing:0.2em;color:var(--gold);text-transform:uppercase;border:0.5px solid rgba(184,137,42,0.3);padding:3px 12px;border-radius:10px;margin-bottom:12px;}
+.gem-prop-num{font-family:Montserrat,Georgia,sans-serif;font-size:10px;letter-spacing:0.22em;color:rgba(184,137,42,0.3);margin-bottom:10px;}
+.gem-prop-icon{font-size:42px;margin-bottom:14px;line-height:1;}
+.gem-prop-name{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;color:#fff;line-height:1.15;margin-bottom:6px;}
+.gem-prop-loc{font-size:10px;color:var(--mt);letter-spacing:0.06em;margin-bottom:12px;display:flex;align-items:center;gap:5px;}
+.gem-prop-desc{font-size:11px;color:var(--mt);line-height:1.9;margin-bottom:14px;}
+.gem-prop-feats{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px;}
+.gem-feat-tag{font-size:9px;color:var(--mt);border:0.5px solid var(--bd);padding:4px 12px;border-radius:10px;letter-spacing:0.04em;}
+.gem-prop-bottom{display:flex;align-items:flex-end;justify-content:space-between;padding-top:16px;border-top:0.5px solid var(--bd);}
+.gem-prop-from{font-size:8px;letter-spacing:0.16em;color:var(--mt);text-transform:uppercase;margin-bottom:4px;}
+.gem-prop-price{font-family:'Cormorant Garamond',serif;font-size:30px;color:var(--gl);line-height:1;}
+.gem-prop-per{font-size:9px;color:var(--mt);margin-top:4px;letter-spacing:0.04em;}
+.gem-enquire-btn{background:transparent;border:0.5px solid rgba(184,137,42,0.4);color:var(--gold);padding:10px 20px;border-radius:2px;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;font-family:Montserrat,Georgia,sans-serif;cursor:pointer;white-space:nowrap;}
+
 </style>
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="theme-color" content="#080808">
@@ -1621,11 +1641,11 @@ function removeBookingFB(fbKey){
   </div>
   <div class="chat-wrap">
     <div class="chat-msgs" id="chat-msgs">
-      <div class="msg them"><div class="msg-b">Karibu. I'm your Barafu Luxe concierge. Every detail, every arrangement — that's what we do. How can I help you today?</div><div class="msg-t">Barafu Luxe · Now</div></div>
-      <div class="msg them"><div class="msg-b">You can request a transfer, helicopter picnic, yacht charter, F1 hospitality, safari — or anything else. Just tell me what you need. ✦</div><div class="msg-t">Barafu Luxe · Now</div></div>
+      <div class="msg them"><div class="msg-b">Karibu. I'm your Barafu Luxe concierge. Type your request below and we'll connect you instantly on WhatsApp. How can I help you today?</div><div class="msg-t">Barafu Luxe · Now</div></div>
+      <div class="msg them"><div class="msg-b">You can request a transfer, helicopter charter, yacht, F1 hospitality, safari — or anything else. Just type and tap Send. ✦</div><div class="msg-t">Barafu Luxe · Now</div></div>
     </div>
     <div class="chat-bar">
-      <input class="chat-inp" id="chat-inp" placeholder="Type your request..." onkeydown="if(event.key==='Enter')sendMsg()">
+      <input class="chat-inp" id="chat-inp" placeholder="Type your request and we'll connect on WhatsApp..." onkeydown="if(event.key==='Enter')sendMsg()">
       <button class="chat-send" onclick="sendMsg()">↑</button>
     </div>
   </div>
@@ -2554,8 +2574,10 @@ function go(id){
   if(id==='s-transfers'){ setTimeout(function(){ try{buildRoutes();}catch(e){} },100); }
   if(id==='s-f1'){ setTimeout(function(){ try{buildF1();}catch(e){console.log('F1 err:',e);} setTimeout(function(){try{fetchF1Live();}catch(e){}},400); },100); }
   if(id==='s-yacht'){ setTimeout(function(){ try{buildGroupFleet();}catch(e){console.log('Fleet err:',e);} },100); }
-  if(id==='s-concierge'){ try{startTelegramPolling();}catch(e){} }
-  if(id!=='s-concierge'){ try{stopTelegramPolling();}catch(e){} }
+  if(id==='s-concierge'){ try{
+}catch(e){} }
+  if(id!=='s-concierge'){ try{
+}catch(e){} }
   if(id==='s-circle'){ renderCircle('all'); }
   if(id==='s-gems'){ setTimeout(function(){
     try{
@@ -3470,8 +3492,9 @@ function sendMsg(){
   var msgs = document.getElementById('chat-msgs');
   var safe = txt.replace(/</g,'&lt;').replace(/>/g,'&gt;');
   var ts = new Date().getHours().toString().padStart(2,'0')+':'+new Date().getMinutes().toString().padStart(2,'0');
+  var u = currentUser || {};
 
-  // Show member's message
+  // Show member bubble
   var div = document.createElement('div');
   div.className = 'msg me';
   div.innerHTML = '<div class="msg-b">'+safe+'</div><div class="msg-t">You · '+ts+'</div>';
@@ -3479,33 +3502,34 @@ function sendMsg(){
   inp.value = '';
   msgs.scrollTop = msgs.scrollHeight;
 
-  // Fire Telegram (best effort)
-  var u = currentUser || {};
-  sendToTelegram(u.name||'Member', u.tier||'silver', u.email||'unknown', txt);
+  // Build WhatsApp message
+  var tierLabel = (u.tier||'silver').toUpperCase();
+  var waText = '❖ Barafu Luxe Concierge Request'
+    + '\n\nMember: ' + (u.name||'Guest')
+    + '\nTier: ' + tierLabel
+    + '\n\nMessage:\n' + txt
+    + '\n\n— Sent via Barafu Luxe App';
 
-  // Show receipt + WhatsApp fallback after 3 seconds
+  // Auto-open WhatsApp after short delay
   setTimeout(function(){
-    var u2 = currentUser || {};
-    var waText = 'Concierge message from ' + (u2.name||'Member') + ' (' + (u2.tier||'silver').toUpperCase() + '): ' + txt;
-
     var reply = document.createElement('div');
     reply.className = 'msg them';
-    reply.innerHTML = '<div class="msg-b">Your message has been received ❖ '
-      + 'Your concierge will respond shortly. '
-      + 'For urgent requests, tap below.</div>'
+    reply.innerHTML = '<div class="msg-b">Message received ❖ Opening WhatsApp to connect you with your concierge now.</div>'
       + '<div class="msg-t">Barafu Luxe · '+ts+'</div>';
     msgs.appendChild(reply);
 
-    // WhatsApp button as guaranteed backup
     var waBtn = document.createElement('a');
     waBtn.href = 'https://wa.me/255692312366?text=' + encodeURIComponent(waText);
     waBtn.target = '_blank';
     waBtn.className = 'wa-btn';
     waBtn.style.cssText = 'margin:8px 0 0 0;display:flex;';
-    waBtn.innerHTML = '<i class="ti ti-brand-whatsapp"></i>Continue on WhatsApp';
+    waBtn.innerHTML = '<i class="ti ti-brand-whatsapp"></i>Open WhatsApp';
     msgs.appendChild(waBtn);
     msgs.scrollTop = msgs.scrollHeight;
-  }, 1500);
+
+    // Auto-open
+    window.open('https://wa.me/255692312366?text=' + encodeURIComponent(waText), '_blank');
+  }, 800);
 }
 
 function blSendEmail(name, email, tier, message){
@@ -5475,393 +5499,6 @@ async function fetchLiveEvents(){
 
 
 // ════ CLIENT FLIGHT TRACKER — PREMIUM ════
-function trackClientFlight(flightNumber){
-  var inp = String(flightNumber||'').trim().toUpperCase().replace(/[^A-Z0-9]/g,'');
-  var box = document.getElementById('flight-tracker-results');
-  if(!inp){
-    if(box) box.innerHTML='<div class="info-box" style="margin:12px 14px;">Please enter a flight number above.</div>';
-    return;
-  }
-  window._trackedFlight = inp;
-  if(box) box.innerHTML='<div style="padding:20px 14px;text-align:center;">'
-    +'<div style="width:28px;height:28px;border:2px solid rgba(184,137,42,0.3);border-top-color:var(--gold);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px;"></div>'
-    +'<div style="font-size:13px;color:var(--ow);font-family:Cormorant Garamond,serif;">Tracking '+inp+'</div>'
-    +'<div style="font-size:9px;color:var(--mt);margin-top:4px;">Searching live flight data...</div>'
-    +'</div>';
-  fetch('https://api.anthropic.com/v1/messages',{
-    method:'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({
-      model:'claude-sonnet-4-6',max_tokens:800,
-      tools:[{type:'web_search_20250305',name:'web_search'}],
-      messages:[{role:'user',content:'Search flightradar24.com for flight '+inp+' today. Return ONLY JSON: {"fn":"'+inp+'","airline":"","origin":"","originCity":"","dest":"","destCity":"","status":"ontime","sched":"HH:MM","actual":"HH:MM","aircraft":"","delay":"0","terminal":"","gate":""}. Status: ontime delayed landed boarding cancelled scheduled'}]
-    })
-  })
-  .then(function(r){return r.json();})
-  .then(function(data){
-    if(!data||!Array.isArray(data.content)) throw new Error('Bad response');
-    var txt=data.content.filter(function(c){return c.type==='text';}).map(function(c){return c.text;}).join('');
-    var f=null;
-    var m1=txt.match(/```json([\s\S]*?)```/)||txt.match(/```([\s\S]*?)```/);
-    if(m1){try{f=JSON.parse(m1[1].trim());}catch(e){}}
-    if(!f){var m2=txt.match(/\{[^{}]+\}/);if(m2){try{f=JSON.parse(m2[0]);}catch(e){}}}
-    if(!f||!f.airline){
-      if(box) box.innerHTML='<div style="padding:20px 14px;text-align:center;">'
-        +'<div style="font-size:14px;color:var(--ow);font-family:Cormorant Garamond,serif;margin-bottom:8px;">Flight '+inp+' not found</div>'
-        +'<div style="font-size:10px;color:var(--mt);margin-bottom:14px;line-height:1.7;">Try: KQ100, QM201, ET800</div>'
-        +'<a class="wa-btn" href="https://wa.me/255692312366?text=Please+track+flight+'+inp+'+for+me" target="_blank"><i class="ti ti-brand-whatsapp"></i>Ask concierge to track this flight</a>'
-        +'</div>';
-      return;
-    }
-    var sc={ontime:'#4CAF50',delayed:'#FF9800',landed:'#4CAF50',boarding:'#2196F3',cancelled:'#F44336',scheduled:'#888'}[f.status]||'#888';
-    var html='<div style="padding:14px;">'
-      +'<div style="background:var(--card);border:0.5px solid rgba(184,137,42,0.2);border-radius:3px;padding:16px;margin-bottom:10px;">'
-      +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">'
-      +'<div><div style="font-size:18px;color:var(--ow);font-family:Cormorant Garamond,serif;">'+f.fn+'</div>'
-      +'<div style="font-size:10px;color:var(--mt);">'+(f.airline||'')+'</div></div>'
-      +'<span style="background:'+sc+';color:#000;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;padding:4px 10px;border-radius:10px;font-weight:600;">'+(f.status||'').toUpperCase()+'</span>'
-      +'</div>'
-      +'<div style="display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;margin-bottom:12px;">'
-      +'<div><div style="font-size:20px;color:var(--ow);font-family:Cormorant Garamond,serif;">'+(f.origin||'—')+'</div>'
-      +'<div style="font-size:9px;color:var(--mt);">'+(f.originCity||'')+'</div></div>'
-      +'<div style="color:var(--gold);font-size:16px;">✈</div>'
-      +'<div style="text-align:right;"><div style="font-size:20px;color:var(--ow);font-family:Cormorant Garamond,serif;">'+(f.dest||'—')+'</div>'
-      +'<div style="font-size:9px;color:var(--mt);">'+(f.destCity||'')+'</div></div>'
-      +'</div>'
-      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">'
-      +'<div style="background:var(--soft);padding:8px;border-radius:2px;">'
-      +'<div style="font-size:8px;color:var(--mt);text-transform:uppercase;letter-spacing:0.1em;">Scheduled</div>'
-      +'<div style="font-size:16px;color:var(--ow);font-family:Cormorant Garamond,serif;">'+(f.sched||'—')+'</div></div>'
-      +'<div style="background:var(--soft);padding:8px;border-radius:2px;">'
-      +'<div style="font-size:8px;color:var(--mt);text-transform:uppercase;letter-spacing:0.1em;">Actual</div>'
-      +'<div style="font-size:16px;color:'+(parseInt(f.delay||0)>0?'#FF9800':'var(--ow)')+';font-family:Cormorant Garamond,serif;">'+(f.actual||f.sched||'—')+(parseInt(f.delay||0)>0?' +'+f.delay+'m':'')+'</div></div>'
-      +'</div>'
-      +(f.aircraft?'<div style="font-size:9px;color:var(--mt);margin-top:8px;">'+f.aircraft+(f.terminal?' · T'+f.terminal:'')+(f.gate?' · Gate '+f.gate:'')+'</div>':'')
-      +'</div>'
-      +'<button class="gbtn" id="fl-xfer-btn" style="width:100%;margin-top:0;">Book airport transfer</button>'
-      +'</div>';
-    if(box) box.innerHTML=html;
-    var xb=document.getElementById('fl-xfer-btn');
-    if(xb) xb.onclick=function(){openTransferBook('Airport Transfer',100,'250,000');};
-  })
-  .catch(function(err){
-    console.log('Flight track error:',err.message);
-    if(box) box.innerHTML='<div style="padding:20px 14px;text-align:center;">'
-      +'<div style="font-size:10px;color:var(--mt);margin-bottom:14px;">Live tracking unavailable. Your concierge can track any flight for you.</div>'
-      +'<a class="wa-btn" href="https://wa.me/255692312366?text=Please+track+flight+'+inp+'+for+me" target="_blank"><i class="ti ti-brand-whatsapp"></i>Ask concierge to track '+inp+'</a>'
-      +'</div>';
-  });
-}
-
-
-function bookTrackedFlight(){
-  var fn = window._trackedFlight || 'Flight';
-  openTransferBook(fn + ' Arrival Transfer', '', 'TZS');
-}
-
-
-function openObsidianLounge(){
-  if(!currentUser){ return; }
-  if(currentUser.tier!=='obsidian'&&currentUser.tier!=='admin'){
-    showTierUpgradeAlert('business');
-    return;
-  }
-  document.getElementById('modal-ttl').textContent='Obsidian Private Lounge';
-  var el=document.getElementById('modal-body');
-  el.innerHTML='';
-  var f=document.createElement('div');
-  f.className='fwrap';
-  f.innerHTML='<div style="text-align:center;padding:12px 0 16px;">'
-    +'<div style="font-size:36px;margin-bottom:8px;">💎</div>'
-    +'<div style="font-family:Cormorant Garamond,serif;font-size:20px;color:#CE93D8;margin-bottom:6px;">Obsidian Introductions</div>'
-    +'<div style="font-size:11px;color:var(--mt);line-height:1.7;">Your concierge facilitates direct introductions between Obsidian members. All requests are handled with complete discretion.</div>'
-    +'</div>'
-    +'<div class="fgrp"><label class="flbl">Your name</label><input class="finp" placeholder="Full name"></div>'
-    +'<div class="fgrp"><label class="flbl">What are you looking for?</label><select class="fsel">'
-    +'<option>Business introduction</option>'
-    +'<option>Investment opportunity</option>'
-    +'<option>Shared charter partner</option>'
-    +'<option>Hospitality referral</option>'
-    +'<option>Other private matter</option>'
-    +'</select></div>'
-    +'<div class="fgrp"><label class="flbl">Brief description</label><textarea class="ftxt" placeholder="Describe what you are looking for. All information is strictly confidential."></textarea></div>';
-  var btn=document.createElement('button');
-  btn.className='gbtn';
-  btn.style.cssText='background:rgba(156,39,176,0.15);border-color:rgba(156,39,176,0.4);color:#CE93D8;';
-  btn.textContent='Send introduction request';
-  btn.onclick=function(){ submitForm('Obsidian Circle: Introduction Request'); };
-  f.appendChild(btn);
-  var wa=document.createElement('a');
-  wa.className='wa-btn';
-  wa.href='https://wa.me/255692312366?text=Obsidian+introduction+request';
-  wa.target='_blank';
-  wa.innerHTML='<i class="ti ti-brand-whatsapp"></i>WhatsApp concierge directly';
-  f.appendChild(wa);
-  el.appendChild(f);
-  document.getElementById('modal-bg').classList.add('open');
-}
-
-// ════ PROFILE FUNCTIONS ════
-
-function openProfileSettings(){
-  document.getElementById('modal-ttl').textContent = 'Account Settings';
-  var el = document.getElementById('modal-body');
-  el.innerHTML = '';
-  var f = document.createElement('div');
-  f.className = 'fwrap';
-
-  var u = currentUser || {};
-  f.innerHTML =
-    '<div style="text-align:center;padding-bottom:14px;">'
-    +'<div style="font-size:28px;margin-bottom:6px;">'+(u.tier==='obsidian'?'💎':u.tier==='gold'?'✦':'◈')+'</div>'
-    +'<div style="font-family:Cormorant Garamond,serif;font-size:18px;color:var(--ow);">'+(u.name||'Member')+'</div>'
-    +'<div style="font-size:10px;color:var(--mt);">'+(u.email||'')+'</div>'
-    +'</div>'
-    +'<div class="fgrp"><label class="flbl">Display name</label>'
-    +'<input class="finp" id="settings-name" value="'+(u.name||'')+'" placeholder="Your full name"></div>'
-    +'<div class="fgrp"><label class="flbl">WhatsApp number</label>'
-    +'<input class="finp" id="settings-wa" value="'+(u.wa||u.phone||'')+'" placeholder="+255 ..."></div>'
-    +'<div class="fgrp"><label class="flbl">Nationality / Passport country</label>'
-    +'<input class="finp" id="settings-nationality" value="'+(u.nationality||'')+'" placeholder="e.g. Tanzanian, British, American"></div>'
-    +'<div class="fgrp"><label class="flbl">Dietary preferences</label>'
-    +'<input class="finp" id="settings-dietary" value="'+(u.dietary||'')+'" placeholder="e.g. halal, vegetarian, none"></div>'
-    +'<div class="fgrp"><label class="flbl">Special notes for concierge</label>'
-    +'<textarea class="ftxt" id="settings-notes" placeholder="Anniversary dates, preferences, allergies...">'+(u.notes||'')+'</textarea></div>';
-
-  var btn = document.createElement('button');
-  btn.className = 'gbtn';
-  btn.textContent = 'Save changes';
-  btn.onclick = function(){
-    var name = document.getElementById('settings-name').value.trim();
-    var wa = document.getElementById('settings-wa').value.trim();
-    var nationality = document.getElementById('settings-nationality').value.trim();
-    var dietary = document.getElementById('settings-dietary').value.trim();
-    var notes = document.getElementById('settings-notes').value.trim();
-    if(name && currentUser){
-      currentUser.name = name;
-      currentUser.wa = wa;
-      currentUser.nationality = nationality;
-      currentUser.dietary = dietary;
-      currentUser.notes = notes;
-      DB.set('user_'+currentUser.email, JSON.stringify(currentUser));
-      document.getElementById('profile-name').textContent = name;
-      showToast('Settings saved ✓');
-      document.getElementById('modal-bg').classList.remove('open');
-    }
-  };
-  f.appendChild(btn);
-
-  var logoutBtn = document.createElement('button');
-  logoutBtn.className = 'gghst';
-  logoutBtn.style.cssText = 'color:#CC5555;border-color:rgba(204,0,0,0.2);margin-top:6px;';
-  logoutBtn.textContent = 'Sign out';
-  logoutBtn.onclick = function(){ document.getElementById('modal-bg').classList.remove('open'); doLogout(); };
-  f.appendChild(logoutBtn);
-
-  el.appendChild(f);
-  document.getElementById('modal-bg').classList.add('open');
-}
-
-function openPaymentDetails(){
-  document.getElementById('modal-ttl').textContent = 'Payment & Billing';
-  var el = document.getElementById('modal-body');
-  el.innerHTML = '';
-  var f = document.createElement('div');
-  f.className = 'fwrap';
-
-  f.innerHTML =
-    '<div style="background:rgba(184,137,42,0.06);border:0.5px solid rgba(184,137,42,0.2);border-radius:2px;padding:12px 14px;margin-bottom:14px;">'
-    +'<div style="font-size:9px;letter-spacing:0.16em;color:var(--gold);text-transform:uppercase;margin-bottom:4px;">Payment policy</div>'
-    +'<div style="font-size:10px;color:var(--mt);line-height:1.8;">All service fees are invoiced per booking. Accepted: bank transfer, Airtel Money, M-Pesa, and international card via concierge. Deposits may be required for high-value bookings.</div>'
-    +'</div>'
-    +'<div class="fgrp"><label class="flbl">Preferred payment method</label>'
-    +'<select class="fsel" id="pay-method">'
-    +'<option>Bank Transfer (TZS)</option>'
-    +'<option>Bank Transfer (USD)</option>'
-    +'<option>Airtel Money</option>'
-    +'<option>M-Pesa</option>'
-    +'<option>Credit card via concierge</option>'
-    +'</select></div>'
-    +'<div class="fgrp"><label class="flbl">Billing name</label>'
-    +'<input class="finp" id="pay-name" placeholder="Full name or company"></div>'
-    +'<div class="fgrp"><label class="flbl">Billing email</label>'
-    +'<input class="finp" id="pay-email" placeholder="email@example.com"></div>'
-    +'<div style="font-size:10px;color:var(--mt);line-height:1.8;margin-bottom:14px;">Bank details and payment instructions are provided at time of booking. Your concierge handles all payment coordination.</div>';
-
-  var btn = document.createElement('button');
-  btn.className = 'gbtn';
-  btn.textContent = 'Save payment preferences';
-  btn.onclick = function(){
-    var method = document.getElementById('pay-method').value;
-    var name = document.getElementById('pay-name').value;
-    if(currentUser){
-      currentUser.payMethod = method;
-      currentUser.payName = name;
-      DB.set('user_'+currentUser.email, JSON.stringify(currentUser));
-      showToast('Payment preferences saved ✓');
-      document.getElementById('modal-bg').classList.remove('open');
-    }
-  };
-  f.appendChild(btn);
-
-  var wa = document.createElement('a');
-  wa.className = 'wa-btn';
-  wa.href = 'https://wa.me/255692312366?text=Payment+enquiry';
-  wa.target = '_blank';
-  wa.innerHTML = '<i class="ti ti-brand-whatsapp"></i>Billing enquiry via concierge';
-  f.appendChild(wa);
-
-  el.appendChild(f);
-  document.getElementById('modal-bg').classList.add('open');
-}
-
-function openMyBookings(){
-  document.getElementById('modal-ttl').textContent = 'My Bookings';
-  var el = document.getElementById('modal-body');
-  el.innerHTML = '';
-  var f = document.createElement('div');
-  f.className = 'fwrap';
-
-  // Load bookings from localStorage
-  var bookings = [];
-  try{ bookings = JSON.parse(DB.get('bookings_'+(currentUser?currentUser.email:'')) || '[]'); }catch(e){}
-
-  if(!bookings.length){
-    f.innerHTML =
-      '<div style="text-align:center;padding:20px 0;">'
-      +'<div style="font-size:36px;margin-bottom:10px;">📋</div>'
-      +'<div style="font-family:Cormorant Garamond,serif;font-size:18px;color:var(--ow);margin-bottom:6px;">No bookings yet</div>'
-      +'<div style="font-size:11px;color:var(--mt);line-height:1.8;">Your confirmed bookings and service requests will appear here after your concierge confirms them.</div>'
-      +'</div>'
-      +'<div style="background:rgba(184,137,42,0.04);border:0.5px solid rgba(184,137,42,0.15);padding:12px 14px;border-radius:2px;font-size:10px;color:var(--mt);line-height:1.8;">'
-      +'All bookings are managed personally by your Barafu Luxe concierge. You will receive WhatsApp confirmation for every service.</div>';
-  } else {
-    var html = '';
-    bookings.forEach(function(b){
-      var statusColor = b.status==='confirmed' ? '#4CAF50' : b.status==='pending' ? '#FF9800' : 'var(--mt)';
-      html += '<div style="background:var(--card);border:0.5px solid var(--bd);border-radius:2px;padding:12px 14px;margin-bottom:8px;">'
-        +'<div style="display:flex;justify-content:space-between;align-items:flex-start;">'
-        +'<div style="font-size:13px;color:var(--ow);font-family:Cormorant Garamond,serif;">'+(b.service||'Service')+'</div>'
-        +'<span style="font-size:9px;color:'+statusColor+';letter-spacing:0.1em;text-transform:uppercase;">'+(b.status||'pending')+'</span>'
-        +'</div>'
-        +'<div style="font-size:10px;color:var(--mt);margin-top:4px;">'+(b.date||'')+(b.amount?' · '+b.amount:'')+'</div>'
-        +'</div>';
-    });
-    f.innerHTML = html;
-  }
-
-  var wa = document.createElement('a');
-  wa.className = 'wa-btn';
-  wa.href = 'https://wa.me/255692312366?text=Booking+enquiry';
-  wa.target = '_blank';
-  wa.innerHTML = '<i class="ti ti-brand-whatsapp"></i>Contact concierge about a booking';
-  f.appendChild(wa);
-
-  el.appendChild(f);
-  document.getElementById('modal-bg').classList.add('open');
-}
-
-function openUpgradeTier(){
-  var tier = currentUser ? currentUser.tier : 'silver';
-  if(tier === 'obsidian'){
-    showToast('You are already at Obsidian — the highest tier 💎');
-    return;
-  }
-  document.getElementById('modal-ttl').textContent = 'Upgrade Membership';
-  var el = document.getElementById('modal-body');
-  el.innerHTML = '';
-  var f = document.createElement('div');
-  f.className = 'fwrap';
-
-  var nextTier = tier === 'silver' ? 'Gold' : 'Obsidian';
-  var nextIcon = tier === 'silver' ? '✦' : '💎';
-  var nextColor = tier === 'silver' ? 'var(--gold)' : '#CE93D8';
-  var nextBenefits = tier === 'silver'
-    ? ['Priority booking on all services','Spa & Wellness access (Peaberries + Siringit)','Hidden Gems exclusive stays','10% loyalty credit on all bookings','Dedicated Gold member concierge line']
-    : ['24/7 personal concierge — your own dedicated line','Obsidian Private Lounge in The Barafu Circle','First access to limited experiences','Annual bespoke experience curated for you','Helicopter and yacht priority allocation'];
-
-  var benefitsHtml = nextBenefits.map(function(b){ return '<li style="padding:4px 0;font-size:11px;color:var(--mt);">'+b+'</li>'; }).join('');
-
-  f.innerHTML =
-    '<div style="text-align:center;padding:16px 0 20px;">'
-    +'<div style="font-size:36px;margin-bottom:8px;">'+nextIcon+'</div>'
-    +'<div style="font-family:Cormorant Garamond,serif;font-size:24px;color:'+nextColor+';margin-bottom:4px;">'+nextTier+'</div>'
-    +'<div style="font-size:10px;color:var(--mt);">Upgrade from '+(tier.charAt(0).toUpperCase()+tier.slice(1))+'</div>'
-    +'</div>'
-    +'<ul style="list-style:none;margin-bottom:16px;">'+benefitsHtml+'</ul>'
-    +'<div style="background:rgba(184,137,42,0.04);border:0.5px solid rgba(184,137,42,0.15);padding:12px 14px;border-radius:2px;font-size:10px;color:var(--mt);line-height:1.8;margin-bottom:14px;">'
-    +'Upgrade is handled personally by your concierge. Contact us and we will walk you through the process.</div>';
-
-  var btn = document.createElement('button');
-  btn.className = 'gbtn';
-  btn.textContent = 'Request '+nextTier+' upgrade';
-  btn.onclick = function(){
-    document.getElementById('modal-bg').classList.remove('open');
-    window.open('https://wa.me/255692312366?text=I+would+like+to+upgrade+to+'+nextTier+'+membership', '_blank');
-  };
-  f.appendChild(btn);
-
-  el.appendChild(f);
-  document.getElementById('modal-bg').classList.add('open');
-}
-
-function showToast(msg){
-  var t = document.getElementById('toast-msg');
-  if(!t){
-    t = document.createElement('div');
-    t.id = 'toast-msg';
-    t.style.cssText = 'position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:rgba(184,137,42,0.95);color:#000;padding:10px 20px;border-radius:20px;font-size:11px;font-family:Montserrat,sans-serif;letter-spacing:0.1em;z-index:9999;transition:opacity 0.3s;';
-    document.body.appendChild(t);
-  }
-  t.textContent = msg;
-  t.style.opacity = '1';
-  setTimeout(function(){ t.style.opacity = '0'; }, 2500);
-}
-
-
-function unlockSection(gateId, contentId){
-  var gate = document.getElementById(gateId);
-  var content = document.getElementById(contentId);
-  if(gate) gate.style.display = 'none';
-  if(content) content.style.display = 'block';
-  if(contentId === 'spa-content'){ buildSpaPartnerTabs(); renderSpa('all','all'); }
-  if(contentId === 'gems-content'){ renderGems('all'); }
-}
-
-
-function highlightPartner(partner){
-  window._spaPartner = partner;
-  var pbLine = document.getElementById('pb-line');
-  var sgLine = document.getElementById('sg-line');
-  var pbCard = document.getElementById('spa-partner-peaberries');
-  var sgCard = document.getElementById('spa-partner-siringit');
-  if(pbLine) pbLine.style.width = partner==='peaberries'?'40px':'20px';
-  if(sgLine) sgLine.style.width = partner==='siringit'?'40px':'20px';
-  if(pbCard) pbCard.style.background = partner==='peaberries'?'rgba(184,137,42,0.06)':'var(--soft)';
-  if(sgCard) sgCard.style.background = partner==='siringit'?'rgba(74,158,127,0.06)':'var(--soft)';
-}
-
-
-function bookRoute(btn){var n=(btn.dataset.rn||'Transfer');var usd=(btn.dataset.usd||'');var tzs=(btn.dataset.tzs||'');openTransferBook(n,usd,tzs);}
-function bookF1Route(btn){var n=(btn.dataset.rn||'F1');var d=(btn.dataset.rd||'');var v=(btn.dataset.rv||'');openF1Book(n,d,v);}
-function bookFleet(btn){var n=(btn.dataset.vn||'Yacht');var c=(btn.dataset.vc||'');openYachtBook(n,c,'','','','');}
-
-// ════ TELEGRAM CONCIERGE INTEGRATION ════
-var BL_TG_TOKEN = '8820396722:AAGSePXlx1qIPfBzBwRlcoWYujNkikgTSKQ';
-var BL_TG_CHAT  = '608285052';
-var _tgLastUpdateId = 0;
-var _tgPollTimer = null;
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -6157,103 +5794,325 @@ function bookRoute(btn){var n=(btn.dataset.rn||'Transfer');var usd=(btn.dataset.
 function bookF1Route(btn){var n=(btn.dataset.rn||'F1');var d=(btn.dataset.rd||'');var v=(btn.dataset.rv||'');openF1Book(n,d,v);}
 function bookFleet(btn){var n=(btn.dataset.vn||'Yacht');var c=(btn.dataset.vc||'');openYachtBook(n,c,'','','','');}
 
-// ════ TELEGRAM CONCIERGE INTEGRATION ════
-var BL_TG_TOKEN = '8820396722:AAGSePXlx1qIPfBzBwRlcoWYujNkikgTSKQ';
-var BL_TG_CHAT  = '608285052';
-var _tgLastUpdateId = 0;
-var _tgPollTimer = null;
 
-function sendToTelegram(memberName, memberTier, memberEmail, message){
-  var tierLabel = memberTier==='obsidian'?'OBSIDIAN':memberTier==='gold'?'GOLD':'SILVER';
-  var text = 'NEW CONCIERGE MESSAGE'
-    + '\n\nMember: ' + memberName
-    + '\nEmail: ' + memberEmail
-    + '\nTier: ' + tierLabel
-    + '\n\nMessage:\n' + message
-    + '\n\nTime: ' + new Date().toLocaleString('en-GB');
 
-  // Use our Vercel proxy — avoids all CORS issues
-  var proxyUrl = '/api/telegram';
 
-  fetch(proxyUrl, {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({text: text})
-  })
-  .then(function(r){ return r.json(); })
-  .then(function(d){ console.log('TG sent via proxy:', d.ok); })
-  .catch(function(e){ console.log('TG proxy error:', e.message); });
+
+
+
+
+
+
+
+
+
+
+
+
+function bookTrackedFlight(){
+  var fn = window._trackedFlight || 'Flight';
+  openTransferBook(fn + ' Arrival Transfer', '', 'TZS');
 }
 
-function sendBookingToTelegram(service, details){
+
+function openObsidianLounge(){
+  if(!currentUser){ return; }
+  if(currentUser.tier!=='obsidian'&&currentUser.tier!=='admin'){
+    showTierUpgradeAlert('business');
+    return;
+  }
+  document.getElementById('modal-ttl').textContent='Obsidian Private Lounge';
+  var el=document.getElementById('modal-body');
+  el.innerHTML='';
+  var f=document.createElement('div');
+  f.className='fwrap';
+  f.innerHTML='<div style="text-align:center;padding:12px 0 16px;">'
+    +'<div style="font-size:36px;margin-bottom:8px;">💎</div>'
+    +'<div style="font-family:Cormorant Garamond,serif;font-size:20px;color:#CE93D8;margin-bottom:6px;">Obsidian Introductions</div>'
+    +'<div style="font-size:11px;color:var(--mt);line-height:1.7;">Your concierge facilitates direct introductions between Obsidian members. All requests are handled with complete discretion.</div>'
+    +'</div>'
+    +'<div class="fgrp"><label class="flbl">Your name</label><input class="finp" placeholder="Full name"></div>'
+    +'<div class="fgrp"><label class="flbl">What are you looking for?</label><select class="fsel">'
+    +'<option>Business introduction</option>'
+    +'<option>Investment opportunity</option>'
+    +'<option>Shared charter partner</option>'
+    +'<option>Hospitality referral</option>'
+    +'<option>Other private matter</option>'
+    +'</select></div>'
+    +'<div class="fgrp"><label class="flbl">Brief description</label><textarea class="ftxt" placeholder="Describe what you are looking for. All information is strictly confidential."></textarea></div>';
+  var btn=document.createElement('button');
+  btn.className='gbtn';
+  btn.style.cssText='background:rgba(156,39,176,0.15);border-color:rgba(156,39,176,0.4);color:#CE93D8;';
+  btn.textContent='Send introduction request';
+  btn.onclick=function(){ submitForm('Obsidian Circle: Introduction Request'); };
+  f.appendChild(btn);
+  var wa=document.createElement('a');
+  wa.className='wa-btn';
+  wa.href='https://wa.me/255692312366?text=Obsidian+introduction+request';
+  wa.target='_blank';
+  wa.innerHTML='<i class="ti ti-brand-whatsapp"></i>WhatsApp concierge directly';
+  f.appendChild(wa);
+  el.appendChild(f);
+  document.getElementById('modal-bg').classList.add('open');
+}
+
+// ════ PROFILE FUNCTIONS ════
+
+function openProfileSettings(){
+  document.getElementById('modal-ttl').textContent = 'Account Settings';
+  var el = document.getElementById('modal-body');
+  el.innerHTML = '';
+  var f = document.createElement('div');
+  f.className = 'fwrap';
+
   var u = currentUser || {};
-  var tierLabel = (u.tier||'silver')==='obsidian'?'OBSIDIAN':(u.tier||'silver')==='gold'?'GOLD':'SILVER';
-  var text = 'NEW BOOKING REQUEST'
-    + '\n\nMember: ' + (u.name||'Guest')
-    + '\nEmail: ' + (u.email||'unknown')
-    + '\nTier: ' + tierLabel
-    + '\n\nService: ' + service
-    + '\nDetails:\n' + details
-    + '\n\nTime: ' + new Date().toLocaleString('en-GB');
+  f.innerHTML =
+    '<div style="text-align:center;padding-bottom:14px;">'
+    +'<div style="font-size:28px;margin-bottom:6px;">'+(u.tier==='obsidian'?'💎':u.tier==='gold'?'✦':'◈')+'</div>'
+    +'<div style="font-family:Cormorant Garamond,serif;font-size:18px;color:var(--ow);">'+(u.name||'Member')+'</div>'
+    +'<div style="font-size:10px;color:var(--mt);">'+(u.email||'')+'</div>'
+    +'</div>'
+    +'<div class="fgrp"><label class="flbl">Display name</label>'
+    +'<input class="finp" id="settings-name" value="'+(u.name||'')+'" placeholder="Your full name"></div>'
+    +'<div class="fgrp"><label class="flbl">WhatsApp number</label>'
+    +'<input class="finp" id="settings-wa" value="'+(u.wa||u.phone||'')+'" placeholder="+255 ..."></div>'
+    +'<div class="fgrp"><label class="flbl">Nationality / Passport country</label>'
+    +'<input class="finp" id="settings-nationality" value="'+(u.nationality||'')+'" placeholder="e.g. Tanzanian, British, American"></div>'
+    +'<div class="fgrp"><label class="flbl">Dietary preferences</label>'
+    +'<input class="finp" id="settings-dietary" value="'+(u.dietary||'')+'" placeholder="e.g. halal, vegetarian, none"></div>'
+    +'<div class="fgrp"><label class="flbl">Special notes for concierge</label>'
+    +'<textarea class="ftxt" id="settings-notes" placeholder="Anniversary dates, preferences, allergies...">'+(u.notes||'')+'</textarea></div>';
 
-  fetch('/api/telegram', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({text: text})
-  }).catch(function(e){ console.log('TG booking proxy error:', e.message); });
+  var btn = document.createElement('button');
+  btn.className = 'gbtn';
+  btn.textContent = 'Save changes';
+  btn.onclick = function(){
+    var name = document.getElementById('settings-name').value.trim();
+    var wa = document.getElementById('settings-wa').value.trim();
+    var nationality = document.getElementById('settings-nationality').value.trim();
+    var dietary = document.getElementById('settings-dietary').value.trim();
+    var notes = document.getElementById('settings-notes').value.trim();
+    if(name && currentUser){
+      currentUser.name = name;
+      currentUser.wa = wa;
+      currentUser.nationality = nationality;
+      currentUser.dietary = dietary;
+      currentUser.notes = notes;
+      DB.set('user_'+currentUser.email, JSON.stringify(currentUser));
+      document.getElementById('profile-name').textContent = name;
+      showToast('Settings saved ✓');
+      document.getElementById('modal-bg').classList.remove('open');
+    }
+  };
+  f.appendChild(btn);
+
+  var logoutBtn = document.createElement('button');
+  logoutBtn.className = 'gghst';
+  logoutBtn.style.cssText = 'color:#CC5555;border-color:rgba(204,0,0,0.2);margin-top:6px;';
+  logoutBtn.textContent = 'Sign out';
+  logoutBtn.onclick = function(){ document.getElementById('modal-bg').classList.remove('open'); doLogout(); };
+  f.appendChild(logoutBtn);
+
+  el.appendChild(f);
+  document.getElementById('modal-bg').classList.add('open');
 }
 
-function startTelegramPolling(){
-  if(_tgPollTimer) return;
-  _tgPollTimer = setInterval(function(){ pollTelegramReplies(); }, 8000);
+function openPaymentDetails(){
+  document.getElementById('modal-ttl').textContent = 'Payment & Billing';
+  var el = document.getElementById('modal-body');
+  el.innerHTML = '';
+  var f = document.createElement('div');
+  f.className = 'fwrap';
+
+  f.innerHTML =
+    '<div style="background:rgba(184,137,42,0.06);border:0.5px solid rgba(184,137,42,0.2);border-radius:2px;padding:12px 14px;margin-bottom:14px;">'
+    +'<div style="font-size:9px;letter-spacing:0.16em;color:var(--gold);text-transform:uppercase;margin-bottom:4px;">Payment policy</div>'
+    +'<div style="font-size:10px;color:var(--mt);line-height:1.8;">All service fees are invoiced per booking. Accepted: bank transfer, Airtel Money, M-Pesa, and international card via concierge. Deposits may be required for high-value bookings.</div>'
+    +'</div>'
+    +'<div class="fgrp"><label class="flbl">Preferred payment method</label>'
+    +'<select class="fsel" id="pay-method">'
+    +'<option>Bank Transfer (TZS)</option>'
+    +'<option>Bank Transfer (USD)</option>'
+    +'<option>Airtel Money</option>'
+    +'<option>M-Pesa</option>'
+    +'<option>Credit card via concierge</option>'
+    +'</select></div>'
+    +'<div class="fgrp"><label class="flbl">Billing name</label>'
+    +'<input class="finp" id="pay-name" placeholder="Full name or company"></div>'
+    +'<div class="fgrp"><label class="flbl">Billing email</label>'
+    +'<input class="finp" id="pay-email" placeholder="email@example.com"></div>'
+    +'<div style="font-size:10px;color:var(--mt);line-height:1.8;margin-bottom:14px;">Bank details and payment instructions are provided at time of booking. Your concierge handles all payment coordination.</div>';
+
+  var btn = document.createElement('button');
+  btn.className = 'gbtn';
+  btn.textContent = 'Save payment preferences';
+  btn.onclick = function(){
+    var method = document.getElementById('pay-method').value;
+    var name = document.getElementById('pay-name').value;
+    if(currentUser){
+      currentUser.payMethod = method;
+      currentUser.payName = name;
+      DB.set('user_'+currentUser.email, JSON.stringify(currentUser));
+      showToast('Payment preferences saved ✓');
+      document.getElementById('modal-bg').classList.remove('open');
+    }
+  };
+  f.appendChild(btn);
+
+  var wa = document.createElement('a');
+  wa.className = 'wa-btn';
+  wa.href = 'https://wa.me/255692312366?text=Payment+enquiry';
+  wa.target = '_blank';
+  wa.innerHTML = '<i class="ti ti-brand-whatsapp"></i>Billing enquiry via concierge';
+  f.appendChild(wa);
+
+  el.appendChild(f);
+  document.getElementById('modal-bg').classList.add('open');
 }
 
-function stopTelegramPolling(){
-  if(_tgPollTimer){ clearInterval(_tgPollTimer); _tgPollTimer = null; }
+function openMyBookings(){
+  document.getElementById('modal-ttl').textContent = 'My Bookings';
+  var el = document.getElementById('modal-body');
+  el.innerHTML = '';
+  var f = document.createElement('div');
+  f.className = 'fwrap';
+
+  // Load bookings from localStorage
+  var bookings = [];
+  try{ bookings = JSON.parse(DB.get('bookings_'+(currentUser?currentUser.email:'')) || '[]'); }catch(e){}
+
+  if(!bookings.length){
+    f.innerHTML =
+      '<div style="text-align:center;padding:20px 0;">'
+      +'<div style="font-size:36px;margin-bottom:10px;">📋</div>'
+      +'<div style="font-family:Cormorant Garamond,serif;font-size:18px;color:var(--ow);margin-bottom:6px;">No bookings yet</div>'
+      +'<div style="font-size:11px;color:var(--mt);line-height:1.8;">Your confirmed bookings and service requests will appear here after your concierge confirms them.</div>'
+      +'</div>'
+      +'<div style="background:rgba(184,137,42,0.04);border:0.5px solid rgba(184,137,42,0.15);padding:12px 14px;border-radius:2px;font-size:10px;color:var(--mt);line-height:1.8;">'
+      +'All bookings are managed personally by your Barafu Luxe concierge. You will receive WhatsApp confirmation for every service.</div>';
+  } else {
+    var html = '';
+    bookings.forEach(function(b){
+      var statusColor = b.status==='confirmed' ? '#4CAF50' : b.status==='pending' ? '#FF9800' : 'var(--mt)';
+      html += '<div style="background:var(--card);border:0.5px solid var(--bd);border-radius:2px;padding:12px 14px;margin-bottom:8px;">'
+        +'<div style="display:flex;justify-content:space-between;align-items:flex-start;">'
+        +'<div style="font-size:13px;color:var(--ow);font-family:Cormorant Garamond,serif;">'+(b.service||'Service')+'</div>'
+        +'<span style="font-size:9px;color:'+statusColor+';letter-spacing:0.1em;text-transform:uppercase;">'+(b.status||'pending')+'</span>'
+        +'</div>'
+        +'<div style="font-size:10px;color:var(--mt);margin-top:4px;">'+(b.date||'')+(b.amount?' · '+b.amount:'')+'</div>'
+        +'</div>';
+    });
+    f.innerHTML = html;
+  }
+
+  var wa = document.createElement('a');
+  wa.className = 'wa-btn';
+  wa.href = 'https://wa.me/255692312366?text=Booking+enquiry';
+  wa.target = '_blank';
+  wa.innerHTML = '<i class="ti ti-brand-whatsapp"></i>Contact concierge about a booking';
+  f.appendChild(wa);
+
+  el.appendChild(f);
+  document.getElementById('modal-bg').classList.add('open');
 }
 
-function pollTelegramReplies(){
-  var url = '/api/telegram-poll?offset=' + (_tgLastUpdateId + 1);
+function openUpgradeTier(){
+  var tier = currentUser ? currentUser.tier : 'silver';
+  if(tier === 'obsidian'){
+    showToast('You are already at Obsidian — the highest tier 💎');
+    return;
+  }
+  document.getElementById('modal-ttl').textContent = 'Upgrade Membership';
+  var el = document.getElementById('modal-body');
+  el.innerHTML = '';
+  var f = document.createElement('div');
+  f.className = 'fwrap';
 
-  fetch(url)
-    .then(function(r){ return r.json(); })
-    .then(function(data){
-      if(!data.ok || !data.result || !data.result.length) return;
-      data.result.forEach(function(update){
-        _tgLastUpdateId = update.update_id;
-        var msg = update.message;
-        if(!msg || !msg.text) return;
-        if(String(msg.from.id) === BL_TG_CHAT && !msg.from.is_bot){
-          showConciergeReply(msg.text);
-        }
-      });
-    })
-    .catch(function(e){ console.log('TG poll error:', e.message); });
+  var nextTier = tier === 'silver' ? 'Gold' : 'Obsidian';
+  var nextIcon = tier === 'silver' ? '✦' : '💎';
+  var nextColor = tier === 'silver' ? 'var(--gold)' : '#CE93D8';
+  var nextBenefits = tier === 'silver'
+    ? ['Priority booking on all services','Spa & Wellness access (Peaberries + Siringit)','Hidden Gems exclusive stays','10% loyalty credit on all bookings','Dedicated Gold member concierge line']
+    : ['24/7 personal concierge — your own dedicated line','Obsidian Private Lounge in The Barafu Circle','First access to limited experiences','Annual bespoke experience curated for you','Helicopter and yacht priority allocation'];
+
+  var benefitsHtml = nextBenefits.map(function(b){ return '<li style="padding:4px 0;font-size:11px;color:var(--mt);">'+b+'</li>'; }).join('');
+
+  f.innerHTML =
+    '<div style="text-align:center;padding:16px 0 20px;">'
+    +'<div style="font-size:36px;margin-bottom:8px;">'+nextIcon+'</div>'
+    +'<div style="font-family:Cormorant Garamond,serif;font-size:24px;color:'+nextColor+';margin-bottom:4px;">'+nextTier+'</div>'
+    +'<div style="font-size:10px;color:var(--mt);">Upgrade from '+(tier.charAt(0).toUpperCase()+tier.slice(1))+'</div>'
+    +'</div>'
+    +'<ul style="list-style:none;margin-bottom:16px;">'+benefitsHtml+'</ul>'
+    +'<div style="background:rgba(184,137,42,0.04);border:0.5px solid rgba(184,137,42,0.15);padding:12px 14px;border-radius:2px;font-size:10px;color:var(--mt);line-height:1.8;margin-bottom:14px;">'
+    +'Upgrade is handled personally by your concierge. Contact us and we will walk you through the process.</div>';
+
+  var btn = document.createElement('button');
+  btn.className = 'gbtn';
+  btn.textContent = 'Request '+nextTier+' upgrade';
+  btn.onclick = function(){
+    document.getElementById('modal-bg').classList.remove('open');
+    window.open('https://wa.me/255692312366?text=I+would+like+to+upgrade+to+'+nextTier+'+membership', '_blank');
+  };
+  f.appendChild(btn);
+
+  el.appendChild(f);
+  document.getElementById('modal-bg').classList.add('open');
 }
 
-function showConciergeReply(text){
-  var msgs = document.getElementById('chat-msgs');
-  if(!msgs) return;
-  var screen = document.getElementById('s-concierge');
-  if(!screen || !screen.classList.contains('active')) return;
-  var safe = text.replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  var ts = new Date().getHours().toString().padStart(2,'0')+':'+new Date().getMinutes().toString().padStart(2,'0');
-  msgs.innerHTML += '<div class="msg them">'
-    + '<div class="msg-b">'+safe+'</div>'
-    + '<div class="msg-t">Barafu Luxe Concierge '+ts+'</div>'
-    + '</div>';
-  msgs.scrollTop = msgs.scrollHeight;
-  try{
-    var ctx = new (window.AudioContext||window.webkitAudioContext)();
-    var osc = ctx.createOscillator();
-    var gain = ctx.createGain();
-    osc.connect(gain); gain.connect(ctx.destination);
-    osc.frequency.value = 880;
-    gain.gain.setValueAtTime(0.1, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+0.3);
-    osc.start(); osc.stop(ctx.currentTime+0.3);
-  }catch(e){}
+function showToast(msg){
+  var t = document.getElementById('toast-msg');
+  if(!t){
+    t = document.createElement('div');
+    t.id = 'toast-msg';
+    t.style.cssText = 'position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:rgba(184,137,42,0.95);color:#000;padding:10px 20px;border-radius:20px;font-size:11px;font-family:Montserrat,sans-serif;letter-spacing:0.1em;z-index:9999;transition:opacity 0.3s;';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.opacity = '1';
+  setTimeout(function(){ t.style.opacity = '0'; }, 2500);
 }
+
+
+function unlockSection(gateId, contentId){
+  var gate = document.getElementById(gateId);
+  var content = document.getElementById(contentId);
+  if(gate) gate.style.display = 'none';
+  if(content) content.style.display = 'block';
+  if(contentId === 'spa-content'){ buildSpaPartnerTabs(); renderSpa('all','all'); }
+  if(contentId === 'gems-content'){ renderGems('all'); }
+}
+
+
+function highlightPartner(partner){
+  window._spaPartner = partner;
+  var pbLine = document.getElementById('pb-line');
+  var sgLine = document.getElementById('sg-line');
+  var pbCard = document.getElementById('spa-partner-peaberries');
+  var sgCard = document.getElementById('spa-partner-siringit');
+  if(pbLine) pbLine.style.width = partner==='peaberries'?'40px':'20px';
+  if(sgLine) sgLine.style.width = partner==='siringit'?'40px':'20px';
+  if(pbCard) pbCard.style.background = partner==='peaberries'?'rgba(184,137,42,0.06)':'var(--soft)';
+  if(sgCard) sgCard.style.background = partner==='siringit'?'rgba(74,158,127,0.06)':'var(--soft)';
+}
+
+
+function bookRoute(btn){var n=(btn.dataset.rn||'Transfer');var usd=(btn.dataset.usd||'');var tzs=(btn.dataset.tzs||'');openTransferBook(n,usd,tzs);}
+function bookF1Route(btn){var n=(btn.dataset.rn||'F1');var d=(btn.dataset.rd||'');var v=(btn.dataset.rv||'');openF1Book(n,d,v);}
+function bookFleet(btn){var n=(btn.dataset.vn||'Yacht');var c=(btn.dataset.vc||'');openYachtBook(n,c,'','','','');}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 function switchF1Tab(tab, btn){
@@ -6539,8 +6398,6 @@ function adminPostCircle(){
   });
   showToast('Posted to The Circle ❖');
   // Also send to Telegram
-  sendToTelegram('Barafu Luxe Admin','admin','admin@barafuluxe.com',
-    'NEW CIRCLE POST\nType: '+type+'\nTitle: '+title+'\n\n'+body);
 }
 
 
@@ -6713,72 +6570,7 @@ function renderEvents(filter){
 }
 
 
-function fetchLiveFlights(){
-  var airport = currentAirport || 'JRO';
-  if(!FLIGHT_DATA[airport]) FLIGHT_DATA[airport]={arrivals:[],departures:[]};
-  if(!Array.isArray(FLIGHT_DATA[airport].arrivals)) FLIGHT_DATA[airport].arrivals=[];
-  if(!Array.isArray(FLIGHT_DATA[airport].departures)) FLIGHT_DATA[airport].departures=[];
 
-  var statusEl = document.getElementById('ft-live-status');
-  var now = new Date();
-  var ts = now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
-  if(statusEl) statusEl.textContent = 'Loading...';
-
-  var apData = {
-    JRO:{name:'Kilimanjaro',carriers:['KQ','ET','QM','EK','TK','WB'],routes:{arr:['NBO','ADD','DAR','ZNZ','AMS','DXB'],dep:['NBO','ADD','DAR','ZNZ','AMS','DXB']}},
-    ARK:{name:'Arusha',carriers:['QM','ATC','5H'],routes:{arr:['DAR','ZNZ','JRO'],dep:['DAR','ZNZ','JRO']}},
-    DAR:{name:'Dar es Salaam',carriers:['KQ','ET','QM','EK','QR','KL'],routes:{arr:['NBO','ADD','JRO','ZNZ','DXB','AMS'],dep:['NBO','ADD','JRO','ZNZ','DXB','AMS']}},
-    ZNZ:{name:'Zanzibar',carriers:['QM','ET','KQ','WB'],routes:{arr:['DAR','NBO','ADD','JRO'],dep:['DAR','NBO','ADD','JRO']}},
-    MYW:{name:'Mtwara',carriers:['QM','5H'],routes:{arr:['DAR','ZNZ'],dep:['DAR','ZNZ']}}
-  };
-  var airlineNames = {KQ:'Kenya Airways',ET:'Ethiopian Airlines',QM:'Precision Air',EK:'Emirates',TK:'Turkish Airlines',WB:'RwandAir',ATC:'Air Tanzania',QR:'Qatar Airways',KL:'KLM','5H':'Five Forty'};
-  var ap = apData[airport] || apData['JRO'];
-  var nowMins = now.getHours()*60 + now.getMinutes();
-
-  function makeFlights(routes, type){
-    var flights = [];
-    var baseHour = Math.max(6, now.getHours()-3);
-    routes.forEach(function(dest, i){
-      var carrier = ap.carriers[i % ap.carriers.length];
-      var fh = (baseHour + i*2) % 22; if(fh < 6) fh += 6;
-      var fm = i%2===0 ? 5 : 35;
-      var sched = fh.toString().padStart(2,'0')+':'+fm.toString().padStart(2,'0');
-      var fMins = fh*60+fm;
-      var delay = (i%5===3) ? 25 : 0;
-      var aMins = fMins+delay;
-      var ah = Math.floor(aMins/60)%24;
-      var am = aMins%60;
-      var actual = ah.toString().padStart(2,'0')+':'+am.toString().padStart(2,'0');
-      var status = fMins<nowMins-30?'landed':fMins<nowMins+15?'boarding':delay>0?'delayed':'ontime';
-      var fn = carrier+(100+(airport.charCodeAt(0)%9)*100+i*11+1);
-      var f = {fn:fn.toString(),airline:airlineNames[carrier]||carrier,sched:sched,actual:actual,status:status};
-      if(type==='arr') f.origin=dest; else f.dest=dest;
-      flights.push(f);
-    });
-    return flights;
-  }
-
-  if(!FLIGHT_DATA[airport].arrivals.length)
-    FLIGHT_DATA[airport].arrivals = makeFlights(ap.routes.arr,'arr');
-  if(!FLIGHT_DATA[airport].departures.length)
-    FLIGHT_DATA[airport].departures = makeFlights(ap.routes.dep,'dep');
-
-  // Update statuses
-  var nowM2 = now.getHours()*60+now.getMinutes();
-  [FLIGHT_DATA[airport].arrivals, FLIGHT_DATA[airport].departures].forEach(function(list){
-    list.forEach(function(f){
-      var p=(f.sched||'12:00').split(':');
-      var fm2=parseInt(p[0]||12)*60+parseInt(p[1]||0);
-      if(fm2<nowM2-30) f.status='landed';
-      else if(fm2<nowM2+15) f.status='boarding';
-      else f.status=f.status||'ontime';
-    });
-  });
-
-  FLIGHT_DATA[airport].lastUpdated = ts;
-  if(statusEl) statusEl.textContent = 'Schedule \u00b7 Updated '+ts;
-  renderFlights();
-}
 
 
 function filterGemsTab(type, btn){
@@ -6849,11 +6641,6 @@ function renderGems(filter){
 
 
 
-// ════ TELEGRAM — BULLETPROOF VERSION ════
-var BL_TG_TOKEN = '8820396722:AAGSePXlx1qIPfBzBwRlcoWYujNkikgTSKQ';
-var BL_TG_CHAT  = '608285052';
-var _tgLastUpdateId = 0;
-var _tgPollTimer = null;
 
 function sendToTelegram(memberName, memberTier, memberEmail, message){
   var tierLabel = memberTier==='obsidian'?'OBSIDIAN':memberTier==='gold'?'GOLD':'SILVER';
@@ -6863,7 +6650,6 @@ function sendToTelegram(memberName, memberTier, memberEmail, message){
     + '\nTier: ' + tierLabel
     + '\n\nMessage:\n' + message
     + '\n\nTime: ' + new Date().toLocaleString('en-GB');
-  tgSend(text);
 }
 
 function sendBookingToTelegram(service, details){
@@ -6876,47 +6662,11 @@ function sendBookingToTelegram(service, details){
     + '\n\nService: ' + service
     + '\n\nDetails: ' + details
     + '\n\nTime: ' + new Date().toLocaleString('en-GB');
-  tgSend(text);
 }
 
-function tgSend(text){
-  var token = BL_TG_TOKEN;
-  var chat  = BL_TG_CHAT;
 
-  // FormData POST — no JSON, no preflight, works from ALL browsers cross-origin
-  var form = new FormData();
-  form.append('chat_id', chat);
-  form.append('text', text);
 
-  fetch('https://api.telegram.org/bot' + token + '/sendMessage', {
-    method: 'POST',
-    body: form
-  })
-  .then(function(r){ return r.json(); })
-  .then(function(d){
-    if(d.ok) console.log('TG delivered ✓');
-    else console.log('TG rejected:', d.description);
-  })
-  .catch(function(e){
-    // Final fallback: script tag injection — bypasses all CORS
-    var s = document.createElement('script');
-    s.src = 'https://api.telegram.org/bot' + token + '/sendMessage'
-      + '?chat_id=' + encodeURIComponent(chat)
-      + '&text=' + encodeURIComponent(text.substring(0, 800));
-    s.onload = function(){ document.head.removeChild(s); };
-    s.onerror = function(){ document.head.removeChild(s); };
-    document.head.appendChild(s);
-  });
-}
 
-function tgSendGet(text){
-  // Method 2: GET via img — zero CORS, always works
-  var img = new Image();
-  img.src = 'https://api.telegram.org/bot' + BL_TG_TOKEN
-    + '/sendMessage?chat_id=' + BL_TG_CHAT
-    + '&text=' + encodeURIComponent(text.substring(0, 1000));
-  img.onerror = function(){ console.log('TG GET sent (error is normal for img)'); };
-}
 
 function startTelegramPolling(){
   if(_tgPollTimer) return;
@@ -6960,6 +6710,264 @@ function showConciergeReply(text){
     +'<div class="msg-t">Barafu Luxe Concierge · '+ts+'</div>';
   msgs.appendChild(div);
   msgs.scrollTop = msgs.scrollHeight;
+}
+
+
+function filterGemsTab(type, btn){
+  document.querySelectorAll('#s-gems .luxury-tab').forEach(function(b){ b.classList.remove('active'); });
+  if(btn) btn.classList.add('active');
+  renderGems(type);
+}
+
+function renderGems(filter){
+  var el = document.getElementById('gems-list');
+  if(!el) return;
+
+  var filtered = (GEMS||[]).filter(function(g){
+    return !filter || filter==='all' || g.type===filter;
+  });
+
+  el.innerHTML = '';
+
+  if(!filtered.length){
+    el.innerHTML='<div style="text-align:center;padding:40px 0;">'
+      +'<div style="font-size:32px;margin-bottom:12px;">🗝️</div>'
+      +'<div style="font-family:Cormorant Garamond,serif;font-size:18px;color:var(--ow);margin-bottom:6px;">No properties yet</div>'
+      +'<div style="font-size:11px;color:var(--mt);line-height:1.8;">New gems are added regularly. Contact your concierge to request access to a specific property.</div>'
+      +'</div>';
+    return;
+  }
+
+  filtered.forEach(function(g, i){
+    var card = document.createElement('div');
+    card.className = 'gem-prop-card';
+    card.dataset.gid = g.id;
+
+    var num = String(i+1).padStart(2,'0');
+    var priceFrom = g.seasons && g.seasons.low ? g.seasons.low.bb
+      : g.seasons && g.seasons.mid ? g.seasons.mid.bb
+      : g.base || 0;
+    var perLabel = g.per || 'per person / night';
+
+    var featsHtml = (g.features||[]).slice(0,5).map(function(f){
+      return '<span class="gem-feat-tag">'+f+'</span>';
+    }).join('');
+
+    card.innerHTML =
+      '<div class="gem-prop-inner">'
+      +(g.new ? '<div class="gem-new-badge">New ✦</div>' : '')
+      +'<div class="gem-prop-num">'+num+'</div>'
+      +'<div class="gem-prop-icon">'+(g.icon||'🏡')+'</div>'
+      +'<div class="gem-prop-name">'+(g.name||'')+'</div>'
+      +'<div class="gem-prop-loc"><i class="ti ti-map-pin" style="font-size:11px;color:var(--gold);opacity:0.5;"></i>'+(g.location||'')+'</div>'
+      +'<div class="gem-prop-desc">'+(g.desc||'')+'</div>'
+      +'<div class="gem-prop-feats">'+featsHtml+'</div>'
+      +'<div class="gem-prop-bottom">'
+      +'<div>'
+      +'<div class="gem-prop-from">From</div>'
+      +'<div class="gem-prop-price">$'+priceFrom+'</div>'
+      +'<div class="gem-prop-per">'+perLabel+'</div>'
+      +'</div>'
+      +'<button class="gem-enquire-btn">View rates</button>'
+      +'</div>'
+      +'</div>';
+
+    var btn = card.querySelector('.gem-enquire-btn');
+    if(btn) btn.onclick = function(e){ e.stopPropagation(); openGemDetail(g.id); };
+    card.onclick = function(){ openGemDetail(this.dataset.gid); };
+    el.appendChild(card);
+  });
+}
+
+
+// ════ AVIATIONSTACK LIVE FLIGHT TRACKER ════
+var BL_AVIATION_KEY = '4bb243f37125db45391eb3b5400df3ca';
+var BL_AVIATION_URL = 'http://api.aviationstack.com/v1/flights';
+
+var AIRPORT_IATA = {
+  JRO: 'JRO', ARK: 'ARK', DAR: 'DAR', ZNZ: 'ZNZ', MYW: 'MYW'
+};
+
+function fetchLiveFlights(){
+  var airport = currentAirport || 'JRO';
+  var iata = AIRPORT_IATA[airport] || airport;
+  var statusEl = document.getElementById('ft-live-status');
+  if(statusEl) statusEl.textContent = 'Loading live data...';
+
+  var boardType = window._ftBoardType || 'arr';
+  var param = boardType === 'arr' ? 'arr_iata' : 'dep_iata';
+  var url = BL_AVIATION_URL + '?access_key=' + BL_AVIATION_KEY
+    + '&' + param + '=' + iata
+    + '&limit=15';
+
+  fetch('/api/aviation?url=' + encodeURIComponent(url))
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      if(data && data.data && data.data.length){
+        _parseAviationData(airport, boardType, data.data);
+        var ts = new Date().getHours().toString().padStart(2,'0')+':'+new Date().getMinutes().toString().padStart(2,'0');
+        if(statusEl) statusEl.textContent = 'Live \u00b7 Updated '+ts;
+      } else {
+        _useFallbackFlights(airport);
+        if(statusEl) statusEl.textContent = 'Schedule (offline)';
+      }
+    })
+    .catch(function(){
+      _useFallbackFlights(airport);
+      if(statusEl) statusEl.textContent = 'Schedule (cached)';
+    });
+}
+
+function _parseAviationData(airport, boardType, flights){
+  if(!FLIGHT_DATA[airport]) FLIGHT_DATA[airport] = {arrivals:[], departures:[]};
+
+  var parsed = flights.map(function(f){
+    var dep = f.departure || {};
+    var arr = f.arrival || {};
+    var airline = (f.airline && f.airline.name) ? f.airline.name : 'Unknown';
+    var fn = (f.flight && f.flight.iata) ? f.flight.iata : '---';
+
+    var scheduled = boardType === 'arr'
+      ? (arr.scheduled || '').substring(11,16)
+      : (dep.scheduled || '').substring(11,16);
+    var estimated = boardType === 'arr'
+      ? (arr.estimated || arr.scheduled || '').substring(11,16)
+      : (dep.estimated || dep.scheduled || '').substring(11,16);
+
+    var rawStatus = (f.flight_status || 'scheduled').toLowerCase();
+    var status = 'scheduled';
+    if(rawStatus === 'landed' || rawStatus === 'arrived') status = 'landed';
+    else if(rawStatus === 'active' || rawStatus === 'en-route') status = 'boarding';
+    else if(rawStatus === 'cancelled') status = 'cancelled';
+    else if(rawStatus === 'delayed') status = 'delayed';
+    else if(rawStatus === 'scheduled') status = 'ontime';
+
+    var result = { fn:fn, airline:airline, sched:scheduled, actual:estimated, status:status };
+    if(boardType === 'arr'){
+      result.origin = dep.iata || dep.airport || '---';
+    } else {
+      result.dest = arr.iata || arr.airport || '---';
+    }
+    return result;
+  });
+
+  if(boardType === 'arr') FLIGHT_DATA[airport].arrivals = parsed;
+  else FLIGHT_DATA[airport].departures = parsed;
+
+  renderFlights();
+}
+
+function _useFallbackFlights(airport){
+  // Generate realistic schedule if API fails
+  var ap = {
+    JRO:{carriers:['KQ','ET','QM','TK'],routes:{arr:['NBO','ADD','DAR','ZNZ','IST'],dep:['NBO','ADD','DAR','ZNZ','IST']}},
+    ARK:{carriers:['QM','ATC'],routes:{arr:['DAR','ZNZ'],dep:['DAR','ZNZ']}},
+    DAR:{carriers:['KQ','ET','QM','EK','QR'],routes:{arr:['NBO','ADD','JRO','ZNZ','DXB'],dep:['NBO','ADD','JRO','ZNZ','DXB']}},
+    ZNZ:{carriers:['QM','ET','KQ'],routes:{arr:['DAR','NBO','JRO'],dep:['DAR','NBO','JRO']}},
+    MYW:{carriers:['QM'],routes:{arr:['DAR'],dep:['DAR']}}
+  };
+  var names = {KQ:'Kenya Airways',ET:'Ethiopian',QM:'Precision Air',TK:'Turkish',EK:'Emirates',QR:'Qatar Airways',ATC:'Air Tanzania'};
+  var info = ap[airport] || ap.JRO;
+  var now = new Date();
+  var nowM = now.getHours()*60+now.getMinutes();
+  var base = Math.max(6, now.getHours()-2);
+
+  if(!FLIGHT_DATA[airport]) FLIGHT_DATA[airport] = {arrivals:[],departures:[]};
+
+  ['arrivals','departures'].forEach(function(type){
+    if(FLIGHT_DATA[airport][type].length) return;
+    var routes = type === 'arrivals' ? info.routes.arr : info.routes.dep;
+    var list = routes.map(function(dest, i){
+      var carrier = info.carriers[i % info.carriers.length];
+      var fh = (base+i*2)%22; if(fh<6) fh+=6;
+      var fm = i%2===0?10:40;
+      var sched = fh.toString().padStart(2,'0')+':'+fm.toString().padStart(2,'0');
+      var fMins = fh*60+fm;
+      var delay = i%5===3 ? 25 : 0;
+      var aMins = fMins+delay;
+      var actual = Math.floor(aMins/60).toString().padStart(2,'0')+':'+(aMins%60).toString().padStart(2,'0');
+      var st = fMins<nowM-30?'landed':fMins<nowM+15?'boarding':delay>0?'delayed':'ontime';
+      var fn2 = carrier+(100+(airport.charCodeAt(0)%9)*50+i*13+1);
+      var r = {fn:fn2,airline:names[carrier]||carrier,sched:sched,actual:actual,status:st};
+      if(type==='arrivals') r.origin=dest; else r.dest=dest;
+      return r;
+    });
+    FLIGHT_DATA[airport][type] = list;
+  });
+  renderFlights();
+}
+
+function trackClientFlight(flightNumber){
+  if(!flightNumber) return;
+  var fn = flightNumber.trim().toUpperCase();
+  var resEl = document.getElementById('flight-tracker-results');
+  if(resEl) resEl.innerHTML = '<div style="padding:16px 0;text-align:center;font-size:11px;color:var(--mt);">Searching '+fn+'...</div>';
+
+  var url = BL_AVIATION_URL + '?access_key=' + BL_AVIATION_KEY + '&flight_iata=' + fn;
+
+  fetch('/api/aviation?url=' + encodeURIComponent(url))
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      if(data && data.data && data.data.length){
+        _renderFlightDetail(data.data[0], resEl);
+      } else {
+        if(resEl) resEl.innerHTML = '<div style="background:var(--card);border:0.5px solid var(--bd);border-radius:3px;padding:18px;text-align:center;">'
+          +'<div style="font-size:28px;margin-bottom:10px;">\u2708</div>'
+          +'<div style="font-family:Cormorant Garamond,serif;font-size:18px;color:var(--ow);margin-bottom:6px;">'+fn+' not found</div>'
+          +'<div style="font-size:11px;color:var(--mt);">Check the flight number and try again.</div>'
+          +'</div>';
+      }
+    })
+    .catch(function(){
+      if(resEl) resEl.innerHTML = '<div style="padding:16px;text-align:center;font-size:11px;color:var(--mt);">Could not reach flight data. Check connection.</div>';
+    });
+}
+
+function _renderFlightDetail(f, el){
+  if(!el) return;
+  var dep = f.departure || {};
+  var arr = f.arrival || {};
+  var airline = (f.airline && f.airline.name) ? f.airline.name : '---';
+  var fn = (f.flight && f.flight.iata) ? f.flight.iata : '---';
+  var status = (f.flight_status || 'unknown').toUpperCase();
+  var statusColors = {LANDED:'#4CAF50',ACTIVE:'#2196F3','EN-ROUTE':'#2196F3',SCHEDULED:'var(--mt)',DELAYED:'#FF9800',CANCELLED:'#F44336'};
+  var sc = statusColors[status] || 'var(--mt)';
+
+  var depTime = (dep.actual || dep.estimated || dep.scheduled || '').substring(11,16) || '--:--';
+  var arrTime = (arr.actual || arr.estimated || arr.scheduled || '').substring(11,16) || '--:--';
+  var depDelay = dep.delay ? '+'+dep.delay+'min' : '';
+  var arrDelay = arr.delay ? '+'+arr.delay+'min' : '';
+
+  el.innerHTML =
+    '<div style="background:var(--card);border:0.5px solid rgba(184,137,42,0.25);border-radius:3px;padding:20px;margin-bottom:10px;">'
+    +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">'
+    +'<div>'
+    +'<div style="font-family:Cormorant Garamond,serif;font-size:28px;color:#fff;">'+fn+'</div>'
+    +'<div style="font-size:11px;color:var(--mt);">'+airline+'</div>'
+    +'</div>'
+    +'<span style="background:'+sc+'22;color:'+sc+';font-size:9px;letter-spacing:0.14em;text-transform:uppercase;padding:5px 14px;border-radius:10px;">'+status+'</span>'
+    +'</div>'
+    +'<div style="display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;margin-bottom:16px;">'
+    +'<div>'
+    +'<div style="font-family:Cormorant Garamond,serif;font-size:30px;color:#fff;">'+(dep.iata||'---')+'</div>'
+    +'<div style="font-size:10px;color:var(--mt);">'+(dep.airport||'---')+'</div>'
+    +'<div style="font-family:Cormorant Garamond,serif;font-size:22px;color:var(--gold);margin-top:6px;">'+depTime+'</div>'
+    +(depDelay?'<div style="font-size:9px;color:#FF9800;">'+depDelay+'</div>':'')
+    +'</div>'
+    +'<div style="text-align:center;padding:0 8px;">'
+    +'<div style="font-size:20px;color:var(--gold);">\u2708</div>'
+    +'<div style="height:1px;background:var(--bd);margin:6px 0;"></div>'
+    +'<div style="font-size:8px;color:var(--mt);letter-spacing:0.1em;">'+(f.aircraft&&f.aircraft.iata?f.aircraft.iata:'')+'</div>'
+    +'</div>'
+    +'<div style="text-align:right;">'
+    +'<div style="font-family:Cormorant Garamond,serif;font-size:30px;color:#fff;">'+(arr.iata||'---')+'</div>'
+    +'<div style="font-size:10px;color:var(--mt);">'+(arr.airport||'---')+'</div>'
+    +'<div style="font-family:Cormorant Garamond,serif;font-size:22px;color:var(--gold);margin-top:6px;">'+arrTime+'</div>'
+    +(arrDelay?'<div style="font-size:9px;color:#FF9800;">'+arrDelay+'</div>':'')
+    +'</div>'
+    +'</div>'
+    +'<button class="gbtn" onclick="openTransferBook(\'Airport Transfer\',100,\'250,000\')" style="margin-top:4px;">Book transfer for this flight</button>'
+    +'</div>';
 }
 
 </script>
