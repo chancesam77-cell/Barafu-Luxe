@@ -6790,29 +6790,27 @@ var AIRPORT_IATA = {
 
 function fetchLiveFlights(){
   var airport = currentAirport || 'JRO';
-  var iata = AIRPORT_IATA[airport] || airport;
   var statusEl = document.getElementById('ft-live-status');
   if(statusEl) statusEl.textContent = 'Loading live data...';
 
   var boardType = window._ftBoardType || 'arr';
-  var param = boardType === 'arr' ? 'arr_iata' : 'dep_iata';
-  var url = BL_AVIATION_URL + '?access_key=' + BL_AVIATION_KEY
-    + '&' + param + '=' + iata
-    + '&limit=15';
+  var proxyUrl = '/api/aviation?airport=' + airport + '&type=' + boardType;
 
-  fetch('/api/aviation?url=' + encodeURIComponent(url))
+  fetch(proxyUrl)
     .then(function(r){ return r.json(); })
     .then(function(data){
       if(data && data.data && data.data.length){
         _parseAviationData(airport, boardType, data.data);
         var ts = new Date().getHours().toString().padStart(2,'0')+':'+new Date().getMinutes().toString().padStart(2,'0');
-        if(statusEl) statusEl.textContent = 'Live \u00b7 Updated '+ts;
+        if(statusEl) statusEl.textContent = 'Live · Updated '+ts;
       } else {
+        console.log('AviationStack returned:', JSON.stringify(data).substring(0,200));
         _useFallbackFlights(airport);
         if(statusEl) statusEl.textContent = 'Schedule (offline)';
       }
     })
-    .catch(function(){
+    .catch(function(e){
+      console.log('Aviation fetch error:', e.message);
       _useFallbackFlights(airport);
       if(statusEl) statusEl.textContent = 'Schedule (cached)';
     });
@@ -6903,16 +6901,14 @@ function trackClientFlight(flightNumber){
   var resEl = document.getElementById('flight-tracker-results');
   if(resEl) resEl.innerHTML = '<div style="padding:16px 0;text-align:center;font-size:11px;color:var(--mt);">Searching '+fn+'...</div>';
 
-  var url = BL_AVIATION_URL + '?access_key=' + BL_AVIATION_KEY + '&flight_iata=' + fn;
-
-  fetch('/api/aviation?url=' + encodeURIComponent(url))
+  fetch('/api/aviation?flight=' + fn)
     .then(function(r){ return r.json(); })
     .then(function(data){
       if(data && data.data && data.data.length){
         _renderFlightDetail(data.data[0], resEl);
       } else {
-        if(resEl) resEl.innerHTML = '<div style="background:var(--card);border:0.5px solid var(--bd);border-radius:3px;padding:18px;text-align:center;">'
-          +'<div style="font-size:28px;margin-bottom:10px;">\u2708</div>'
+        if(resEl) resEl.innerHTML = '<div style="background:var(--card);border:0.5px solid var(--bd);border-radius:3px;padding:20px;text-align:center;">'
+          +'<div style="font-size:32px;margin-bottom:10px;">✈</div>'
           +'<div style="font-family:Cormorant Garamond,serif;font-size:18px;color:var(--ow);margin-bottom:6px;">'+fn+' not found</div>'
           +'<div style="font-size:11px;color:var(--mt);">Check the flight number and try again.</div>'
           +'</div>';
