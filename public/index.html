@@ -2635,22 +2635,34 @@ function openTransferBook(route, usd, tzs){
     +'<div class="fgrp"><label class="flbl">Notes (optional)</label><textarea class="ftxt" id="tr-notes" placeholder="Flight number, special requests..."></textarea></div>';
   var btn = document.createElement('button');
   btn.className = 'gbtn';
-  btn.textContent = 'Confirm booking request';
+  btn.innerHTML = '<i class="ti ti-brand-whatsapp"></i> Confirm booking request';
   btn.onclick = function(){
     var date = (document.getElementById('tr-date')||{}).value||'';
     var time = (document.getElementById('tr-time')||{}).value||'';
     var pickup = (document.getElementById('tr-pickup')||{}).value||'';
     var pax = (document.getElementById('tr-pax')||{}).value||'1';
     var notes = (document.getElementById('tr-notes')||{}).value||'';
-    submitForm(route + ' | $'+usd+' | '+date+' '+time+' | '+pax+' pax | Pickup: '+pickup+(notes?' | '+notes:''));
+    var detail = route + ' | $'+usd+' | '+date+' '+time+' | '+pax+' pax | Pickup: '+pickup+(notes?' | '+notes:'');
+    var name = currentUser?currentUser.name:'Guest';
+    var msg = 'New Transfer Booking\n'
+      +'Client: '+name+'\n'
+      +'Route: '+route+'\n'
+      +'Rate: $'+usd+' / '+tzs+' TZS\n'
+      +'Date: '+(date||'Not specified')+'\n'
+      +'Pick-up time: '+(time||'Not specified')+'\n'
+      +'Pick-up location: '+(pickup||'Not specified')+'\n'
+      +'Passengers: '+pax
+      +(notes?'\nNotes: '+notes:'');
+    if(window.FB&&window.submitFormFB)window.submitFormFB(detail,name);
+    var bk=DB.get('bookings')||DEFAULT_BOOKINGS;
+    var now=new Date();
+    var t=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
+    bk.unshift({id:'b'+Date.now(),service:detail,client:name,detail:'App enquiry',price:'$'+usd,status:'pending',time:t});
+    DB.set('bookings',bk);
+    document.getElementById('modal-bg').classList.remove('open');
+    window.open('https://wa.me/255692312366?text='+encodeURIComponent(msg), '_blank');
   };
   f.appendChild(btn);
-  var wa = document.createElement('a');
-  wa.className = 'wa-btn';
-  wa.href = 'https://wa.me/255692312366?text=Transfer+booking:+'+encodeURIComponent(route+' on '+new Date().toLocaleDateString());
-  wa.target = '_blank';
-  wa.innerHTML = '<i class="ti ti-brand-whatsapp"></i>Book via WhatsApp';
-  f.appendChild(wa);
   el.appendChild(f);
   document.getElementById('modal-bg').classList.add('open');
 }
