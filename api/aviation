@@ -1,75 +1,17 @@
-const http = require('http');
-
+// Vercel serverless proxy for AviationStack — avoids CORS
 module.exports = async function(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   if(req.method === 'OPTIONS') return res.status(200).end();
 
-  const ACCESS_KEY = '4bb243f37125db45391eb3b5400df3ca';
-  const { airport, type, flight, debug } = req.query;
+  try {
+    const { url } = req.query;
+    if(!url) return res.status(400).json({ error: 'No URL' });
 
-  // Debug mode — just confirm proxy is alive
-  if(debug) {
-    return res.status(200).json({ 
-      status: 'proxy alive', 
-      node: process.version,
-      time: new Date().toISOString()
-    });
+    const response = await fetch(decodeURIComponent(url));
+    const data = await response.json();
+    return res.status(200).json(data);
+  } catch(err) {
+    return res.status(500).json({ error: err.message });
   }
-
-  let path;
-  if(flight) {
-    path = `/v1/flights?access_key=${ACCESS_KEY}&flight_iata=${flight}`;
-  } else if(airport) {
-    const param = (type === 'dep') ? 'dep_iata' : 'arr_iata';
-    path = `/v1/flights?access_key=${ACCESS_KEY}&${param}=${airport}&limit=10`;
-  } else {
-    return res.status(400).json({ error: 'Provide airport or flight param' });
-  }
-
-  return new Promise((resolve) => {
-    const options = {
-      hostname: 'api.aviationstack.com',
-      port: 80,
-      path: path,
-      method: 'GET',
-      headers: { 'User-Agent': 'BarafuLuxe/1.0' }
-    };
-
-    const request = http.request(options, (apiRes) => {
-      let data = '';
-      apiRes.on('data', chunk => data += chunk);
-      apiRes.on('end', () => {
-        try {
-          const parsed = JSON.parse(data);
-          // Return full response including any error from AviationStack
-          res.status(200).json(parsed);
-        } catch(e) {
-          res.status(200).json({ 
-            error: 'parse_failed', 
-            status: apiRes.statusCode,
-            raw: data.substring(0, 500) 
-          });
-        }
-        resolve();
-      });
-    });
-
-    request.on('error', (err) => {
-      res.status(200).json({ 
-        error: 'request_failed', 
-        message: err.message, 
-        code: err.code 
-      });
-      resolve();
-    });
-
-    request.setTimeout(10000, () => {
-      request.destroy();
-      res.status(200).json({ error: 'timeout' });
-      resolve();
-    });
-
-    request.end();
-  });
 };
