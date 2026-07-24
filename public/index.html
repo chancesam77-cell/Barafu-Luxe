@@ -1599,9 +1599,9 @@ function removeBookingFB(fbKey){
     <div class="f1-hero-season">2026 Formula 1 World Championship</div>
     <div class="f1-hero-title">Race the World <em>in Luxury.</em></div>
     <div class="f1-standings-strip" id="f1-standings-strip">
-      <div class="f1-standing-item"><span class="f1-pos">1</span><span class="f1-sname">Norris</span><span class="f1-pts">229pts</span></div>
-      <div class="f1-standing-item"><span class="f1-pos">2</span><span class="f1-sname">Verstappen</span><span class="f1-pts">205pts</span></div>
-      <div class="f1-standing-item"><span class="f1-pos">3</span><span class="f1-sname">Piastri</span><span class="f1-pts">188pts</span></div>
+      <div class="f1-standing-item"><span class="f1-pos">1</span><span class="f1-sname">Antonelli</span><span class="f1-pts">204pts</span></div>
+      <div class="f1-standing-item"><span class="f1-pos">2</span><span class="f1-sname">Hamilton</span><span class="f1-pts">159pts</span></div>
+      <div class="f1-standing-item"><span class="f1-pos">3</span><span class="f1-sname">Russell</span><span class="f1-pts">154pts</span></div>
     </div>
   </div>
 
@@ -2404,9 +2404,9 @@ var ROUTES = [
   {n:'Arusha City Tour (Half Day)',usd:100,tzs:'250,000',info:'~4 hrs · Curated experience'},
   {n:'Arusha City Tour (Full Day)',usd:150,tzs:'375,000',info:'~8 hrs · Full curated day'},
 ];
-var F1 = [
-  {r:10,n:'🇧🇪 Belgian Grand Prix',d:'17–19 July 2026',v:'Spa-Francorchamps',next:true},
-  {r:11,n:'🇭🇺 Hungarian Grand Prix',d:'25–27 July 2026',v:'Hungaroring, Budapest'},
+var F1_LIVE = null;
+var F1_FALLBACK = [
+  {r:11,n:'🇭🇺 Hungarian Grand Prix',d:'24–26 July 2026',v:'Hungaroring, Budapest',next:true},
   {r:12,n:'🇳🇱 Dutch Grand Prix',d:'22–24 Aug 2026',v:'Zandvoort · Sprint'},
   {r:13,n:'🇮🇹 Italian Grand Prix',d:'5–7 Sep 2026',v:'Monza — Temple of Speed'},
   {r:14,n:'🇪🇸 Spanish GP — Madrid',d:'11–13 Sep 2026',v:'Madring Circuit · Debut venue'},
@@ -2455,26 +2455,80 @@ function buildRoutes(){
   });
 }
 
+function formatF1Date(iso){
+  if(!iso || iso.indexOf('-')<0) return iso;
+  var MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var parts=iso.split('-');
+  var y=parts[0], m=parseInt(parts[1],10)-1, d=parseInt(parts[2],10);
+  return d+' '+MON[m]+' '+y;
+}
+
+function updateF1HeroStrip(standings){
+  var el = document.getElementById('f1-standings-strip');
+  if(!el || !standings || standings.length<3) return;
+  var top3 = standings.slice(0,3);
+  el.innerHTML = top3.map(function(d){
+    var last = d.driver.split(' ').slice(-1)[0];
+    return '<div class="f1-standing-item"><span class="f1-pos">'+d.pos+'</span><span class="f1-sname">'+last+'</span><span class="f1-pts">'+d.pts+'pts</span></div>';
+  }).join('');
+}
+
+function fetchF1Live(){
+  fetch('/api/f1?type=all')
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      if(!data || data.error) return;
+      F1_LIVE = data;
+      var badge = document.getElementById('f1-live-badge');
+      if(badge) badge.innerHTML = '<span class="live-dot"></span>LIVE';
+      if(data.standings) updateF1HeroStrip(data.standings);
+      try{ buildF1(); }catch(e){}
+      var resultsTab = document.getElementById('f1-tab-results');
+      if(resultsTab && resultsTab.style.display!=='none'){ try{ renderF1Results(); }catch(e){} }
+      var standingsTab = document.getElementById('f1-tab-standings');
+      if(standingsTab && standingsTab.style.display!=='none'){ try{ renderF1Standings(); }catch(e){} }
+    })
+    .catch(function(e){ console.log('F1 live fetch failed:', e); });
+}
+
 function buildF1(){
   var el=document.getElementById('f1-list');
   if(!el) return;
   el.innerHTML='';
 
-  var DONE=[
-    {r:1,n:'Australian GP',d:'15-17 Mar 2026',v:'Melbourne',p1:'Verstappen',p2:'Norris',p3:'Leclerc',fast:'Norris 1:20.235',laps:58},
-    {r:2,n:'Chinese GP',d:'22-24 Mar 2026',v:'Shanghai',p1:'Norris',p2:'Piastri',p3:'Verstappen',fast:'Verstappen 1:33.664',laps:56},
-    {r:3,n:'Japanese GP',d:'5-7 Apr 2026',v:'Suzuka',p1:'Verstappen',p2:'Leclerc',p3:'Norris',fast:'Leclerc 1:32.511',laps:53},
-    {r:4,n:'Bahrain GP',d:'12-14 Apr 2026',v:'Sakhir',p1:'Leclerc',p2:'Sainz',p3:'Verstappen',fast:'Verstappen 1:32.608',laps:57},
-    {r:5,n:'Saudi Arabian GP',d:'19-21 Apr 2026',v:'Jeddah',p1:'Norris',p2:'Verstappen',p3:'Russell',fast:'Norris 1:30.734',laps:50},
-    {r:6,n:'Monaco GP',d:'25-27 May 2026',v:'Monte Carlo',p1:'Leclerc',p2:'Sainz',p3:'Piastri',fast:'Leclerc 1:13.166',laps:78},
-    {r:7,n:'Canadian GP',d:'9-11 Jun 2026',v:'Montreal',p1:'Verstappen',p2:'Norris',p3:'Alonso',fast:'Norris 1:14.481',laps:70},
-    {r:8,n:'Austrian GP',d:'29 Jun-1 Jul 2026',v:'Red Bull Ring',p1:'Piastri',p2:'Norris',p3:'Verstappen',fast:'Piastri 1:07.275',laps:71},
-    {r:9,n:'British GP',d:'3-5 Jul 2026',v:'Silverstone',p1:'Norris',p2:'Piastri',p3:'Verstappen',fast:'Norris 1:27.097',laps:52},
+  var DONE_FALLBACK=[
+    {r:1,n:'Australian GP',d:'6-8 Mar 2026',v:'Melbourne',p1:'Russell',p2:'Antonelli',p3:'Leclerc',margin:'2.974s'},
+    {r:2,n:'Chinese GP',d:'13-15 Mar 2026',v:'Shanghai',p1:'Antonelli',p2:'Russell',p3:'Hamilton',margin:'5.515s'},
+    {r:3,n:'Japanese GP',d:'27-29 Mar 2026',v:'Suzuka',p1:'Antonelli',p2:'Piastri',p3:'Leclerc',margin:'13.722s'},
+    {r:4,n:'Miami GP',d:'1-3 May 2026',v:'Miami',p1:'Antonelli',p2:'Norris',p3:'Piastri',margin:'3.264s'},
+    {r:5,n:'Canadian GP',d:'22-24 May 2026',v:'Montreal',p1:'Antonelli',p2:'Hamilton',p3:'Verstappen',margin:'10.768s'},
+    {r:6,n:'Monaco GP',d:'5-7 Jun 2026',v:'Monte Carlo',p1:'Antonelli',p2:'Hamilton',p3:'Gasly',margin:'6.271s'},
+    {r:7,n:'Spanish GP',d:'12-14 Jun 2026',v:'Barcelona-Catalunya',p1:'Hamilton',p2:'Russell',p3:'Norris',margin:'19.561s'},
+    {r:8,n:'Austrian GP',d:'26-28 Jun 2026',v:'Red Bull Ring',p1:'Russell',p2:'Verstappen',p3:'Antonelli',margin:'1.611s'},
+    {r:9,n:'British GP',d:'3-5 Jul 2026',v:'Silverstone',p1:'Leclerc',p2:'Russell',p3:'Hamilton',margin:'0.427s'},
+    {r:10,n:'Belgian GP',d:'17-19 Jul 2026',v:'Spa-Francorchamps',p1:'Antonelli',p2:'Leclerc',p3:'Verstappen',margin:'1.952s'},
   ];
+
+  var DONE = DONE_FALLBACK;
+  var UPCOMING = F1_FALLBACK;
+  var totalRounds = 22;
+
+  if(F1_LIVE && F1_LIVE.results && F1_LIVE.results.length && F1_LIVE.calendar && F1_LIVE.calendar.length){
+    var liveDone = F1_LIVE.results.slice().sort(function(a,b){return a.r-b.r;}).map(function(r){
+      return {r:r.r,n:r.n,d:formatF1Date(r.date),v:r.v,p1:r.p1,p2:r.p2,p3:r.p3,margin:r.margin};
+    });
+    var maxDone = liveDone.length ? liveDone[liveDone.length-1].r : 0;
+    var liveUpcoming = F1_LIVE.calendar.filter(function(c){return c.r>maxDone;}).map(function(c,i){
+      return {r:c.r,n:c.n,d:formatF1Date(c.date),v:c.v,next:(i===0)};
+    });
+    DONE = liveDone;
+    UPCOMING = liveUpcoming;
+    totalRounds = F1_LIVE.calendar.length;
+  }
 
   var ch=document.createElement('div');
   ch.className='f1-section-hdr';
-  ch.innerHTML='<span>Completed Races</span><span class="f1-section-count">9 of 22</span>';
+  ch.innerHTML='<span>Completed Races</span><span class="f1-section-count">'+DONE.length+' of '+totalRounds+'</span>';
   el.appendChild(ch);
 
   DONE.forEach(function(r){
@@ -2492,7 +2546,7 @@ function buildF1(){
       +'<div class="f1-result-badge">Done</div>'
       +'</div>'
       +podHtml
-      +'<div class="f1-fastest">\u26a1 '+r.fast+' \u00b7 '+r.laps+' laps</div>';
+      +'<div class="f1-fastest">\ud83c\udfc1 Won by '+r.margin+'</div>';
     var btn=document.createElement('button');
     btn.className='f1-hospitality-btn';
     btn.textContent='Hospitality enquiry';
@@ -2504,10 +2558,10 @@ function buildF1(){
   var uh=document.createElement('div');
   uh.className='f1-section-hdr';
   uh.style.marginTop='6px';
-  uh.innerHTML='<span>Upcoming Races</span><span class="f1-section-count">'+F1.length+' remaining</span>';
+  uh.innerHTML='<span>Upcoming Races</span><span class="f1-section-count">'+UPCOMING.length+' remaining</span>';
   el.appendChild(uh);
 
-  F1.forEach(function(race){
+  UPCOMING.forEach(function(race){
     var card=document.createElement('div');
     card.className='f1-card upcoming'+(race.next?' next-race':'');
     card.innerHTML='<div class="f1-card-top">'
@@ -6140,21 +6194,32 @@ function switchF1Tab(tab, btn){
 function renderF1Results(){
   var el = document.getElementById('f1-results-list');
   if(!el) return;
-  var R = [
-    {r:9,n:'British GP',d:'3-5 Jul 2026',v:'Silverstone',p1:'Lando Norris',p2:'Oscar Piastri',p3:'Max Verstappen',fast:'Norris 1:27.097',laps:52},
-    {r:8,n:'Austrian GP',d:'29 Jun-1 Jul 2026',v:'Red Bull Ring',p1:'Oscar Piastri',p2:'Lando Norris',p3:'Max Verstappen',fast:'Piastri 1:07.275',laps:71},
-    {r:7,n:'Canadian GP',d:'9-11 Jun 2026',v:'Montreal',p1:'Max Verstappen',p2:'Lando Norris',p3:'Fernando Alonso',fast:'Norris 1:14.481',laps:70},
-    {r:6,n:'Monaco GP',d:'25-27 May 2026',v:'Monte Carlo',p1:'Charles Leclerc',p2:'Carlos Sainz',p3:'Oscar Piastri',fast:'Leclerc 1:13.166',laps:78},
-    {r:5,n:'Saudi Arabian GP',d:'19-21 Apr 2026',v:'Jeddah',p1:'Lando Norris',p2:'Max Verstappen',p3:'George Russell',fast:'Norris 1:30.734',laps:50},
-    {r:4,n:'Bahrain GP',d:'12-14 Apr 2026',v:'Sakhir',p1:'Charles Leclerc',p2:'Carlos Sainz',p3:'Max Verstappen',fast:'Verstappen 1:32.608',laps:57},
-    {r:3,n:'Japanese GP',d:'5-7 Apr 2026',v:'Suzuka',p1:'Max Verstappen',p2:'Charles Leclerc',p3:'Lando Norris',fast:'Leclerc 1:32.511',laps:53},
-    {r:2,n:'Chinese GP',d:'22-24 Mar 2026',v:'Shanghai',p1:'Lando Norris',p2:'Oscar Piastri',p3:'Max Verstappen',fast:'Verstappen 1:33.664',laps:56},
-    {r:1,n:'Australian GP',d:'15-17 Mar 2026',v:'Melbourne',p1:'Max Verstappen',p2:'Lando Norris',p3:'Charles Leclerc',fast:'Norris 1:20.235',laps:58},
+  var R_FALLBACK = [
+    {r:10,n:'Belgian GP',d:'17-19 Jul 2026',v:'Spa-Francorchamps',p1:'Kimi Antonelli',p2:'Charles Leclerc',p3:'Max Verstappen',margin:'1.952s'},
+    {r:9,n:'British GP',d:'3-5 Jul 2026',v:'Silverstone',p1:'Charles Leclerc',p2:'George Russell',p3:'Lewis Hamilton',margin:'0.427s'},
+    {r:8,n:'Austrian GP',d:'26-28 Jun 2026',v:'Red Bull Ring',p1:'George Russell',p2:'Max Verstappen',p3:'Kimi Antonelli',margin:'1.611s'},
+    {r:7,n:'Spanish GP',d:'12-14 Jun 2026',v:'Barcelona-Catalunya',p1:'Lewis Hamilton',p2:'George Russell',p3:'Lando Norris',margin:'19.561s'},
+    {r:6,n:'Monaco GP',d:'5-7 Jun 2026',v:'Monte Carlo',p1:'Kimi Antonelli',p2:'Lewis Hamilton',p3:'Pierre Gasly',margin:'6.271s'},
+    {r:5,n:'Canadian GP',d:'22-24 May 2026',v:'Montreal',p1:'Kimi Antonelli',p2:'Lewis Hamilton',p3:'Max Verstappen',margin:'10.768s'},
+    {r:4,n:'Miami GP',d:'1-3 May 2026',v:'Miami',p1:'Kimi Antonelli',p2:'Lando Norris',p3:'Oscar Piastri',margin:'3.264s'},
+    {r:3,n:'Japanese GP',d:'27-29 Mar 2026',v:'Suzuka',p1:'Kimi Antonelli',p2:'Oscar Piastri',p3:'Charles Leclerc',margin:'13.722s'},
+    {r:2,n:'Chinese GP',d:'13-15 Mar 2026',v:'Shanghai',p1:'Kimi Antonelli',p2:'George Russell',p3:'Lewis Hamilton',margin:'5.515s'},
+    {r:1,n:'Australian GP',d:'6-8 Mar 2026',v:'Melbourne',p1:'George Russell',p2:'Kimi Antonelli',p3:'Charles Leclerc',margin:'2.974s'},
   ];
+
+  var R = R_FALLBACK;
+  var rangeLabel = 'R1-R10';
+  if(F1_LIVE && F1_LIVE.results && F1_LIVE.results.length){
+    R = F1_LIVE.results.slice().sort(function(a,b){return b.r-a.r;}).map(function(r){
+      return {r:r.r,n:r.n,d:formatF1Date(r.date),v:r.v,p1:r.p1,p2:r.p2,p3:r.p3,margin:r.margin};
+    });
+    rangeLabel = 'R1-R'+R[0].r;
+  }
+
   el.innerHTML='';
   var hdr=document.createElement('div');
   hdr.className='f1-section-hdr';
-  hdr.innerHTML='<span>2026 Results</span><span class="f1-section-count">R1-R9</span>';
+  hdr.innerHTML='<span>2026 Results</span><span class="f1-section-count">'+rangeLabel+'</span>';
   el.appendChild(hdr);
   R.forEach(function(r){
     var card=document.createElement('div');
@@ -6175,7 +6240,7 @@ function renderF1Results(){
     card.appendChild(pod);
     var fast=document.createElement('div');
     fast.className='f1-fastest';
-    fast.textContent='\u26a1 '+r.fast+' \u00b7 '+r.laps+' laps';
+    fast.textContent='\ud83c\udfc1 Won by '+r.margin;
     card.appendChild(fast);
     var btn=document.createElement('button');
     btn.className='f1-hospitality-btn';
@@ -6189,22 +6254,32 @@ function renderF1Results(){
 function renderF1Standings(){
   var el=document.getElementById('f1-standings-full');
   if(!el) return;
-  var S=[
-    {pos:1,driver:'Lando Norris',team:'McLaren',pts:229,flag:'🇬🇧'},
-    {pos:2,driver:'Max Verstappen',team:'Red Bull Racing',pts:205,flag:'🇳🇱'},
-    {pos:3,driver:'Oscar Piastri',team:'McLaren',pts:188,flag:'🇦🇺'},
-    {pos:4,driver:'Charles Leclerc',team:'Ferrari',pts:162,flag:'🇲🇨'},
-    {pos:5,driver:'Carlos Sainz',team:'Ferrari',pts:155,flag:'🇪🇸'},
-    {pos:6,driver:'George Russell',team:'Mercedes',pts:124,flag:'🇬🇧'},
-    {pos:7,driver:'Lewis Hamilton',team:'Ferrari',pts:110,flag:'🇬🇧'},
-    {pos:8,driver:'Fernando Alonso',team:'Aston Martin',pts:62,flag:'🇪🇸'},
-    {pos:9,driver:'Lance Stroll',team:'Aston Martin',pts:33,flag:'🇨🇦'},
-    {pos:10,driver:'Yuki Tsunoda',team:'RB',pts:30,flag:'🇯🇵'},
+  var S_FALLBACK=[
+    {pos:1,driver:'Kimi Antonelli',team:'Mercedes',pts:204,flag:'🇮🇹'},
+    {pos:2,driver:'Lewis Hamilton',team:'Ferrari',pts:159,flag:'🇬🇧'},
+    {pos:3,driver:'George Russell',team:'Mercedes',pts:154,flag:'🇬🇧'},
+    {pos:4,driver:'Charles Leclerc',team:'Ferrari',pts:126,flag:'🇲🇨'},
+    {pos:5,driver:'Lando Norris',team:'McLaren',pts:103,flag:'🇬🇧'},
+    {pos:6,driver:'Oscar Piastri',team:'McLaren',pts:92,flag:'🇦🇺'},
+    {pos:7,driver:'Max Verstappen',team:'Red Bull Racing',pts:91,flag:'🇳🇱'},
+    {pos:8,driver:'Isack Hadjar',team:'Red Bull Racing',pts:60,flag:'🇫🇷'},
+    {pos:9,driver:'Pierre Gasly',team:'Alpine',pts:42,flag:'🇫🇷'},
+    {pos:10,driver:'Liam Lawson',team:'Racing Bulls',pts:39,flag:'🇳🇿'},
   ];
+
+  var S = S_FALLBACK;
+  var afterLabel = 'After R10 \u00b7 Belgium';
+  if(F1_LIVE && F1_LIVE.standings && F1_LIVE.standings.length){
+    S = F1_LIVE.standings.map(function(d){
+      return {pos:d.pos,driver:d.driver,team:d.team,pts:d.pts,flag:d.flag};
+    });
+    afterLabel = F1_LIVE.afterRound ? ('After R'+F1_LIVE.afterRound) : 'Latest';
+  }
+
   el.innerHTML='';
   var hdr=document.createElement('div');
   hdr.className='f1-section-hdr';
-  hdr.innerHTML='<span>Drivers Championship</span><span class="f1-section-count">After R9</span>';
+  hdr.innerHTML='<span>Drivers Championship</span><span class="f1-section-count">'+afterLabel+'</span>';
   el.appendChild(hdr);
   S.forEach(function(d){
     var row=document.createElement('div');
