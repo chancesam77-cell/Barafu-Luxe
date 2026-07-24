@@ -2665,7 +2665,22 @@ function tr(head){
 // ── MODAL ──
 function openModal(title,type){
   document.getElementById('modal-ttl').textContent=title;
-  document.getElementById('modal-body').innerHTML='     <div class="fwrap">       <div class="fgrp"><label class="flbl">Your name</label><input class="finp" placeholder="Full name"></div>       <div class="fgrp"><label class="flbl">Date</label><input class="finp" type="date" style="color-scheme:dark"></div>       <div class="fgrp"><label class="flbl">Guests</label><input class="finp" type="number" placeholder="Number of guests"></div>       <div class="fgrp"><label class="flbl">Special requests</label><textarea class="ftxt" placeholder="Tell us more..."></textarea></div>       <button class="gbtn" onclick="submitForm(\''+(title)+'\')">Send request</button>       <a class="wa-btn" href="https://wa.me/255692312366?text=Enquiry+ " target="_blank"><i class="ti ti-brand-whatsapp"></i>WhatsApp directly</a>     </div>';
+  document.getElementById('modal-body').innerHTML='     <div class="fwrap">       <div class="fgrp"><label class="flbl">Your name</label><input class="finp" id="om-name" placeholder="Full name"></div>       <div class="fgrp"><label class="flbl">Date</label><input class="finp" id="om-date" type="date" style="color-scheme:dark"></div>       <div class="fgrp"><label class="flbl">Guests</label><input class="finp" id="om-guests" type="number" placeholder="Number of guests"></div>       <div class="fgrp"><label class="flbl">Special requests</label><textarea class="ftxt" id="om-notes" placeholder="Tell us more..."></textarea></div>       <button class="gbtn" id="om-confirm-btn"><i class="ti ti-brand-whatsapp"></i> Send request</button>     </div>';
+  var btn = document.getElementById('om-confirm-btn');
+  if(btn) btn.onclick = function(){
+    var name = (document.getElementById('om-name')||{}).value||'';
+    var date = (document.getElementById('om-date')||{}).value||'';
+    var guests = (document.getElementById('om-guests')||{}).value||'';
+    var notes = (document.getElementById('om-notes')||{}).value||'';
+    var msg = title+' enquiry\n'
+      +'Name: '+(name||'Guest')+'\n'
+      +'Date: '+(date||'Not specified')+'\n'
+      +'Guests: '+(guests||'Not specified')
+      +(notes?'\nNotes: '+notes:'');
+    submitForm(title);
+    document.getElementById('modal-bg').classList.remove('open');
+    window.open('https://wa.me/255692312366?text='+encodeURIComponent(msg), '_blank');
+  };
   document.getElementById('modal-bg').classList.add('open');
 }
 
@@ -2721,7 +2736,30 @@ function openTransferBook(route, usd, tzs){
 }
 function openHeliBook(dep,price){
   document.getElementById('modal-ttl').textContent='Helicopter Enquiry';
-  document.getElementById('modal-body').innerHTML='     <div class="fwrap">       <div class="fgrp"><label class="flbl">Your name</label><input class="finp" placeholder="Full name"></div>       <div class="fgrp"><label class="flbl">Preferred date</label><input class="finp" type="date" style="color-scheme:dark"></div>       <div class="fgrp"><label class="flbl">Departure point</label><select class="fsel"><option '+(dep==='Tropic Base'?'selected':'')+'>Tropic Base, Dolly — $9,500</option><option '+(dep==='Arusha Area'?'selected':'')+'>Arusha Area — $11,600</option><option '+(dep==='JRO Airport'?'selected':'')+'>Kilimanjaro Airport — $9,900</option><option '+(dep==='Moshi Airport'?'selected':'')+'>Moshi Airport — $9,600</option></select></div>       <div class="fgrp"><label class="flbl">Guests (max 4 landing)</label><select class="fsel"><option>1</option><option>2</option><option>3</option><option>4</option></select></div>       <div class="flbl" style="margin-bottom:7px;">Upgrades</div>       <label class="fchk"><input type="checkbox"><span class="fchk-name">Mountain picnic breakfast</span><span class="fchk-price">+$54/pp</span></label>       <label class="fchk"><input type="checkbox"><span class="fchk-name">Champagne upgrade</span><span class="fchk-price">On request</span></label>       <label class="fchk"><input type="checkbox"><span class="fchk-name">Nomad Caviar experience</span><span class="fchk-price">Custom</span></label>       <label class="fchk"><input type="checkbox"><span class="fchk-name">Sundowner add-on</span><span class="fchk-price">+$34/pp</span></label>       <div class="fgrp" style="margin-top:10px;"><label class="flbl">Special requests / occasion</label><textarea class="ftxt" placeholder="Anniversary, corporate, specific experience..."></textarea></div>       <button class="gbtn" onclick="submitForm(\'Helicopter Picnic\')">Send enquiry</button>       <a class="wa-btn" href="https://wa.me/255692312366?text=Helicopter enquiry from Barafu Luxe app" target="_blank"><i class="ti ti-brand-whatsapp"></i>WhatsApp concierge</a>     </div>';
+  document.getElementById('modal-body').innerHTML='     <div class="fwrap">       <div class="fgrp"><label class="flbl">Your name</label><input class="finp" id="hb-name" placeholder="Full name"></div>       <div class="fgrp"><label class="flbl">Preferred date</label><input class="finp" id="hb-date" type="date" style="color-scheme:dark"></div>       <div class="fgrp"><label class="flbl">Departure point</label><select class="fsel" id="hb-dep"><option '+(dep==='Tropic Base'?'selected':'')+'>Tropic Base, Dolly — $9,500</option><option '+(dep==='Arusha Area'?'selected':'')+'>Arusha Area — $11,600</option><option '+(dep==='JRO Airport'?'selected':'')+'>Kilimanjaro Airport — $9,900</option><option '+(dep==='Moshi Airport'?'selected':'')+'>Moshi Airport — $9,600</option></select></div>       <div class="fgrp"><label class="flbl">Guests (max 4 landing)</label><select class="fsel" id="hb-guests"><option>1</option><option>2</option><option>3</option><option>4</option></select></div>       <div class="flbl" style="margin-bottom:7px;">Upgrades</div>       <label class="fchk"><input type="checkbox" id="hb-up1"><span class="fchk-name">Mountain picnic breakfast</span><span class="fchk-price">+$54/pp</span></label>       <label class="fchk"><input type="checkbox" id="hb-up2"><span class="fchk-name">Champagne upgrade</span><span class="fchk-price">On request</span></label>       <label class="fchk"><input type="checkbox" id="hb-up3"><span class="fchk-name">Nomad Caviar experience</span><span class="fchk-price">Custom</span></label>       <label class="fchk"><input type="checkbox" id="hb-up4"><span class="fchk-name">Sundowner add-on</span><span class="fchk-price">+$34/pp</span></label>       <div class="fgrp" style="margin-top:10px;"><label class="flbl">Special requests / occasion</label><textarea class="ftxt" id="hb-notes" placeholder="Anniversary, corporate, specific experience..."></textarea></div>       <button class="gbtn" id="hb-confirm-btn"><i class="ti ti-brand-whatsapp"></i> Send enquiry</button>     </div>';
+  var btn = document.getElementById('hb-confirm-btn');
+  if(btn) btn.onclick = function(){
+    var name = (document.getElementById('hb-name')||{}).value||'';
+    var date = (document.getElementById('hb-date')||{}).value||'';
+    var depSel = (document.getElementById('hb-dep')||{}).value||dep||'';
+    var guests = (document.getElementById('hb-guests')||{}).value||'1';
+    var notes = (document.getElementById('hb-notes')||{}).value||'';
+    var ups = [];
+    if((document.getElementById('hb-up1')||{}).checked) ups.push('Mountain picnic breakfast');
+    if((document.getElementById('hb-up2')||{}).checked) ups.push('Champagne upgrade');
+    if((document.getElementById('hb-up3')||{}).checked) ups.push('Nomad Caviar experience');
+    if((document.getElementById('hb-up4')||{}).checked) ups.push('Sundowner add-on');
+    var msg = 'Helicopter Picnic Enquiry\n'
+      +'Name: '+(name||'Guest')+'\n'
+      +'Date: '+(date||'Not specified')+'\n'
+      +'Departure: '+depSel+'\n'
+      +'Guests: '+guests
+      +(ups.length?'\nUpgrades: '+ups.join(', '):'')
+      +(notes?'\nNotes: '+notes:'');
+    submitForm('Helicopter Picnic');
+    document.getElementById('modal-bg').classList.remove('open');
+    window.open('https://wa.me/255692312366?text='+encodeURIComponent(msg), '_blank');
+  };
   document.getElementById('modal-bg').classList.add('open');
 }
 function openYachtBook(name, cap, half, full, live, two){
@@ -2758,28 +2796,50 @@ function openYachtBook(name, cap, half, full, live, two){
 
   var btn = document.createElement('button');
   btn.className = 'gbtn';
-  btn.textContent = 'Send charter request';
+  btn.innerHTML = '<i class="ti ti-brand-whatsapp"></i> Send charter request';
   btn.onclick = function(){
     var date = (document.getElementById('yt-date')||{}).value||'';
     var type = (document.getElementById('yt-type')||{}).value||'';
     var guests = (document.getElementById('yt-guests')||{}).value||'';
     var occasion = (document.getElementById('yt-occasion')||{}).value||'';
     var notes = (document.getElementById('yt-notes')||{}).value||'';
+    var msg = 'Yacht Charter Enquiry\n'
+      +'Vessel: '+name+'\n'
+      +'Type: '+type+'\n'
+      +'Date: '+(date||'Not specified')+'\n'
+      +'Guests: '+(guests||'Not specified')
+      +(occasion?'\nOccasion: '+occasion:'')
+      +(notes?'\nNotes: '+notes:'');
     submitForm(name+' Charter | '+type+' | '+date+' | '+guests+' guests'+(occasion?' | '+occasion:'')+(notes?' | '+notes:''));
+    document.getElementById('modal-bg').classList.remove('open');
+    window.open('https://wa.me/255692312366?text='+encodeURIComponent(msg), '_blank');
   };
   f.appendChild(btn);
-  var wa = document.createElement('a');
-  wa.className = 'wa-btn';
-  wa.href = 'https://wa.me/255692312366?text=Yacht+charter+enquiry:+'+encodeURIComponent(name);
-  wa.target = '_blank';
-  wa.innerHTML = '<i class="ti ti-brand-whatsapp"></i>Enquire via WhatsApp';
-  f.appendChild(wa);
   el.appendChild(f);
   document.getElementById('modal-bg').classList.add('open');
 }
 function openF1Book(race,date,venue){
   document.getElementById('modal-ttl').textContent=race.replace(/^[^\s]+ /,'');
-  document.getElementById('modal-body').innerHTML='     <div class="fwrap">       <div style="font-size:11px;color:var(--mt);margin-bottom:14px;line-height:1.7;">'+(date)+' · '+(venue)+'</div>       <div class="fgrp"><label class="flbl">Your name</label><input class="finp" placeholder="Full name"></div>       <div class="fgrp"><label class="flbl">Guests</label><select class="fsel"><option>1</option><option>2</option><option>3</option><option>4+</option></select></div>       <div class="fgrp"><label class="flbl">Package required</label><select class="fsel"><option>Race tickets only</option><option>Tickets + accommodation</option><option>Full hospitality package</option><option>Paddock access + full arrangement</option></select></div>       <div class="fgrp"><label class="flbl">Travel from</label><input class="finp" placeholder="Arusha / Dar es Salaam / other"></div>       <div class="fgrp"><label class="flbl">Special requests</label><textarea class="ftxt" placeholder="VIP suite, team hospitality, specific requirements..."></textarea></div>       <button class="gbtn" onclick="submitForm(\'F1: '+(race.replace(/'/g,"\\'"))+'\')">Send F1 enquiry</button>       <a class="wa-btn" href="https://wa.me/255692312366?text=F1+hospitality+enquiry" target="_blank"><i class="ti ti-brand-whatsapp"></i>WhatsApp concierge</a>     </div>';
+  document.getElementById('modal-body').innerHTML='     <div class="fwrap">       <div style="font-size:11px;color:var(--mt);margin-bottom:14px;line-height:1.7;">'+(date)+' · '+(venue)+'</div>       <div class="fgrp"><label class="flbl">Your name</label><input class="finp" id="f1b-name" placeholder="Full name"></div>       <div class="fgrp"><label class="flbl">Guests</label><select class="fsel" id="f1b-guests"><option>1</option><option>2</option><option>3</option><option>4+</option></select></div>       <div class="fgrp"><label class="flbl">Package required</label><select class="fsel" id="f1b-package"><option>Race tickets only</option><option>Tickets + accommodation</option><option>Full hospitality package</option><option>Paddock access + full arrangement</option></select></div>       <div class="fgrp"><label class="flbl">Travel from</label><input class="finp" id="f1b-from" placeholder="Arusha / Dar es Salaam / other"></div>       <div class="fgrp"><label class="flbl">Special requests</label><textarea class="ftxt" id="f1b-notes" placeholder="VIP suite, team hospitality, specific requirements..."></textarea></div>       <button class="gbtn" id="f1b-confirm-btn"><i class="ti ti-brand-whatsapp"></i> Send F1 enquiry</button>     </div>';
+  var btn = document.getElementById('f1b-confirm-btn');
+  if(btn) btn.onclick = function(){
+    var name = (document.getElementById('f1b-name')||{}).value||'';
+    var guests = (document.getElementById('f1b-guests')||{}).value||'1';
+    var pkg = (document.getElementById('f1b-package')||{}).value||'';
+    var from = (document.getElementById('f1b-from')||{}).value||'';
+    var notes = (document.getElementById('f1b-notes')||{}).value||'';
+    var msg = 'F1 Hospitality Enquiry\n'
+      +'Race: '+race+'\n'
+      +'Dates: '+date+' · '+venue+'\n'
+      +'Name: '+(name||'Guest')+'\n'
+      +'Guests: '+guests+'\n'
+      +'Package: '+pkg
+      +(from?'\nTravelling from: '+from:'')
+      +(notes?'\nNotes: '+notes:'');
+    submitForm('F1: '+race);
+    document.getElementById('modal-bg').classList.remove('open');
+    window.open('https://wa.me/255692312366?text='+encodeURIComponent(msg), '_blank');
+  };
   document.getElementById('modal-bg').classList.add('open');
 }
 
@@ -3994,21 +4054,30 @@ function openSpaDetail(id){
     +noteHtml
     +'<div style="font-size:10px;color:var(--mt);line-height:1.7;margin-bottom:12px;">'+(t.desc||'')+'</div>'
     +incHtml
-    +'<div class="fgrp"><label class="flbl">Your name</label><input class="finp" placeholder="Full name"></div>'
-    +'<div class="fgrp"><label class="flbl">Date</label><input class="finp" type="date" style="color-scheme:dark"></div>'
-    +'<div class="fgrp"><label class="flbl">Preferred time</label><select class="fsel"><option>Morning (9am–12pm)</option><option>Afternoon (12pm–4pm)</option><option>Evening (4pm–6pm)</option></select></div>'
-    +'<div class="fgrp"><label class="flbl">Health notes</label><textarea class="ftxt" placeholder="Allergies, injuries, pregnancy..."></textarea></div>';
+    +'<div class="fgrp"><label class="flbl">Your name</label><input class="finp" id="sp-name" placeholder="Full name"></div>'
+    +'<div class="fgrp"><label class="flbl">Date</label><input class="finp" id="sp-date" type="date" style="color-scheme:dark"></div>'
+    +'<div class="fgrp"><label class="flbl">Preferred time</label><select class="fsel" id="sp-time"><option>Morning (9am–12pm)</option><option>Afternoon (12pm–4pm)</option><option>Evening (4pm–6pm)</option></select></div>'
+    +'<div class="fgrp"><label class="flbl">Health notes</label><textarea class="ftxt" id="sp-notes" placeholder="Allergies, injuries, pregnancy..."></textarea></div>';
   var btn=document.createElement('button');
   btn.className='gbtn';
-  btn.textContent='Book treatment';
-  btn.onclick=function(){submitForm('Spa: '+t.name+' - '+blDisplay(t.base));};
+  btn.innerHTML='<i class="ti ti-brand-whatsapp"></i> Book treatment';
+  btn.onclick=function(){
+    var name=(document.getElementById('sp-name')||{}).value||'';
+    var date=(document.getElementById('sp-date')||{}).value||'';
+    var time=(document.getElementById('sp-time')||{}).value||'';
+    var notes=(document.getElementById('sp-notes')||{}).value||'';
+    var msg='Spa Booking\n'
+      +'Treatment: '+t.name+' ('+pName+')\n'
+      +'Price: '+blDisplay(t.base)+' · '+t.duration+'\n'
+      +'Name: '+(name||'Guest')+'\n'
+      +'Date: '+(date||'Not specified')+'\n'
+      +'Preferred time: '+time
+      +(notes?'\nHealth notes: '+notes:'');
+    submitForm('Spa: '+t.name+' - '+blDisplay(t.base));
+    document.getElementById('modal-bg').classList.remove('open');
+    window.open('https://wa.me/255692312366?text='+encodeURIComponent(msg), '_blank');
+  };
   f.appendChild(btn);
-  var wa=document.createElement('a');
-  wa.className='wa-btn';
-  wa.href='https://wa.me/255692312366?text=Spa+booking:+'+encodeURIComponent(t.name);
-  wa.target='_blank';
-  wa.innerHTML='<i class="ti ti-brand-whatsapp"></i>WhatsApp concierge';
-  f.appendChild(wa);
   el.appendChild(f);
   document.getElementById('modal-bg').classList.add('open');
 }
@@ -4131,15 +4200,14 @@ function openGemDetail(id){
 
   var btn=document.createElement('button');
   btn.className='gbtn';
-  btn.textContent='Enquire — '+(g.name||'');
-  btn.onclick=function(){ submitForm('Hidden Gems: '+g.name); };
+  btn.innerHTML='<i class="ti ti-brand-whatsapp"></i> Enquire — '+(g.name||'');
+  btn.onclick=function(){
+    var msg='Hidden Gems Enquiry\nProperty: '+(g.name||'')+'\nLocation: '+(g.location||'');
+    submitForm('Hidden Gems: '+g.name);
+    document.getElementById('modal-bg').classList.remove('open');
+    window.open('https://wa.me/255692312366?text='+encodeURIComponent(msg), '_blank');
+  };
   f.appendChild(btn);
-  var wa=document.createElement('a');
-  wa.className='wa-btn';
-  wa.href='https://wa.me/255692312366?text=Hidden+Gems+enquiry:+'+encodeURIComponent(g.name||'');
-  wa.target='_blank';
-  wa.innerHTML='<i class="ti ti-brand-whatsapp"></i>WhatsApp concierge';
-  f.appendChild(wa);
   el.appendChild(f);
   document.getElementById('modal-bg').classList.add('open');
 }
@@ -4206,21 +4274,28 @@ function openEvDetail(id){
     +'<div class="pbox"><div class="pbox-val" style="font-size:14px;">'+(ev.attendees||0)+'/'+(ev.capacity||100)+'</div><div class="pbox-lbl">Attending</div></div>'
     +'</div>'
     +(!full
-      ?'<div class="fgrp"><label class="flbl">Your name</label><input class="finp" placeholder="Full name"></div>'
-       +'<div class="fgrp"><label class="flbl">Guests</label><select class="fsel"><option>1</option><option>2</option><option>3</option><option>4</option></select></div>'
-       +'<div class="fgrp"><label class="flbl">Dietary requirements</label><input class="finp" placeholder="e.g. vegetarian, halal, none"></div>'
+      ?'<div class="fgrp"><label class="flbl">Your name</label><input class="finp" id="ev-name" placeholder="Full name"></div>'
+       +'<div class="fgrp"><label class="flbl">Guests</label><select class="fsel" id="ev-guests"><option>1</option><option>2</option><option>3</option><option>4</option></select></div>'
+       +'<div class="fgrp"><label class="flbl">Dietary requirements</label><input class="finp" id="ev-dietary" placeholder="e.g. vegetarian, halal, none"></div>'
       :'<div class="info-box" style="text-align:center;">This event is fully booked.<br>Join the waitlist below.</div>');
   var btn=document.createElement('button');
   btn.className='gbtn';
-  btn.textContent=full?'Join waitlist':'Confirm RSVP';
-  btn.onclick=function(){ submitForm(full?'Waitlist: '+ev.name:'RSVP: '+ev.name); };
+  btn.innerHTML='<i class="ti ti-brand-whatsapp"></i> '+(full?'Join waitlist':'Confirm RSVP');
+  btn.onclick=function(){
+    var name=(document.getElementById('ev-name')||{}).value||'';
+    var guests=(document.getElementById('ev-guests')||{}).value||'1';
+    var dietary=(document.getElementById('ev-dietary')||{}).value||'';
+    var msg=(full?'Waitlist Request':'Event RSVP')+'\n'
+      +'Event: '+(ev.name||'')+'\n'
+      +'Date: '+dateStr+' · '+(ev.time||'')+'\n'
+      +'Venue: '+(ev.venue||'')+'\n'
+      +'Name: '+(name||'Guest')
+      +(!full?'\nGuests: '+guests+(dietary?'\nDietary: '+dietary:''):'');
+    submitForm(full?'Waitlist: '+ev.name:'RSVP: '+ev.name);
+    document.getElementById('modal-bg').classList.remove('open');
+    window.open('https://wa.me/255692312366?text='+encodeURIComponent(msg), '_blank');
+  };
   f.appendChild(btn);
-  var wa=document.createElement('a');
-  wa.className='wa-btn';
-  wa.href='https://wa.me/255692312366?text=RSVP+for+'+encodeURIComponent(ev.name||'Event');
-  wa.target='_blank';
-  wa.innerHTML='<i class="ti ti-brand-whatsapp"></i>WhatsApp concierge';
-  f.appendChild(wa);
   el.appendChild(f);
   document.getElementById('modal-bg').classList.add('open');
 }
@@ -4310,7 +4385,25 @@ function openELBook(routeOrEl,aircraft,datetime,price,was){
     was=card.dataset.was||'';
   }
   document.getElementById('modal-ttl').textContent='Empty Leg · '+route;
-  document.getElementById('modal-body').innerHTML='     <div class="fwrap">       <div style="background:rgba(184,137,42,0.06);border:0.5px solid rgba(184,137,42,0.25);padding:12px 14px;margin-bottom:14px;border-radius:2px;">         <div style="font-family:\'Cormorant Garamond\',serif;font-size:24px;color:var(--gl);">'+(route)+'</div>         <div style="font-size:10px;color:var(--mt);margin-top:2px;">'+(aircraft)+' · '+(datetime)+'</div>         <div style="display:flex;align-items:center;gap:10px;margin-top:8px;">           <span style="font-size:11px;color:var(--mt);text-decoration:line-through;">'+(was)+'</span>           <span style="font-family:\'Cormorant Garamond\',serif;font-size:26px;color:var(--gl);">'+(price)+'</span>         </div>       </div>       <div class="fgrp"><label class="flbl">Full name (for manifest)</label><input class="finp" placeholder="Full name"></div>       <div class="fgrp"><label class="flbl">Passport / ID number</label><input class="finp" placeholder="Required for private aviation"></div>       <div class="fgrp"><label class="flbl">Passengers</label><select class="fsel"><option>1</option><option>2</option><option>3</option><option>4</option><option>5+</option></select></div>       <div class="fgrp"><label class="flbl">WhatsApp number</label><input class="finp" placeholder="+255 ..."></div>       <button class="gbtn" onclick="submitForm(\'Empty Leg: '+(route)+'\')">Reserve this leg now</button>       <a class="wa-btn" href="https://wa.me/255692312366?text=Empty+leg+enquiry:" target="_blank"><i class="ti ti-brand-whatsapp"></i>WhatsApp for instant reply</a>     </div>';
+  document.getElementById('modal-body').innerHTML='     <div class="fwrap">       <div style="background:rgba(184,137,42,0.06);border:0.5px solid rgba(184,137,42,0.25);padding:12px 14px;margin-bottom:14px;border-radius:2px;">         <div style="font-family:\'Cormorant Garamond\',serif;font-size:24px;color:var(--gl);">'+(route)+'</div>         <div style="font-size:10px;color:var(--mt);margin-top:2px;">'+(aircraft)+' · '+(datetime)+'</div>         <div style="display:flex;align-items:center;gap:10px;margin-top:8px;">           <span style="font-size:11px;color:var(--mt);text-decoration:line-through;">'+(was)+'</span>           <span style="font-family:\'Cormorant Garamond\',serif;font-size:26px;color:var(--gl);">'+(price)+'</span>         </div>       </div>       <div class="fgrp"><label class="flbl">Full name (for manifest)</label><input class="finp" id="el-name" placeholder="Full name"></div>       <div class="fgrp"><label class="flbl">Passport / ID number</label><input class="finp" id="el-passport" placeholder="Required for private aviation"></div>       <div class="fgrp"><label class="flbl">Passengers</label><select class="fsel" id="el-pax"><option>1</option><option>2</option><option>3</option><option>4</option><option>5+</option></select></div>       <div class="fgrp"><label class="flbl">WhatsApp number</label><input class="finp" id="el-phone" placeholder="+255 ..."></div>       <button class="gbtn" id="el-confirm-btn"><i class="ti ti-brand-whatsapp"></i> Reserve this leg now</button>     </div>';
+  var elBtn = document.getElementById('el-confirm-btn');
+  if(elBtn) elBtn.onclick = function(){
+    var name = (document.getElementById('el-name')||{}).value||'';
+    var passport = (document.getElementById('el-passport')||{}).value||'';
+    var pax = (document.getElementById('el-pax')||{}).value||'1';
+    var phone = (document.getElementById('el-phone')||{}).value||'';
+    var msg = 'Empty Leg Reservation\n'
+      +'Route: '+route+'\n'
+      +'Aircraft: '+aircraft+' · '+datetime+'\n'
+      +'Price: '+price+' (was '+was+')\n'
+      +'Name: '+(name||'Guest')
+      +(passport?'\nPassport/ID: '+passport:'')
+      +'\nPassengers: '+pax
+      +(phone?'\nWhatsApp: '+phone:'');
+    submitForm('Empty Leg: '+route);
+    document.getElementById('modal-bg').classList.remove('open');
+    window.open('https://wa.me/255692312366?text='+encodeURIComponent(msg), '_blank');
+  };
   document.getElementById('modal-bg').classList.add('open');
 }
 function openNotifyAlert(){
@@ -5024,14 +5117,31 @@ function openDiningDetail(id){
     +'<div class="pc-row"><span class="pc-label">Location</span><span style="font-size:11px;color:var(--ow);">'+v.location+'</span></div>'
     +'</div>'
     +'<div style="font-size:10px;color:var(--gold);margin-bottom:14px;letter-spacing:0.06em;">'+v.note+'</div>'
-    +'<div class="fgrp"><label class="flbl">Your name</label><input class="finp" placeholder="Full name"></div>'
-    +'<div class="fgrp"><label class="flbl">Date</label><input class="finp" type="date" style="color-scheme:dark"></div>'
-    +'<div class="fgrp"><label class="flbl">Time</label><select class="fsel"><option>Lunch — 12:00</option><option>Lunch — 13:00</option><option>Dinner — 19:00</option><option>Dinner — 20:00</option><option>Dinner — 21:00</option></select></div>'
-    +'<div class="fgrp"><label class="flbl">Guests</label><select class="fsel"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6+</option></select></div>'
-    +'<div class="fgrp"><label class="flbl">Occasion & requests</label><textarea class="ftxt" placeholder="Anniversary, dietary requirements, preferred table, wine pairing..."></textarea></div>'
-    +'<button class="gbtn" onclick="submitForm(\'Dining: '+v.name+'\')">Reserve table via concierge</button>'
-    +'<a class="wa-btn" href="https://wa.me/255692312366?text=Dining+reservation+at" target="_blank"><i class="ti ti-brand-whatsapp"></i>WhatsApp concierge</a>'
+    +'<div class="fgrp"><label class="flbl">Your name</label><input class="finp" id="dn-name" placeholder="Full name"></div>'
+    +'<div class="fgrp"><label class="flbl">Date</label><input class="finp" id="dn-date" type="date" style="color-scheme:dark"></div>'
+    +'<div class="fgrp"><label class="flbl">Time</label><select class="fsel" id="dn-time"><option>Lunch — 12:00</option><option>Lunch — 13:00</option><option>Dinner — 19:00</option><option>Dinner — 20:00</option><option>Dinner — 21:00</option></select></div>'
+    +'<div class="fgrp"><label class="flbl">Guests</label><select class="fsel" id="dn-guests"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6+</option></select></div>'
+    +'<div class="fgrp"><label class="flbl">Occasion & requests</label><textarea class="ftxt" id="dn-notes" placeholder="Anniversary, dietary requirements, preferred table, wine pairing..."></textarea></div>'
+    +'<button class="gbtn" id="dn-confirm-btn"><i class="ti ti-brand-whatsapp"></i> Reserve table via concierge</button>'
     +'</div>';
+  var dnBtn = document.getElementById('dn-confirm-btn');
+  if(dnBtn) dnBtn.onclick = function(){
+    var name=(document.getElementById('dn-name')||{}).value||'';
+    var date=(document.getElementById('dn-date')||{}).value||'';
+    var time=(document.getElementById('dn-time')||{}).value||'';
+    var guests=(document.getElementById('dn-guests')||{}).value||'';
+    var notes=(document.getElementById('dn-notes')||{}).value||'';
+    var msg='Dining Reservation\n'
+      +'Venue: '+v.name+'\n'
+      +'Name: '+(name||'Guest')+'\n'
+      +'Date: '+(date||'Not specified')+'\n'
+      +'Time: '+time+'\n'
+      +'Guests: '+guests
+      +(notes?'\nNotes: '+notes:'');
+    submitForm('Dining: '+v.name);
+    document.getElementById('modal-bg').classList.remove('open');
+    window.open('https://wa.me/255692312366?text='+encodeURIComponent(msg), '_blank');
+  };
   document.getElementById('modal-bg').classList.add('open');
 }
 
@@ -5191,16 +5301,35 @@ function openACLReservation(){
   document.getElementById('modal-ttl').textContent = 'Reserve at The Grill Room';
   var html = '<div class="fwrap">'
     +'<div style="font-size:10px;color:var(--mt);line-height:1.7;margin-bottom:14px;">Arusha Coffee Lodge · Elewana Collection<br>Dinner 19:00–22:30 · Lunch 12:00–15:00</div>'
-    +'<div class="fgrp"><label class="flbl">Your name</label><input class="finp" placeholder="Full name"></div>'
-    +'<div class="fgrp"><label class="flbl">Date</label><input class="finp" type="date" style="color-scheme:dark"></div>'
-    +'<div class="fgrp"><label class="flbl">Time</label><select class="fsel"><option>Lunch — 12:00</option><option>Lunch — 13:00</option><option>Dinner — 19:00</option><option>Dinner — 20:00</option><option>Dinner — 21:00</option></select></div>'
-    +'<div class="fgrp"><label class="flbl">Number of guests</label><select class="fsel"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>Private group 7+</option></select></div>'
-    +'<div class="fgrp"><label class="flbl">Occasion</label><input class="finp" placeholder="Anniversary, birthday, business dinner..."></div>'
-    +'<div class="fgrp"><label class="flbl">Dietary requirements</label><textarea class="ftxt" placeholder="Allergies, vegetarian, halal, gluten-free..."></textarea></div>'
-    +'<button class="gbtn" onclick="submitForm(\'Dining: The Grill Room ACL\')">Send reservation request</button>'
-    +'<a class="wa-btn" href="https://wa.me/255692312366?text=Grill+Room+reservation+request" target="_blank"><i class="ti ti-brand-whatsapp"></i>WhatsApp for instant confirmation</a>'
+    +'<div class="fgrp"><label class="flbl">Your name</label><input class="finp" id="acl-name" placeholder="Full name"></div>'
+    +'<div class="fgrp"><label class="flbl">Date</label><input class="finp" id="acl-date" type="date" style="color-scheme:dark"></div>'
+    +'<div class="fgrp"><label class="flbl">Time</label><select class="fsel" id="acl-time"><option>Lunch — 12:00</option><option>Lunch — 13:00</option><option>Dinner — 19:00</option><option>Dinner — 20:00</option><option>Dinner — 21:00</option></select></div>'
+    +'<div class="fgrp"><label class="flbl">Number of guests</label><select class="fsel" id="acl-guests"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>Private group 7+</option></select></div>'
+    +'<div class="fgrp"><label class="flbl">Occasion</label><input class="finp" id="acl-occasion" placeholder="Anniversary, birthday, business dinner..."></div>'
+    +'<div class="fgrp"><label class="flbl">Dietary requirements</label><textarea class="ftxt" id="acl-dietary" placeholder="Allergies, vegetarian, halal, gluten-free..."></textarea></div>'
+    +'<button class="gbtn" id="acl-confirm-btn"><i class="ti ti-brand-whatsapp"></i> Send reservation request</button>'
     +'</div>';
   document.getElementById('modal-body').innerHTML = html;
+  var aclBtn = document.getElementById('acl-confirm-btn');
+  if(aclBtn) aclBtn.onclick = function(){
+    var name=(document.getElementById('acl-name')||{}).value||'';
+    var date=(document.getElementById('acl-date')||{}).value||'';
+    var time=(document.getElementById('acl-time')||{}).value||'';
+    var guests=(document.getElementById('acl-guests')||{}).value||'';
+    var occasion=(document.getElementById('acl-occasion')||{}).value||'';
+    var dietary=(document.getElementById('acl-dietary')||{}).value||'';
+    var msg='Grill Room Reservation\n'
+      +'Venue: The Grill Room, Arusha Coffee Lodge\n'
+      +'Name: '+(name||'Guest')+'\n'
+      +'Date: '+(date||'Not specified')+'\n'
+      +'Time: '+time+'\n'
+      +'Guests: '+guests
+      +(occasion?'\nOccasion: '+occasion:'')
+      +(dietary?'\nDietary: '+dietary:'');
+    submitForm('Dining: The Grill Room ACL');
+    document.getElementById('modal-bg').classList.remove('open');
+    window.open('https://wa.me/255692312366?text='+encodeURIComponent(msg), '_blank');
+  };
   document.getElementById('modal-bg').classList.add('open');
 }
 
@@ -5364,25 +5493,37 @@ function openEqBook(name, price) {
     +'<div style="font-size:10px;color:var(--mt);">Arranged exclusively by Barafu Luxe</div>'
     +'<div style="font-size:12px;color:var(--gold);margin-top:6px;">'+price+'</div>'
     +'</div>'
-    +'<div class="fgrp"><label class="flbl">Full name</label><input class="finp" placeholder="As per passport"></div>'
-    +'<div class="fgrp"><label class="flbl">WhatsApp number</label><input class="finp" placeholder="+255 ..."></div>'
-    +'<div class="fgrp"><label class="flbl">Preferred dates</label><input class="finp" placeholder="e.g. June 10–14 2026"></div>'
-    +'<div class="fgrp"><label class="flbl">Number of guests</label><select class="fsel"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>Group 6+</option></select></div>'
-    +'<div class="fgrp"><label class="flbl">Riding experience</label><select class="fsel"><option>Experienced — comfortable at canter/gallop</option><option>Intermediate — comfortable at trot</option><option>Non-rider</option></select></div>'
-    +'<div class="fgrp"><label class="flbl">Special requests</label><textarea class="ftxt" placeholder="Dietary, fitness, any questions..."></textarea></div>';
+    +'<div class="fgrp"><label class="flbl">Full name</label><input class="finp" id="eq-name" placeholder="As per passport"></div>'
+    +'<div class="fgrp"><label class="flbl">WhatsApp number</label><input class="finp" id="eq-phone" placeholder="+255 ..."></div>'
+    +'<div class="fgrp"><label class="flbl">Preferred dates</label><input class="finp" id="eq-dates" placeholder="e.g. June 10–14 2026"></div>'
+    +'<div class="fgrp"><label class="flbl">Number of guests</label><select class="fsel" id="eq-guests"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>Group 6+</option></select></div>'
+    +'<div class="fgrp"><label class="flbl">Riding experience</label><select class="fsel" id="eq-level"><option>Experienced — comfortable at canter/gallop</option><option>Intermediate — comfortable at trot</option><option>Non-rider</option></select></div>'
+    +'<div class="fgrp"><label class="flbl">Special requests</label><textarea class="ftxt" id="eq-notes" placeholder="Dietary, fitness, any questions..."></textarea></div>';
 
   var btn = document.createElement('button');
   btn.className = 'gbtn';
-  btn.textContent = 'Send enquiry';
-  btn.onclick = function(){ submitForm('Equestrian: '+window._eqService); };
+  btn.innerHTML = '<i class="ti ti-brand-whatsapp"></i> Send enquiry';
+  btn.onclick = function(){
+    var eqName=(document.getElementById('eq-name')||{}).value||'';
+    var phone=(document.getElementById('eq-phone')||{}).value||'';
+    var dates=(document.getElementById('eq-dates')||{}).value||'';
+    var guests=(document.getElementById('eq-guests')||{}).value||'';
+    var level=(document.getElementById('eq-level')||{}).value||'';
+    var notes=(document.getElementById('eq-notes')||{}).value||'';
+    var msg='Equestrian Safari Enquiry\n'
+      +'Experience: '+name+'\n'
+      +'Price: '+price+'\n'
+      +'Name: '+(eqName||'Guest')
+      +(phone?'\nWhatsApp: '+phone:'')
+      +(dates?'\nPreferred dates: '+dates:'')
+      +'\nGuests: '+guests+'\n'
+      +'Riding level: '+level
+      +(notes?'\nNotes: '+notes:'');
+    submitForm('Equestrian: '+window._eqService);
+    document.getElementById('modal-bg').classList.remove('open');
+    window.open('https://wa.me/255692312366?text='+encodeURIComponent(msg), '_blank');
+  };
   f.appendChild(btn);
-
-  var wa = document.createElement('a');
-  wa.className = 'wa-btn';
-  wa.href = 'https://wa.me/255692312366?text=Horse+safari+booking:+'+encodeURIComponent(name);
-  wa.target = '_blank';
-  wa.innerHTML = '<i class="ti ti-brand-whatsapp"></i>WhatsApp for instant response';
-  f.appendChild(wa);
 
   el.appendChild(f);
   document.getElementById('modal-bg').classList.add('open');
@@ -5445,46 +5586,6 @@ function bookTrackedFlight(){
 }
 
 
-function openObsidianLounge(){
-  if(!currentUser){ return; }
-  if(currentUser.tier!=='obsidian'&&currentUser.tier!=='admin'){
-    showTierUpgradeAlert('business');
-    return;
-  }
-  document.getElementById('modal-ttl').textContent='Obsidian Private Lounge';
-  var el=document.getElementById('modal-body');
-  el.innerHTML='';
-  var f=document.createElement('div');
-  f.className='fwrap';
-  f.innerHTML='<div style="text-align:center;padding:12px 0 16px;">'
-    +'<div style="font-size:36px;margin-bottom:8px;">💎</div>'
-    +'<div style="font-family:Cormorant Garamond,serif;font-size:20px;color:#CE93D8;margin-bottom:6px;">Obsidian Introductions</div>'
-    +'<div style="font-size:11px;color:var(--mt);line-height:1.7;">Your concierge facilitates direct introductions between Obsidian members. All requests are handled with complete discretion.</div>'
-    +'</div>'
-    +'<div class="fgrp"><label class="flbl">Your name</label><input class="finp" placeholder="Full name"></div>'
-    +'<div class="fgrp"><label class="flbl">What are you looking for?</label><select class="fsel">'
-    +'<option>Business introduction</option>'
-    +'<option>Investment opportunity</option>'
-    +'<option>Shared charter partner</option>'
-    +'<option>Hospitality referral</option>'
-    +'<option>Other private matter</option>'
-    +'</select></div>'
-    +'<div class="fgrp"><label class="flbl">Brief description</label><textarea class="ftxt" placeholder="Describe what you are looking for. All information is strictly confidential."></textarea></div>';
-  var btn=document.createElement('button');
-  btn.className='gbtn';
-  btn.style.cssText='background:rgba(156,39,176,0.15);border-color:rgba(156,39,176,0.4);color:#CE93D8;';
-  btn.textContent='Send introduction request';
-  btn.onclick=function(){ submitForm('Obsidian Circle: Introduction Request'); };
-  f.appendChild(btn);
-  var wa=document.createElement('a');
-  wa.className='wa-btn';
-  wa.href='https://wa.me/255692312366?text=Obsidian+introduction+request';
-  wa.target='_blank';
-  wa.innerHTML='<i class="ti ti-brand-whatsapp"></i>WhatsApp concierge directly';
-  f.appendChild(wa);
-  el.appendChild(f);
-  document.getElementById('modal-bg').classList.add('open');
-}
 
 // ════ PROFILE FUNCTIONS ════
 
@@ -5768,27 +5869,32 @@ function openObsidianLounge(){
     +'<div style="font-family:Cormorant Garamond,serif;font-size:20px;color:#CE93D8;margin-bottom:6px;">Obsidian Introductions</div>'
     +'<div style="font-size:11px;color:var(--mt);line-height:1.7;">Your concierge facilitates direct introductions between Obsidian members. All requests are handled with complete discretion.</div>'
     +'</div>'
-    +'<div class="fgrp"><label class="flbl">Your name</label><input class="finp" placeholder="Full name"></div>'
-    +'<div class="fgrp"><label class="flbl">What are you looking for?</label><select class="fsel">'
+    +'<div class="fgrp"><label class="flbl">Your name</label><input class="finp" id="ob-name" placeholder="Full name"></div>'
+    +'<div class="fgrp"><label class="flbl">What are you looking for?</label><select class="fsel" id="ob-purpose">'
     +'<option>Business introduction</option>'
     +'<option>Investment opportunity</option>'
     +'<option>Shared charter partner</option>'
     +'<option>Hospitality referral</option>'
     +'<option>Other private matter</option>'
     +'</select></div>'
-    +'<div class="fgrp"><label class="flbl">Brief description</label><textarea class="ftxt" placeholder="Describe what you are looking for. All information is strictly confidential."></textarea></div>';
+    +'<div class="fgrp"><label class="flbl">Brief description</label><textarea class="ftxt" id="ob-desc" placeholder="Describe what you are looking for. All information is strictly confidential."></textarea></div>';
   var btn=document.createElement('button');
   btn.className='gbtn';
   btn.style.cssText='background:rgba(156,39,176,0.15);border-color:rgba(156,39,176,0.4);color:#CE93D8;';
-  btn.textContent='Send introduction request';
-  btn.onclick=function(){ submitForm('Obsidian Circle: Introduction Request'); };
+  btn.innerHTML='<i class="ti ti-brand-whatsapp"></i> Send introduction request';
+  btn.onclick=function(){
+    var name=(document.getElementById('ob-name')||{}).value||'';
+    var purpose=(document.getElementById('ob-purpose')||{}).value||'';
+    var desc=(document.getElementById('ob-desc')||{}).value||'';
+    var msg='Obsidian Circle Introduction Request\n'
+      +'Name: '+(name||'Obsidian member')+'\n'
+      +'Looking for: '+purpose
+      +(desc?'\nDescription: '+desc:'');
+    submitForm('Obsidian Circle: Introduction Request');
+    document.getElementById('modal-bg').classList.remove('open');
+    window.open('https://wa.me/255692312366?text='+encodeURIComponent(msg), '_blank');
+  };
   f.appendChild(btn);
-  var wa=document.createElement('a');
-  wa.className='wa-btn';
-  wa.href='https://wa.me/255692312366?text=Obsidian+introduction+request';
-  wa.target='_blank';
-  wa.innerHTML='<i class="ti ti-brand-whatsapp"></i>WhatsApp concierge directly';
-  f.appendChild(wa);
   el.appendChild(f);
   document.getElementById('modal-bg').classList.add('open');
 }
