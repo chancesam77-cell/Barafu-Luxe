@@ -364,6 +364,39 @@
 .gem-prop-per{font-size:9px;color:var(--mt);margin-top:4px;letter-spacing:0.04em;}
 .gem-enquire-btn{background:transparent;border:0.5px solid rgba(184,137,42,0.4);color:var(--gold);padding:10px 20px;border-radius:2px;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;font-family:Montserrat,Georgia,sans-serif;cursor:pointer;white-space:nowrap;}
 
+/* ════ GEM PHOTO GALLERY ════ */
+.gg-wrap{position:relative;margin:0 -14px 18px;background:#000;}
+.gg-track{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.gg-track::-webkit-scrollbar{display:none;}
+.gg-slide{flex:0 0 100%;scroll-snap-align:center;position:relative;aspect-ratio:4/3;background:#0c0c0c;}
+.gg-slide img{width:100%;height:100%;object-fit:cover;display:block;cursor:zoom-in;}
+.gg-slide-cap{position:absolute;left:0;right:0;bottom:0;padding:24px 16px 12px;background:linear-gradient(to top,rgba(0,0,0,0.75),transparent);font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--gp);}
+.gg-counter{position:absolute;top:12px;right:12px;background:rgba(8,8,8,0.55);backdrop-filter:blur(6px);border:0.5px solid rgba(184,137,42,0.3);color:var(--gp);font-size:9px;letter-spacing:0.1em;padding:4px 10px;border-radius:20px;z-index:2;}
+.gg-dots{position:absolute;bottom:10px;left:0;right:0;display:flex;justify-content:center;gap:5px;z-index:2;}
+.gg-dot{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.35);transition:all .25s;cursor:pointer;}
+.gg-dot.on{background:var(--gl);width:16px;border-radius:3px;}
+.gg-thumbs{display:flex;gap:6px;padding:10px 16px 0;overflow-x:auto;scrollbar-width:none;}
+.gg-thumbs::-webkit-scrollbar{display:none;}
+.gg-thumb{flex:0 0 52px;height:52px;border-radius:2px;overflow:hidden;border:0.5px solid var(--bd);opacity:0.5;cursor:pointer;transition:all .2s;}
+.gg-thumb.on{opacity:1;border-color:var(--gl);}
+.gg-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+.gg-empty{aspect-ratio:16/10;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(160deg,#0d0d0d,#080808);color:var(--mt);gap:8px;margin:0 -14px 18px;}
+.gg-empty i{font-size:26px;color:rgba(184,137,42,0.35);}
+.gg-empty span{font-size:9px;letter-spacing:0.14em;text-transform:uppercase;}
+.gg-slide-fallback{position:absolute;inset:0;display:none;align-items:center;justify-content:center;flex-direction:column;gap:6px;background:linear-gradient(160deg,#141310,#0a0a08);color:rgba(184,137,42,0.35);}
+.gg-slide-fallback i{font-size:28px;}
+.gg-slide-fallback span{font-size:8px;letter-spacing:0.14em;text-transform:uppercase;color:var(--mt);}
+
+/* ════ LIGHTBOX ════ */
+.gg-lightbox{position:fixed;inset:0;background:rgba(4,4,4,0.97);z-index:9999;display:none;align-items:center;justify-content:center;}
+.gg-lightbox.open{display:flex;}
+.gg-lb-img{max-width:94vw;max-height:78vh;object-fit:contain;border-radius:2px;}
+.gg-lb-close{position:absolute;top:18px;right:18px;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.06);border:0.5px solid rgba(184,137,42,0.3);color:var(--gp);display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;}
+.gg-lb-nav{position:absolute;top:50%;transform:translateY(-50%);width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,0.06);border:0.5px solid rgba(184,137,42,0.3);color:var(--gp);display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;}
+.gg-lb-prev{left:14px;}
+.gg-lb-next{right:14px;}
+.gg-lb-counter{position:absolute;bottom:22px;left:0;right:0;text-align:center;font-size:9px;letter-spacing:0.16em;color:var(--gp);text-transform:uppercase;}
+
 
 /* ════ HIDDEN GEMS ════ */
 .gem-hero-wrap{padding:28px 20px 22px;border-bottom:0.5px solid rgba(184,137,42,0.15);text-align:center;background:linear-gradient(160deg,#080808,#0b0a06,#080808);}
@@ -2191,6 +2224,18 @@ function removeBookingFB(fbKey){
   </div>
 </div>
 
+<div class="gg-lightbox" id="gg-lightbox">
+  <button class="gg-lb-close" onclick="closeGemLightbox()"><i class="ti ti-x"></i></button>
+  <button class="gg-lb-nav gg-lb-prev" onclick="gemLightboxNav(-1)"><i class="ti ti-chevron-left"></i></button>
+  <img class="gg-lb-img" id="gg-lb-img" src="" alt="" onerror="this.style.display='none';document.getElementById('gg-lb-fallback').style.display='flex';" onload="this.style.display='block';document.getElementById('gg-lb-fallback').style.display='none';">
+  <div id="gg-lb-fallback" style="display:none;flex-direction:column;align-items:center;gap:8px;color:rgba(184,137,42,0.4);">
+    <i class="ti ti-camera" style="font-size:36px;"></i>
+    <span style="font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--gp);">Photo coming soon</span>
+  </div>
+  <button class="gg-lb-nav gg-lb-next" onclick="gemLightboxNav(1)"><i class="ti ti-chevron-right"></i></button>
+  <div class="gg-lb-counter" id="gg-lb-counter"></div>
+</div>
+
 <script>
 function communityToggle(el){
   var id=el.dataset.commid||(el.closest('[data-commid]') ? el.closest('[data-commid]').dataset.commid : null);
@@ -3576,6 +3621,16 @@ var GEMS = [
    base:330,per:'per person/night',
    features:['6 luxury suites','Healing Earth Spa','Infinity pool','Farm-to-table dining','Kilimanjaro views'],
    icon:'🏡',new:true,
+   // Real photos supplied by Chance from Siringit's own site (contracted partner).
+   // Add more to /public/images/gems/siringit-villa/ (exterior, pool, dining, gardens) any time.
+   gallery:[
+     {src:'/images/gems/siringit-villa/1.jpg',cap:'Suite Bedroom'},
+     {src:'/images/gems/siringit-villa/2.jpg',cap:'Suite Bedroom II'},
+     {src:'/images/gems/siringit-villa/3.jpg',cap:'Suite Bedroom III'},
+     {src:'/images/gems/siringit-villa/4.jpg',cap:'Suite Bedroom IV'},
+     {src:'/images/gems/siringit-villa/5.jpg',cap:'Ensuite Bathroom'},
+     {src:'/images/gems/siringit-villa/6.jpg',cap:'Ensuite Bathroom II'}
+   ],
    seasons:{
      high:{label:'Jan–Feb · Jul–Oct · Dec',bb:330,fb:405,ai:480},
      mid:{label:'Mar · Jun · Nov–Dec',bb:275,fb:350,ai:425},
@@ -4133,6 +4188,117 @@ function renderGems(f){
     });
   });
 }
+// ════ HIDDEN GEMS PHOTO GALLERY ════
+function buildGemGalleryHtml(g){
+  var imgs = (g.gallery && g.gallery.length) ? g.gallery : [];
+  if(!imgs.length){
+    return '<div class="gg-empty"><i class="ti ti-camera"></i><span>Photos coming soon</span></div>';
+  }
+  var slides = '';
+  imgs.forEach(function(img,i){
+    slides += '<div class="gg-slide" data-idx="'+i+'">'
+      + '<img src="'+img.src+'" alt="'+(img.cap||g.name||'')+'" loading="'+(i===0?'eager':'lazy')+'" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';">'
+      + '<div class="gg-slide-fallback"><i class="ti ti-camera"></i><span>Photo coming soon</span></div>'
+      + (img.cap ? '<div class="gg-slide-cap">'+img.cap+'</div>' : '')
+      + '</div>';
+  });
+  var dots = imgs.map(function(x,i){ return '<div class="gg-dot'+(i===0?' on':'')+'" data-idx="'+i+'"></div>'; }).join('');
+  var thumbs = imgs.map(function(img,i){
+    return '<div class="gg-thumb'+(i===0?' on':'')+'" data-idx="'+i+'"><img src="'+img.src+'" alt="" onerror="this.style.opacity=0.12"></div>';
+  }).join('');
+  return '<div class="gg-wrap" id="gg-wrap">'
+    + '<div class="gg-track" id="gg-track">'+slides+'</div>'
+    + '<div class="gg-counter" id="gg-counter">1 / '+imgs.length+'</div>'
+    + '<div class="gg-dots">'+dots+'</div>'
+    + '</div>'
+    + (imgs.length>1 ? '<div class="gg-thumbs" id="gg-thumbs">'+thumbs+'</div>' : '');
+}
+
+function wireGemGallery(imgs){
+  var track = document.getElementById('gg-track');
+  if(!track || !imgs || !imgs.length) return;
+  var counter = document.getElementById('gg-counter');
+  var dots = track.parentNode.querySelectorAll('.gg-dot');
+  var thumbsWrap = document.getElementById('gg-thumbs');
+  var thumbs = thumbsWrap ? thumbsWrap.querySelectorAll('.gg-thumb') : [];
+
+  function setActive(idx){
+    if(counter) counter.textContent=(idx+1)+' / '+imgs.length;
+    for(var i=0;i<dots.length;i++) dots[i].classList.toggle('on', i===idx);
+    for(var j=0;j<thumbs.length;j++) thumbs[j].classList.toggle('on', j===idx);
+  }
+
+  var scrollTimer=null;
+  track.addEventListener('scroll', function(){
+    if(scrollTimer) clearTimeout(scrollTimer);
+    scrollTimer = setTimeout(function(){
+      var idx = Math.round(track.scrollLeft / track.clientWidth);
+      setActive(idx);
+    }, 60);
+  });
+
+  var slideImgs = track.querySelectorAll('.gg-slide img');
+  slideImgs.forEach(function(img,i){
+    img.onclick = function(){ openGemLightbox(imgs, i); };
+  });
+
+  dots.forEach(function(d,i){
+    d.onclick=function(){ track.scrollTo({left: i*track.clientWidth, behavior:'smooth'}); };
+  });
+  thumbs.forEach(function(t,i){
+    t.onclick=function(){ track.scrollTo({left: i*track.clientWidth, behavior:'smooth'}); };
+  });
+}
+
+function renderGemLightbox(){
+  var imgs = window._ggLbImages||[];
+  var i = window._ggLbIndex||0;
+  var img = imgs[i];
+  if(!img) return;
+  var el = document.getElementById('gg-lb-img');
+  if(el){ el.src = img.src; el.alt = img.cap||''; }
+  var counter = document.getElementById('gg-lb-counter');
+  if(counter) counter.textContent = (i+1)+' / '+imgs.length;
+}
+
+function openGemLightbox(imgs, idx){
+  window._ggLbImages = imgs;
+  window._ggLbIndex = idx||0;
+  renderGemLightbox();
+  var lb = document.getElementById('gg-lightbox');
+  if(lb) lb.classList.add('open');
+}
+
+function closeGemLightbox(){
+  var lb = document.getElementById('gg-lightbox');
+  if(lb) lb.classList.remove('open');
+}
+
+function gemLightboxNav(dir){
+  var imgs = window._ggLbImages||[];
+  if(!imgs.length) return;
+  window._ggLbIndex = ((window._ggLbIndex||0) + dir + imgs.length) % imgs.length;
+  renderGemLightbox();
+}
+
+// Swipe support for the lightbox
+(function(){
+  var touchStartX=0, touchEndX=0;
+  document.addEventListener('touchstart', function(e){
+    var lb = document.getElementById('gg-lightbox');
+    if(lb && lb.classList.contains('open')) touchStartX = e.changedTouches[0].screenX;
+  }, {passive:true});
+  document.addEventListener('touchend', function(e){
+    var lb = document.getElementById('gg-lightbox');
+    if(lb && lb.classList.contains('open')){
+      touchEndX = e.changedTouches[0].screenX;
+      var delta = touchEndX - touchStartX;
+      if(delta > 40) gemLightboxNav(-1);
+      else if(delta < -40) gemLightboxNav(1);
+    }
+  }, {passive:true});
+})();
+
 function openGemDetail(id){
   var g=GEMS.filter(function(x){return x.id===id;})[0];
   if(!g) return;
@@ -4188,7 +4354,10 @@ function openGemDetail(id){
     return '<span style="display:inline-block;background:var(--soft);border:0.5px solid var(--bd);padding:3px 10px;border-radius:10px;font-size:9px;color:var(--mt);margin:2px 4px 2px 0;letter-spacing:0.06em;">'+feat+'</span>';
   }).join('');
 
-  f.innerHTML='<div style="text-align:center;padding:12px 0 16px;">'
+  var galleryHtml = buildGemGalleryHtml(g);
+
+  f.innerHTML=galleryHtml
+    +'<div style="text-align:center;padding:12px 0 16px;">'
     +'<div style="font-size:36px;margin-bottom:8px;">'+(g.icon||'🏡')+'</div>'
     +'<div style="font-family:Cormorant Garamond,serif;font-size:22px;color:var(--ow);margin-bottom:3px;">'+(g.name||'')+'</div>'
     +'<div style="font-size:10px;color:var(--mt);"><i class="ti ti-map-pin" style="font-size:11px;"></i> '+(g.location||'')+'</div>'
@@ -4210,6 +4379,7 @@ function openGemDetail(id){
   f.appendChild(btn);
   el.appendChild(f);
   document.getElementById('modal-bg').classList.add('open');
+  if(g.gallery && g.gallery.length) wireGemGallery(g.gallery);
 }
 
 // ════ EVENTS ════
