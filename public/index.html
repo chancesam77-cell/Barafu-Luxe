@@ -325,6 +325,9 @@
 .el-book-btn{background:#E10600;color:#fff;border:none;padding:10px 20px;border-radius:2px;font-size:9px;letter-spacing:0.16em;text-transform:uppercase;font-family:Montserrat,sans-serif;cursor:pointer;}
 .el-filled{font-size:9px;color:var(--mt);letter-spacing:0.1em;text-transform:uppercase;}
 /* ════ FLIGHT TRACKER ════ */
+.ft-eat-clock{margin:14px 14px 0;padding:16px;text-align:center;background:linear-gradient(160deg,#0d0d0d,#080808);border:0.5px solid rgba(184,137,42,0.2);border-radius:3px;}
+.ft-eat-time{font-family:'Cormorant Garamond',serif;font-size:34px;letter-spacing:0.04em;color:var(--gl);line-height:1;font-variant-numeric:tabular-nums;}
+.ft-eat-label{font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--mt);margin-top:6px;}
 .ft-search-box{display:flex;gap:8px;margin-bottom:14px;}
 .ft-search-inp{flex:1;background:var(--card);border:0.5px solid rgba(184,137,42,0.3);color:var(--ow);padding:13px 16px;border-radius:3px;font-size:16px;font-family:'Cormorant Garamond',serif;letter-spacing:0.08em;}
 .ft-search-inp::placeholder{color:var(--mt);font-size:13px;}
@@ -1762,6 +1765,10 @@ function removeBookingFB(fbKey){
     <div class="luxury-hero-title">Track Any<br><em>Flight.</em></div>
     <div class="luxury-hero-sub">Enter a flight number to get live status, delays, gate and terminal info — then book your transfer.</div>
     <div class="luxury-hero-rule"></div>
+  </div>
+  <div class="ft-eat-clock" id="ft-eat-clock">
+    <div class="ft-eat-time" id="ft-eat-time">--:--:--</div>
+    <div class="ft-eat-label">East Africa Time · <span id="ft-eat-date">--</span></div>
   </div>
   <div style="padding:16px 14px 0;">
     <div class="ft-search-box">
@@ -7022,6 +7029,54 @@ var AIRPORT_IATA = {
   JRO: 'JRO', ARK: 'ARK', DAR: 'DAR', ZNZ: 'ZNZ', MYW: 'MYW'
 };
 
+// ════ EAST AFRICA TIME (EAT, UTC+3) — timezone-safe, ignores device locale ════
+function eatDateObj(){
+  return new Date(Date.now() + 3*3600*1000);
+}
+function eatTimeString(isoOrNothing){
+  // If given an ISO timestamp (e.g. from AviationStack, in UTC), convert it to EAT HH:MM.
+  // If given nothing, returns the current EAT HH:MM:SS (live clock use).
+  var d;
+  if(isoOrNothing){
+    d = new Date(isoOrNothing);
+    if(isNaN(d.getTime())) return '--:--';
+    d = new Date(d.getTime() + 3*3600*1000);
+    var hh2 = d.getUTCHours().toString().padStart(2,'0');
+    var mm2 = d.getUTCMinutes().toString().padStart(2,'0');
+    return hh2+':'+mm2;
+  }
+  d = eatDateObj();
+  var hh = d.getUTCHours().toString().padStart(2,'0');
+  var mm = d.getUTCMinutes().toString().padStart(2,'0');
+  var ss = d.getUTCSeconds().toString().padStart(2,'0');
+  return hh+':'+mm+':'+ss;
+}
+function updateEATClock(){
+  var timeEl = document.getElementById('ft-eat-time');
+  var dateEl = document.getElementById('ft-eat-date');
+  if(!timeEl) return; // Flight Tracker screen not open — skip silently
+  timeEl.textContent = eatTimeString();
+  var d = eatDateObj();
+  var DAYS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  var MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  if(dateEl) dateEl.textContent = DAYS[d.getUTCDay()]+' '+d.getUTCDate()+' '+MON[d.getUTCMonth()];
+}
+(function startEATClockTicker(){
+  if(window._eatClockTimer) return;
+  updateEATClock();
+  window._eatClockTimer = setInterval(updateEATClock, 1000);
+})();
+
+function startFlightAutoRefresh(){
+  if(window._ftRefreshTimer) return;
+  window._ftRefreshTimer = setInterval(function(){
+    var scr = document.getElementById('s-flights');
+    if(scr && scr.classList.contains('active')){
+      fetchLiveFlights();
+    }
+  }, 2*60*1000);
+}
+
 function fetchLiveFlights(){
   var airport = currentAirport || 'JRO';
   var statusEl = document.getElementById('ft-live-status');
@@ -7035,8 +7090,8 @@ function fetchLiveFlights(){
     .then(function(data){
       if(data && data.data && data.data.length){
         _parseAviationData(airport, boardType, data.data);
-        var ts = new Date().getHours().toString().padStart(2,'0')+':'+new Date().getMinutes().toString().padStart(2,'0');
-        if(statusEl) statusEl.textContent = 'Live · Updated '+ts;
+        var ts = eatTimeString().substring(0,5);
+        if(statusEl) statusEl.textContent = 'Live · Updated '+ts+' EAT';
       } else {
         console.log('AviationStack returned:', JSON.stringify(data).substring(0,200));
         _useFallbackFlights(airport);
@@ -7060,11 +7115,11 @@ function _parseAviationData(airport, boardType, flights){
     var fn = (f.flight && f.flight.iata) ? f.flight.iata : '---';
 
     var scheduled = boardType === 'arr'
-      ? (arr.scheduled || '').substring(11,16)
-      : (dep.scheduled || '').substring(11,16);
+      ? eatTimeString(arr.scheduled)
+      : eatTimeString(dep.scheduled);
     var estimated = boardType === 'arr'
-      ? (arr.estimated || arr.scheduled || '').substring(11,16)
-      : (dep.estimated || dep.scheduled || '').substring(11,16);
+      ? eatTimeString(arr.estimated || arr.scheduled)
+      : eatTimeString(dep.estimated || dep.scheduled);
 
     var rawStatus = (f.flight_status || 'scheduled').toLowerCase();
     var status = 'scheduled';
@@ -7100,9 +7155,9 @@ function _useFallbackFlights(airport){
   };
   var names = {KQ:'Kenya Airways',ET:'Ethiopian',QM:'Precision Air',TK:'Turkish',EK:'Emirates',QR:'Qatar Airways',ATC:'Air Tanzania'};
   var info = ap[airport] || ap.JRO;
-  var now = new Date();
-  var nowM = now.getHours()*60+now.getMinutes();
-  var base = Math.max(6, now.getHours()-2);
+  var now = eatDateObj();
+  var nowM = now.getUTCHours()*60+now.getUTCMinutes();
+  var base = Math.max(6, now.getUTCHours()-2);
 
   if(!FLIGHT_DATA[airport]) FLIGHT_DATA[airport] = {arrivals:[],departures:[]};
 
