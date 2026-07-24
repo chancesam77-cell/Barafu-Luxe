@@ -14,7 +14,6 @@
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="dns-prefetch" href="https://api.anthropic.com">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Barafu Luxe">
@@ -4186,75 +4185,7 @@ function renderCalendar(){
 }
 function prevMonth(){calMonth--;if(calMonth<0){calMonth=11;calYear--;}renderCalendar();renderEvents();}
 function nextMonth(){calMonth++;if(calMonth>11){calMonth=0;calYear++;}renderCalendar();renderEvents();}
-function filterEvt(btn,f){
-  document.querySelectorAll('.ev-filter').forEach(function(b){b.classList.remove('on');});
-  btn.classList.add('on');evFilter=f;renderEvents();
-}
-function renderEvents(){
-  var list=document.getElementById('ev-list');
-  if(!list) return;
-  var filtered=EVENTS_DATA.filter(function(e){
-    return evFilter==='all'||( Array.isArray(e.tags)&&e.tags.includes(evFilter));
-  }).sort(function(a,b){return new Date(a.date)-new Date(b.date);});
-
-  if(!filtered.length){
-    list.innerHTML='<div class="info-box" style="text-align:center;padding:20px;">'
-      +'<div style="font-size:28px;margin-bottom:10px;">🔍</div>'
-      +'<div style="font-family:Cormorant Garamond,serif;font-size:18px;color:var(--ow);margin-bottom:8px;">Searching for events...</div>'
-      +'<div style="font-size:11px;color:var(--mt);">Finding real upcoming events in Tanzania & East Africa.</div>'
-      +'</div>';
-    return;
-  }
-
-  list.innerHTML='';
-  filtered.forEach(function(e){
-    var dt=new Date(e.date);
-    var dateStr=dt.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
-    var full=(e.attendees||0)>=(e.capacity||100);
-    var rsvpClass=e.going?'going':full?'ghost':'gold';
-    var rsvpTxt=e.going?'✓ Going':full?'Waitlist':'RSVP';
-    var safeName=(e.name||'Event').replace(/</g,'&lt;');
-    var safeVenue=(e.venue||'').replace(/</g,'&lt;');
-
-    var card=document.createElement('div');
-    card.className='ev-card';
-    card.dataset.eid=e.id;
-    card.onclick=function(){ openEventDetail(this.dataset.eid); };
-    card.innerHTML='<div class="ev-card-accent '+(e.color||'gold')+'"></div>'
-      +'<div class="ev-card-body">'
-      +'<div class="ev-card-top"><span class="ev-cat '+(e.color||'gold')+'">'+(e.cat||'').toUpperCase()+'</span><span class="ev-price-lbl">'+(e.price||'Custom')+'</span></div>'
-      +'<div class="ev-name">'+safeName+'</div>'
-      +'<div class="ev-meta">'
-      +'<span><i class="ti ti-calendar"></i>'+dateStr+'</span>'
-      +'<span><i class="ti ti-clock"></i>'+(e.time||'')+'</span>'
-      +'<span><i class="ti ti-map-pin"></i>'+safeVenue+'</span>'
-      +'</div>'
-      +'<div class="ev-card-bot">'
-      +'<div class="ev-attendees">'
-      +'<div class="ev-att-avatars"><div class="ev-att-av">B</div><div class="ev-att-av">K</div><div class="ev-att-av">J</div></div>'
-      +'<span class="ev-att-count">'+(e.attendees||0)+' going · '+((e.capacity||100)-(e.attendees||0))+' left</span>'
-      +'</div>'
-      +'<button class="ev-rsvp-btn '+rsvpClass+'">'+rsvpTxt+'</button>'
-      +'</div></div>';
-
-    var rsvpBtn=card.querySelector('.ev-rsvp-btn');
-    if(rsvpBtn){
-      rsvpBtn.onclick=function(evt){
-        evt.stopPropagation();
-        rsvpEvent(card.dataset.eid,this);
-      };
-    }
-    list.appendChild(card);
-  });
-}
-function rsvpEvent(id,btn){
-  var ev=(EVENTS_DATA.filter(function(e){return e.id===id;})||[null])[0];
-  if(!ev) return;
-  if(ev.going){ev.going=false;ev.attendees--;btn.className='ev-rsvp-btn gold';btn.textContent='RSVP';}
-  else{ev.going=true;ev.attendees++;btn.className='ev-rsvp-btn going';btn.textContent='✓ Going';}
-  renderEvents();
-}
-function openEventDetail(id){
+function openEvDetail(id){
   var ev=EVENTS_DATA.find(function(e){return e.id===id;});
   if(!ev) return;
   var dt=new Date(ev.date);
@@ -4983,8 +4914,9 @@ function startEmptyLegsRefresh(){
   }, 60*60*1000);
 }
 
-// ── 3. REAL-TIME EVENTS ──
-// Sources: Eventbrite Africa, Quicket, Tukiio, Wapi2go, Nairobi Events Guide, Trade & Fairs EA
+// ── 3. CURATED EVENTS ──
+// No reliable public API covers East African private/luxury events, so this
+// list is hand-maintained by Barafu Luxe. Ask Claude to "refresh events" to update.
 
 
 function startEventsRefresh(){
@@ -5457,110 +5389,49 @@ function openEqBook(name, price) {
 }
 
 
-async function fetchLiveEvents(){
+// Barafu Luxe curated events. There is no reliable public API covering
+// East African luxury/private events, so this list is hand-maintained.
+// Ask Claude to "refresh events" any time to pull fresh, correctly-dated listings.
+function fetchLiveEvents(){
   if(_eventsFetched) return;
   var statusEl=document.getElementById('ev-live-status');
-  var evList=document.getElementById('ev-list');
-  if(statusEl) statusEl.textContent='Searching events...';
 
   var CURATED=[
-  {name:'Kilimanjaro Marathon 2026',cat:'sports',color:'blue',date:'2026-08-30',time:'05:30',venue:'Moshi, Tanzania',price:'$45',desc:'The most iconic marathon in Africa. 42km, 21km and 10km routes through Kilimanjaro foothills. World-class runners and breathtaking scenery.',capacity:5000},
-  {name:'Zanzibar International Film Festival',cat:'gala',color:'gold',date:'2026-07-11',time:'19:00',venue:'Old Fort, Stone Town, Zanzibar',price:'$30',desc:'ZIFF — one of Africas great cultural festivals. Films, music and art from across the Indian Ocean islands. Open-air screenings under the stars.',capacity:1200},
-  {name:'Tanzania Safari Classic — Rally',cat:'sports',color:'blue',date:'2026-08-06',time:'08:00',venue:'Arusha National Park',price:'$80',desc:'Annual classic car rally through Northern Tanzania. Vintage vehicles, bush tracks and a black-tie gala dinner at the finish line.',capacity:200},
-  {name:'Ngorongoro Conservation Gala',cat:'gala',color:'gold',date:'2026-09-05',time:'19:30',venue:'Ngorongoro Crater Lodge',price:'Custom',desc:'Exclusive black-tie conservation fundraiser on the rim of the worlds largest intact volcanic caldera. Limited to 80 guests. By invitation.',capacity:80},
-  {name:'Serengeti Balloon Safari & Bush Brunch',cat:'travel',color:'gold',date:'2026-08-15',time:'05:00',venue:'Serengeti National Park',price:'$550',desc:'Pre-dawn launch over the Great Migration. One hour of silent flight followed by a champagne bush brunch served on the plains. Unforgettable.',capacity:16},
-  {name:'Arusha Coffee & Wine Evening',cat:'wine',color:'purple',date:'2026-07-25',time:'18:30',venue:'Arusha Coffee Lodge',price:'$95',desc:'An evening of award-winning Tanzanian coffee pairings alongside curated African and international wines. Hosted by master sommelier.',capacity:40},
-  {name:'East Africa Fashion Week — Arusha',cat:'fashion',color:'purple',date:'2026-10-08',time:'19:00',venue:'Mount Meru Hotel, Arusha',price:'$120',desc:'East Africas rising fashion showcase. Tanzanian and regional designers, art installations, and a VIP cocktail reception.',capacity:300},
-  {name:'Tarangire Elephant Research Gala',cat:'gala',color:'gold',date:'2026-09-19',time:'18:00',venue:'Tarangire National Park',price:'$250',desc:'Intimate conservation fundraiser with the Elephant Research Project. Guided bush walk, researcher talks, and sundowner dinner under the baobabs.',capacity:60},
-  {name:'Indian Ocean Regatta — Zanzibar',cat:'sports',color:'blue',date:'2026-10-24',time:'07:00',venue:'Zanzibar Marina',price:'$150',desc:'Annual sailing regatta across the Zanzibar channel. Open to charter vessels. Barafu Luxe can arrange private vessel and VIP spectator packages.',capacity:500},
-  {name:'Mount Kilimanjaro Summit Experience',cat:'travel',color:'gold',date:'2026-07-20',time:'06:00',venue:'Kilimanjaro National Park Gate',price:'From $2,200',desc:'7-day guided Lemosho Route summit attempt on Africas highest peak. Barafu Luxe arranges permits, porters, gear and luxury base camp return.',capacity:12},
-];
+  {name:'Great Wildebeest Migration — Mara River Crossings',cat:'travel',color:'gold',date:'2026-08-15',time:'Sunrise game drives',venue:'Northern Serengeti, Mara River',price:'From $1,450/night',desc:'Peak river-crossing season. Barafu Luxe arranges private mobile camps and expert guides positioned for the best crossing sightings.',capacity:12},
+  {name:'Zanzibar Sunset Dhow & Sundowner',cat:'travel',color:'gold',date:'2026-08-01',time:'17:30',venue:'Nungwi, Zanzibar',price:'$180 per couple',desc:'A private dhow sails from Nungwi as the sun drops into the Indian Ocean. Champagne, canapés and a live oud player. Runs weekly on request.',capacity:20},
+  {name:'Ngorongoro Conservation Gala',cat:'gala',color:'gold',date:'2026-09-05',time:'19:30',venue:'Ngorongoro Crater Lodge',price:'Custom',desc:'An intimate black-tie evening on the crater rim supporting local conservation. Limited to 80 guests, arranged through Barafu Luxe by invitation.',capacity:80},
+  {name:'Tarangire Bush Dinner & Elephant Research Evening',cat:'gala',color:'gold',date:'2026-09-19',time:'18:00',venue:'Tarangire National Park',price:'$250 per person',desc:'Private dinner under the baobabs with researchers from the Tarangire Elephant Project. Guided walk, talk and sundowners included.',capacity:60},
+  {name:'Arusha Coffee & Wine Evening',cat:'wine',color:'purple',date:'2026-08-22',time:'18:30',venue:'Arusha Coffee Lodge',price:'$95 per person',desc:'Award-winning Tanzanian coffee paired with a curated selection of African and international wines, hosted by a master sommelier.',capacity:40},
+  {name:'Serengeti Balloon Safari & Bush Brunch',cat:'travel',color:'gold',date:'2026-08-10',time:'05:00',venue:'Serengeti National Park',price:'$550 per person',desc:'Pre-dawn launch over the plains, an hour of silent flight, then a champagne bush brunch. Available daily on request, weather permitting.',capacity:16},
+  {name:'Mount Kilimanjaro Summit Experience',cat:'travel',color:'gold',date:'2026-08-05',time:'06:00',venue:'Kilimanjaro National Park Gate',price:'From $2,200',desc:'7-day guided Lemosho Route summit attempt. Barafu Luxe arranges permits, porters, gear and a luxury lodge return. Departures available on request.',capacity:12},
+  {name:'Zanzibar Private Sailing Regatta',cat:'sports',color:'blue',date:'2026-10-03',time:'07:00',venue:'Zanzibar Marina',price:'$150 per person',desc:'Barafu Luxe arranges a private vessel and VIP spectator package for the Zanzibar sailing season. Charter and viewing packages available on request.',capacity:500},
+  ];
 
-  function loadEvents(source, isLive){
-    var adm=EVENTS_DATA.filter(function(e){return e.id&&e.id.startsWith('ev');});
-    EVENTS_DATA.length=0;
-    adm.forEach(function(e){EVENTS_DATA.push(e);});
-    var cc={gala:'gold',golf:'green',wine:'purple',fashion:'purple',sports:'blue',travel:'gold'};
-    source.forEach(function(ev,i){
-      try{
-        EVENTS_DATA.push({
-          id:(isLive?'live_':'cur_')+i+'_'+Date.now(),
-          name:String(ev.name||'Exclusive Event').replace(/[<>]/g,'').substring(0,60),
-          cat:String(ev.cat||'gala'),
-          color:String(ev.color||cc[ev.cat]||'gold'),
-          date:String(ev.date||'2026-08-01'),
-          time:String(ev.time||'10:00'),
-          venue:String(ev.venue||'Tanzania').replace(/[<>]/g,'').substring(0,50),
-          price:String(ev.price||'Custom'),
-          desc:String(ev.desc||'').replace(/[<>]/g,'').substring(0,120),
-          attendees:0,capacity:parseInt(ev.capacity)||100,
-          going:false,tags:[String(ev.cat||'gala')],
-          source:isLive?'Live':'Barafu Luxe'
-        });
-      }catch(e){}
+  var adm=EVENTS_DATA.filter(function(e){return e.id&&e.id.indexOf('ev')===0;});
+  EVENTS_DATA.length=0;
+  adm.forEach(function(e){EVENTS_DATA.push(e);});
+  var cc={gala:'gold',golf:'green',wine:'purple',fashion:'purple',sports:'blue',travel:'gold'};
+  CURATED.forEach(function(ev,i){
+    EVENTS_DATA.push({
+      id:'cur_'+i+'_'+Date.now(),
+      name:String(ev.name||'Exclusive Event'),
+      cat:String(ev.cat||'gala'),
+      color:String(ev.color||cc[ev.cat]||'gold'),
+      date:String(ev.date||'2026-08-01'),
+      time:String(ev.time||'10:00'),
+      venue:String(ev.venue||'Tanzania'),
+      price:String(ev.price||'Custom'),
+      desc:String(ev.desc||''),
+      attendees:0,capacity:parseInt(ev.capacity)||100,
+      going:false,tags:[String(ev.cat||'gala')],
+      source:'Barafu Luxe'
     });
-  }
+  });
 
-  try {
-    var resp=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        model:'claude-sonnet-4-6',
-        max_tokens:2000,
-        tools:[{type:'web_search_20250305',name:'web_search'}],
-        messages:[{role:'user',content:
-          'Search eventbrite.com or quicket.co.za or tukiio.com for upcoming events in Tanzania or East Africa in 2026. '
-          +'Return ONLY a JSON array, no other text: '
-          +'[{"name":"event","cat":"gala","color":"gold","date":"2026-MM-DD","time":"HH:MM","venue":"city","price":"$X or Free","desc":"brief","capacity":100}]. '
-          +'cat must be one of: gala golf wine fashion sports travel. Find at least 5 events.'
-        }]
-      })
-    });
-
-    var data=await resp.json();
-    var evts=null;
-
-    if(data && Array.isArray(data.content)){
-      var txt=data.content.filter(function(c){return c.type==='text';}).map(function(c){return c.text;}).join('');
-      var m=txt.match(/\[[\s\S]*\]/);
-      if(m){
-        try{
-          var s=m[0];
-          s=s.split('\r').join('').split('\n').join('').split('\t').join('');
-          s=s.replace(/,\s*]/g,']').replace(/,\s*}/g,'}');
-          var parsed=JSON.parse(s);
-          if(Array.isArray(parsed)&&parsed.length>0&&parsed[0].name) evts=parsed;
-        }catch(e1){
-          var objs=txt.match(/\{[^{}]+\}/g)||[];
-          var found=[];
-          objs.forEach(function(o){
-            try{
-              var s2=o.split('\r').join('').split('\n').join('');
-              var p=JSON.parse(s2);
-              if(p&&p.name&&p.date) found.push(p);
-            }catch(e2){}
-          });
-          if(found.length>=3) evts=found;
-        }
-      }
-    }
-
-    var useLive=evts&&evts.length>=3;
-    loadEvents(useLive?evts:CURATED, useLive);
-    _eventsFetched=true;
-    if(statusEl) statusEl.textContent=(useLive?'Live \u00b7 ':'Curated \u00b7 ')+EVENTS_DATA.length+' events';
-    renderCalendar();
-    renderEvents();
-
-  }catch(err){
-    console.log('Events error:',err.message);
-    if(!EVENTS_DATA.length) loadEvents(CURATED, false);
-    _eventsFetched=true;
-    if(statusEl) statusEl.textContent='Curated \u00b7 '+EVENTS_DATA.length+' events';
-    renderCalendar();
-    renderEvents();
-  }
+  _eventsFetched=true;
+  if(statusEl) statusEl.textContent='Curated \u00b7 '+EVENTS_DATA.length+' events';
+  renderCalendar();
+  renderEvents();
 }
 
 
@@ -6641,7 +6512,7 @@ function renderEvents(filter){
     card.innerHTML =
       '<div class="ev-card-top">'
       +'<span class="ev-cat-tag" style="color:'+cc+';border-color:'+cc+'25;">'+ev.cat.toUpperCase()+'</span>'
-      +'<span class="ev-card-date">'+ev.date+'</span>'
+      +'<span class="ev-card-date">'+formatF1Date(ev.date)+'</span>'
       +'</div>'
       +'<div class="ev-card-name">'+ev.name+'</div>'
       +'<div class="ev-card-venue"><i class="ti ti-map-pin" style="font-size:11px;color:var(--gold);opacity:0.6;"></i> '+ev.venue+'</div>'
