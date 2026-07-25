@@ -935,6 +935,35 @@ window.FB = {
     return remove(ref(db, 'members/' + safe));
   },
 
+  // ── ACCESS REQUESTS ("Request Access" signup form) ──
+  saveRequest: (req) => {
+    return push(ref(db, 'requests'), {
+      name: req.name || '',
+      email: req.email || '',
+      phone: req.phone || '',
+      ref: req.ref || '',
+      status: 'pending',
+      createdAt: serverTimestamp()
+    });
+  },
+
+  getRequests: (callback) => {
+    onValue(ref(db, 'requests'), snap => {
+      const data = snap.val() || {};
+      const list = Object.keys(data).map(id => Object.assign({id: id}, data[id]));
+      list.sort((a,b) => (b.createdAt||0)-(a.createdAt||0));
+      callback(list);
+    });
+  },
+
+  removeRequest: (id) => {
+    return remove(ref(db, 'requests/' + id));
+  },
+
+  markRequestStatus: (id, status) => {
+    return update(ref(db, 'requests/' + id), { status: status });
+  },
+
   // ── COMMUNITY CHAT ──
   sendMessage: (commId, msg) => {
     return push(ref(db, 'communities/' + commId + '/messages'), {
@@ -1268,6 +1297,11 @@ function removeBookingFB(fbKey){
     <div class="admin-section">
       <div class="admin-sec-title">Incoming bookings</div>
       <div id="adm-bookings-list"></div>
+    </div>
+
+    <div class="admin-section">
+      <div class="admin-sec-title">Pending access requests</div>
+      <div id="adm-requests-list"><div style="font-size:11px;color:var(--mt);padding:10px 0;">Loading...</div></div>
     </div>
 
     <div class="admin-section">
@@ -3004,6 +3038,23 @@ function doRequest(){
   var phone=(document.getElementById('su-phone')||{}).value||'';
   var ref2=(document.getElementById('su-ref')||{}).value||'';
   if(!name||!email){alert('Please fill in your name and email.');return;}
+
+  var reqObj = {name:name, email:email.trim().toLowerCase(), phone:phone, ref:ref2};
+
+  // Persist so it survives even if the WhatsApp message is missed
+  if(window.FB && typeof window.FB.saveRequest === 'function'){
+    try{ window.FB.saveRequest(reqObj); }catch(e){ console.log('FB saveRequest:', e); }
+  }
+  // Local fallback copy too, in case Firebase is briefly unavailable
+  try{
+    var pending = DB.get('pending_requests') || [];
+    reqObj.id = 'local_'+Date.now();
+    reqObj.status = 'pending';
+    reqObj.createdAt = Date.now();
+    pending.unshift(reqObj);
+    DB.set('pending_requests', pending);
+  }catch(e){}
+
   window.open('https://wa.me/255692312366?text=New+access+request:%0AName:+'+encodeURIComponent(name)+'%0AEmail:+'+encodeURIComponent(email)+'%0APhone:+'+encodeURIComponent(phone),'_blank');
   var f=document.getElementById('lf-signup');
   if(f) f.innerHTML='<div style="text-align:center;padding:20px;color:var(--ow);"><div style="font-size:36px;margin-bottom:12px;">✓</div><div style="font-family:Cormorant Garamond,serif;font-size:22px;margin-bottom:8px;">Request Sent</div><div style="font-size:11px;color:var(--mt);line-height:1.7;">You will be contacted within 24 hours.</div></div>';
@@ -3072,7 +3123,119 @@ function openAdmin(){
   renderAdminStats();
   if(window._fbBookings&&window._fbBookings.length>0) renderAdminBookingsFromFB(window._fbBookings);
   else renderAdminBookings();
+
+  // Render immediately from whatever's cached, so the dashboard isn't blank —
+  // then refresh live from Firebase, which is the actual source of truth.
   renderAdminMembers();
+  renderAdminRequestsFromLocal();
+
+  if(window.FB && typeof window.FB.getMembers==='function'){
+    window.FB.getMembers(function(members){
+      renderAdminMembers();
+      renderAdminStats();
+    });
+  }
+  if(window.FB && typeof window.FB.getRequests==='function'){
+    window.FB.getRequests(function(requests){
+      window._fbRequests = requests;
+      renderAdminRequests(requests);
+    });
+  }
+}
+
+function renderAdminRequestsFromLocal(){
+  var pending = DB.get('pending_requests') || [];
+  pending = pending.filter(function(r){ return r.status === 'pending'; });
+  renderAdminRequests(pending);
+}
+
+function renderAdminRequests(requests){
+  var el = document.getElementById('adm-requests-list');
+  if(!el) return;
+  var pending = (requests||[]).filter(function(r){ return !r.status || r.status === 'pending'; });
+
+  if(!pending.length){
+    el.innerHTML = '<div style="font-size:11px;color:var(--mt);padding:10px 0;">No pending requests.</div>';
+    return;
+  }
+
+  el.innerHTML = '';
+  pending.forEach(function(r){
+    var row = document.createElement('div');
+    row.className = 'admin-member';
+    var whenStr = '';
+    if(r.createdAt){
+      try{ whenStr = ' · '+new Date(r.createdAt).toLocaleDateString(); }catch(e){}
+    }
+    row.innerHTML =
+      '<div class="am-info">'
+      +'<div class="am-name">'+(r.name||'Unnamed')+'</div>'
+      +'<div class="am-detail">'+(r.email||'')+(r.phone?' · '+r.phone:'')+whenStr+'</div>'
+      +(r.ref?'<div class="am-detail" style="font-style:italic;">"'+r.ref+'"</div>':'')
+      +'</div>'
+      +'<div class="am-btns" id="rq-btns-'+(r.id||r.email)+'"></div>';
+    var btnRow = row.querySelector('.am-btns');
+
+    var approveBtn = document.createElement('button');
+    approveBtn.className = 'ab-btn confirm';
+    approveBtn.textContent = 'Approve';
+    approveBtn.onclick = function(){
+      // Pre-fill the Add Member form so admin picks the tier & confirms
+      var nameEl=document.getElementById('adm-new-name');
+      var emailEl=document.getElementById('adm-new-email');
+      var phoneEl=document.getElementById('adm-new-phone');
+      if(nameEl) nameEl.value = r.name||'';
+      if(emailEl) emailEl.value = r.email||'';
+      if(phoneEl) phoneEl.value = r.phone||'';
+      var formSection = nameEl ? nameEl.closest('.admin-section') : null;
+      if(formSection) formSection.scrollIntoView({behavior:'smooth', block:'start'});
+      if(nameEl) nameEl.focus();
+      // Mark request approved so it drops off the pending list once member is added
+      if(r.id && window.FB && typeof window.FB.markRequestStatus==='function'){
+        try{ window.FB.markRequestStatus(r.id, 'approved'); }catch(e){}
+      }
+      if(r.id && r.id.indexOf('local_')===0){
+        var pend = DB.get('pending_requests')||[];
+        pend.forEach(function(p){ if(p.id===r.id) p.status='approved'; });
+        DB.set('pending_requests', pend);
+      }
+      showToast('Fill in tier & confirm below to complete');
+    };
+
+    var declineBtn = document.createElement('button');
+    declineBtn.className = 'ab-btn done';
+    declineBtn.textContent = 'Decline';
+    declineBtn.onclick = function(){
+      if(!confirm('Decline request from '+(r.name||'this person')+'?')) return;
+      if(r.id && window.FB && typeof window.FB.removeRequest==='function'){
+        try{ window.FB.removeRequest(r.id); }catch(e){}
+      }
+      if(r.id && r.id.indexOf('local_')===0){
+        var pend = DB.get('pending_requests')||[];
+        pend = pend.filter(function(p){ return p.id!==r.id; });
+        DB.set('pending_requests', pend);
+      }
+      showToast('Request declined');
+      renderAdminRequestsFromLocal();
+      if(window._fbRequests){
+        window._fbRequests = window._fbRequests.filter(function(x){ return x.id!==r.id; });
+        renderAdminRequests(window._fbRequests);
+      }
+    };
+
+    var waBtn = document.createElement('button');
+    waBtn.className = 'ab-btn wa';
+    waBtn.textContent = 'WA';
+    waBtn.onclick = function(){
+      var num=(r.phone||'').replace(/[^0-9]/g,'');
+      if(num) window.open('https://wa.me/'+num,'_blank');
+    };
+
+    btnRow.appendChild(approveBtn);
+    btnRow.appendChild(waBtn);
+    btnRow.appendChild(declineBtn);
+    el.appendChild(row);
+  });
 }
 
 function renderAdminStats(){
@@ -3137,18 +3300,11 @@ function renderAdminMembers(){
     return;
   }
 
+  var tierLabels={silver:'Silver',gold:'Gold',obsidian:'Obsidian'};
+
   us.forEach(function(u){
     var row=document.createElement('div');
     row.className='admin-member';
-
-    var upgradeBtn='';
-    if(u.tier!=='obsidian'){
-      var ub=document.createElement('button');
-      ub.className='ab-btn confirm';
-      ub.textContent='Upgrade';
-      ub.onclick=function(){ upgradeMember(u.email); };
-      upgradeBtn=ub;
-    }
 
     var removeBtn=document.createElement('button');
     removeBtn.className='ab-btn done';
@@ -3166,45 +3322,78 @@ function renderAdminMembers(){
       else window.open('https://wa.me/255692312366?text=Message+for+'+encodeURIComponent(u.name),'_blank');
     };
 
+    var joinedStr='';
+    if(u.joinedAt){
+      try{ joinedStr=' · Joined '+new Date(u.joinedAt).toLocaleDateString(); }catch(e){}
+    }
+
     row.innerHTML=
       '<div class="am-info">'
       +'<div class="am-name">'+(u.name||'Member')+'</div>'
-      +'<div class="am-detail">'+(u.email||'')+(u.phone?' · '+u.phone:'')+'</div>'
+      +'<div class="am-detail">'+(u.email||'')+(u.phone?' · '+u.phone:'')+joinedStr+'</div>'
       +'</div>'
       +'<div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">'
-      +'<span class="am-tier '+(u.tier||'silver')+'">'+(u.tier||'silver').toUpperCase()+'</span>'
+      +'<div style="display:flex;gap:6px;align-items:center;">'
+      +'<select class="admin-inp" style="font-size:9px;padding:4px 6px;width:auto;" id="tier-sel-'+(u.email.replace(/[^a-z0-9]/gi,''))+'">'
+      +'<option value="silver"'+(u.tier==='silver'?' selected':'')+'>Silver</option>'
+      +'<option value="gold"'+(u.tier==='gold'?' selected':'')+'>Gold</option>'
+      +'<option value="obsidian"'+(u.tier==='obsidian'?' selected':'')+'>Obsidian</option>'
+      +'</select>'
+      +'<button class="ab-btn confirm" style="padding:4px 8px;">Set</button>'
+      +'</div>'
       +'<div class="am-btns"></div>'
       +'</div>';
 
+    var setBtn = row.querySelector('.ab-btn.confirm');
+    var tierSel = row.querySelector('select');
+    setBtn.onclick = function(){
+      setMemberTier(u.email, tierSel.value);
+    };
+
     var btnRow=row.querySelector('.am-btns');
-    if(upgradeBtn) btnRow.appendChild(upgradeBtn);
     btnRow.appendChild(msgBtn);
     btnRow.appendChild(removeBtn);
     el.appendChild(row);
   });
 }
 
-function upgradeMember(email){
+function setMemberTier(email, newTier){
   var us=DB.get('users');
   if(!us||!Array.isArray(us)) us=DEFAULT_USERS.slice();
   var found=false;
-  var tiers=['silver','gold','obsidian'];
   us.forEach(function(u){
     if(u.email===email){
-      var idx=tiers.indexOf(u.tier);
-      u.tier=tiers[Math.min(idx+1,2)];
+      u.tier=newTier;
       found=true;
-      if(window.FB && typeof window.FB.updateMemberTier==='function'){
-        try{window.FB.updateMemberTier(email,u.tier);}catch(e){}
-      }
     }
   });
+  if(window.FB && typeof window.FB.updateMemberTier==='function'){
+    try{ window.FB.updateMemberTier(email,newTier); }catch(e){}
+  }
   if(found){
     DB.set('users',us);
-    showToast('Member upgraded ✓');
+    showToast('Member set to '+newTier.charAt(0).toUpperCase()+newTier.slice(1)+' ✓');
     renderAdminMembers();
     renderAdminStats();
+  } else {
+    // Not in local cache yet (e.g. added on another device) — still push
+    // the tier change to Firebase directly, then re-sync.
+    showToast('Updating...');
+    if(window.FB && typeof window.FB.getMembers==='function'){
+      window.FB.getMembers(function(){ renderAdminMembers(); });
+    }
   }
+}
+
+// Kept for backward compatibility with any old references — now delegates
+// to setMemberTier with a one-tier-up jump.
+function upgradeMember(email){
+  var us=DB.get('users')||DEFAULT_USERS;
+  var tiers=['silver','gold','obsidian'];
+  var current='silver';
+  us.forEach(function(u){ if(u.email===email) current=u.tier||'silver'; });
+  var idx=tiers.indexOf(current);
+  setMemberTier(email, tiers[Math.min(idx+1,2)]);
 }
 function removeMember(email){
   var us=DB.get('users');
