@@ -7074,41 +7074,102 @@ function updateEATClock(){
   window._eatClockTimer = setInterval(updateEATClock, 1000);
 })();
 
+// ════ FLIGHT DATA CACHE ════
+// AviationStack free tier = 100 requests/month total (~3/day). A blind
+// poll-every-2-minutes model burns that in hours. Instead: cache each
+// airport+board combo on-device for 3 hours, and only hit the API when
+// that cache has actually gone stale.
+var FT_CACHE_TTL_MS = 3*60*60*1000; // 3 hours
+
+function ftCacheKey(airport, boardType){
+  return 'bl_ft_cache_'+airport+'_'+boardType;
+}
+function ftCacheGet(airport, boardType){
+  try{
+    var raw = localStorage.getItem(ftCacheKey(airport, boardType));
+    if(!raw) return null;
+    var obj = JSON.parse(raw);
+    if(!obj || !obj.ts || !obj.data) return null;
+    return obj;
+  }catch(e){ return null; }
+}
+function ftCacheSet(airport, boardType, data){
+  try{
+    localStorage.setItem(ftCacheKey(airport, boardType), JSON.stringify({ts:Date.now(), data:data}));
+  }catch(e){}
+}
+function ftCacheAgeLabel(ts){
+  var mins = Math.round((Date.now()-ts)/60000);
+  if(mins < 1) return 'just now';
+  if(mins < 60) return mins+'m ago';
+  var hrs = Math.round(mins/60);
+  return hrs+'h ago';
+}
+
 function startFlightAutoRefresh(){
   if(window._ftRefreshTimer) return;
+  // Checks every 20 minutes, but fetchLiveFlights itself only calls the
+  // API if the cache for the current tab is actually stale — so this
+  // timer costs nothing extra on its own.
   window._ftRefreshTimer = setInterval(function(){
     var scr = document.getElementById('s-flights');
     if(scr && scr.classList.contains('active')){
       fetchLiveFlights();
     }
-  }, 2*60*1000);
+  }, 20*60*1000);
 }
 
-function fetchLiveFlights(){
+function fetchLiveFlights(forceRefresh){
   var airport = currentAirport || 'JRO';
   var statusEl = document.getElementById('ft-live-status');
-  if(statusEl) statusEl.textContent = 'Loading live data...';
-
   var boardType = window._ftBoardType || 'arr';
+
+  var cached = ftCacheGet(airport, boardType);
+  var isFresh = cached && (Date.now() - cached.ts) < FT_CACHE_TTL_MS;
+
+  if(cached){
+    // Always show cached data immediately — instant, no waiting on network.
+    _parseAviationData(airport, boardType, cached.data, true);
+    if(statusEl) statusEl.textContent = (isFresh ? 'Live · ' : 'Cached · ') + ftCacheAgeLabel(cached.ts);
+  }
+
+  if(isFresh && !forceRefresh) return; // cache is good enough, skip the API call entirely
+
+  if(!cached && statusEl) statusEl.textContent = 'Loading live data...';
+
   var proxyUrl = '/api/aviation?airport=' + airport + '&type=' + boardType;
 
   fetch(proxyUrl)
     .then(function(r){ return r.json(); })
     .then(function(data){
       if(data && data.data && data.data.length){
+        ftCacheSet(airport, boardType, data.data);
         _parseAviationData(airport, boardType, data.data);
         var ts = eatTimeString().substring(0,5);
         if(statusEl) statusEl.textContent = 'Live · Updated '+ts+' EAT';
+      } else if(data && data.error && (data.error.code === 'usage_limit_reached' || data.error.code === 'rate_limit_reached')){
+        if(cached){
+          if(statusEl) statusEl.textContent = 'Cached · '+ftCacheAgeLabel(cached.ts)+' (quota reached)';
+        } else {
+          _useFallbackFlights(airport);
+          if(statusEl) statusEl.textContent = 'Schedule (quota reached)';
+        }
       } else {
         console.log('AviationStack returned:', JSON.stringify(data).substring(0,200));
-        _useFallbackFlights(airport);
-        if(statusEl) statusEl.textContent = 'Schedule (offline)';
+        if(!cached){
+          _useFallbackFlights(airport);
+          if(statusEl) statusEl.textContent = 'Schedule (offline)';
+        }
       }
     })
     .catch(function(e){
       console.log('Aviation fetch error:', e.message);
-      _useFallbackFlights(airport);
-      if(statusEl) statusEl.textContent = 'Schedule (cached)';
+      if(!cached){
+        _useFallbackFlights(airport);
+        if(statusEl) statusEl.textContent = 'Schedule (offline)';
+      } else {
+        if(statusEl) statusEl.textContent = 'Cached · '+ftCacheAgeLabel(cached.ts)+' (offline)';
+      }
     });
 }
 
