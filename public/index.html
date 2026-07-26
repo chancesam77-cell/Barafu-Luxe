@@ -151,6 +151,11 @@
 .spa-section-rule{display:flex;align-items:center;gap:12px;padding:16px 16px 8px;}
 .spa-rule-line{flex:1;height:0.5px;background:var(--bd);}
 .spa-rule-lbl{font-size:8px;letter-spacing:0.22em;color:var(--mt);text-transform:uppercase;}
+.menu-dish{padding:12px 2px;border-bottom:0.5px solid rgba(255,255,255,0.04);}
+.menu-dish:last-child{border-bottom:none;}
+.menu-dish-name{font-family:'Cormorant Garamond',serif;font-size:17px;color:var(--ow);display:flex;align-items:center;gap:6px;}
+.menu-dish-desc{font-size:10.5px;color:var(--mt);line-height:1.7;margin-top:3px;font-style:italic;}
+.menu-veg-tag{font-size:8px;color:#7CB88A;border:0.5px solid rgba(124,184,138,0.35);border-radius:8px;padding:1px 6px;letter-spacing:0.04em;font-style:normal;}
 /* Footer */
 .spa-footer{margin:16px;background:rgba(184,137,42,0.03);border:0.5px solid rgba(184,137,42,0.1);border-radius:3px;padding:14px;}
 .spa-footer-note{font-size:9px;color:var(--mt);line-height:1.9;letter-spacing:0.04em;margin-bottom:12px;}
@@ -1479,7 +1484,7 @@ function removeBookingFB(fbKey){
   <div class="sec" style="padding-top:4px;"><div class="slbl">More services</div></div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 14px 14px;">
     <div class="qc" onclick="openSpaWithTierCheck()"><span class="qc-ico" style="color:var(--gold)"><i class="ti ti-sparkles"></i></span><div class="qc-name">Spa & Wellness</div><div class="qc-sub">Peaberries · Siringit</div></div>
-    <div class="qc" onclick="go('s-dining')"><span class="qc-ico">🍽️</span><div class="qc-name">Private Dining</div><div class="qc-sub">ACL Grill · Serena</div></div>
+    <div class="qc" onclick="go('s-dining')"><span class="qc-ico">🍽️</span><div class="qc-name">Private Dining</div><div class="qc-sub">ACL Grill · Gran Meliá</div></div>
     <div class="qc" onclick="go('s-equestrian')"><span class="qc-ico">🐎</span><div class="qc-name">Equestrian</div><div class="qc-sub">Safari rides</div></div>
     <div class="qc" onclick="openGemsWithTierCheck()"><span class="qc-ico" style="color:var(--ocean-soft)"><i class="ti ti-diamond"></i></span><div class="qc-name">Hidden Gems</div><div class="qc-sub">Exclusive stays</div></div>
     <div class="qc" onclick="go('s-gemstones')"><span class="qc-ico" style="color:#7C4DFF"><i class="ti ti-diamond"></i></span><div class="qc-name">Gemstone Sourcing</div><div class="qc-sub">Tanzanite & more</div></div>
@@ -1578,20 +1583,22 @@ function removeBookingFB(fbKey){
   <div id="tr-tab-payment" class="tr-tab-body" style="display:none;">
     <div style="padding:14px;">
       <div style="font-size:9px;letter-spacing:0.18em;color:var(--mt);text-transform:uppercase;margin-bottom:12px;">Accepted payment methods</div>
+
       <div class="tr-pay-card">
-        <div class="tr-pay-method">Bank Transfer (USD)</div>
-        <div class="tr-pay-row"><span class="tr-pay-k">Name</span><span class="tr-pay-v">Chance Liganga</span></div>
-        <div class="tr-pay-row"><span class="tr-pay-k">Bank</span><span class="tr-pay-v">CRDB Bank Tanzania</span></div>
-        <div class="tr-pay-row"><span class="tr-pay-k">Account</span><span class="tr-pay-v">0150794121800</span></div>
-        <div class="tr-pay-row"><span class="tr-pay-k">SWIFT</span><span class="tr-pay-v">CORUTZTZ</span></div>
+        <div class="tr-pay-method"><i class="ti ti-building-bank" style="font-size:12px;margin-right:5px;"></i>Bank Transfer</div>
+        <div style="font-size:10.5px;color:var(--mt);line-height:1.7;">USD and TZS accounts available. Account details are shared privately over WhatsApp once your booking is confirmed — never displayed in the app, for your security.</div>
       </div>
       <div class="tr-pay-card" style="margin-top:10px;">
-        <div class="tr-pay-method">Mobile Money</div>
-        <div class="tr-pay-row"><span class="tr-pay-k">Airtel Money</span><span class="tr-pay-v">+255 692 312 366</span></div>
-        <div class="tr-pay-row"><span class="tr-pay-k">M-Pesa</span><span class="tr-pay-v">+255 692 312 366</span></div>
+        <div class="tr-pay-method"><i class="ti ti-device-mobile" style="font-size:12px;margin-right:5px;"></i>Mobile Money</div>
+        <div style="font-size:10.5px;color:var(--mt);line-height:1.7;">Airtel Money and M-Pesa accepted. Payment number sent directly to you in chat.</div>
       </div>
-      <div style="font-size:9px;color:var(--mt);line-height:1.8;margin-top:12px;">All payments confirmed via WhatsApp. Receipt provided for every transaction.</div>
-      <a class="wa-btn" href="https://wa.me/255692312366?text=Payment+enquiry+for+my+transfer" target="_blank" style="margin-top:14px;"><i class="ti ti-brand-whatsapp"></i>Payment enquiry</a>
+      <div class="tr-pay-card" style="margin-top:10px;">
+        <div class="tr-pay-method"><i class="ti ti-credit-card" style="font-size:12px;margin-right:5px;"></i>International Card</div>
+        <div style="font-size:10.5px;color:var(--mt);line-height:1.7;">Processed securely through your concierge on request.</div>
+      </div>
+
+      <div style="font-size:9px;color:var(--mt);line-height:1.8;margin-top:14px;">All payments confirmed via WhatsApp. A receipt is provided for every transaction.</div>
+      <a class="wa-btn" href="https://wa.me/255692312366?text=Hi%2C+I%27d+like+to+receive+payment+details+for+my+booking" target="_blank" style="margin-top:14px;"><i class="ti ti-brand-whatsapp"></i>Request payment details</a>
     </div>
   </div>
 
@@ -2218,21 +2225,43 @@ function removeBookingFB(fbKey){
     <span class="tb-title">Private Dining</span>
     <div style="width:32px"></div>
   </div>
-  <div class="info-box" style="background:linear-gradient(135deg,#0a0a08,#141208);border-color:rgba(184,137,42,0.2);">
-    Every table reservation is arranged personally by your Barafu Luxe concierge — preferred seating, dietary requirements, occasion setup, wine pairing and private room bookings all handled for you.
+
+  <!-- HERO -->
+  <div class="gem-hero-wrap">
+    <div class="luxury-hero-eyebrow">Barafu Luxe · Contracted Dining Partners</div>
+    <div class="luxury-hero-title">Every Table,<br><em>Reserved for You.</em></div>
+    <div class="luxury-hero-sub">Two of Arusha's finest grill rooms, arranged personally by your concierge — preferred seating, dietary requirements, occasion setup and private room bookings all handled for you.</div>
+    <div class="luxury-hero-rule"></div>
   </div>
-  <div class="sec"><div class="slbl">Arusha Coffee Lodge · Full menu available</div></div>
-  <div class="info-box" style="display:flex;align-items:center;gap:12px;padding:14px;">
-    <span style="font-size:32px;">☕</span>
-    <div>
-      <div style="font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--ow);margin-bottom:3px;">The Grill at Arusha Coffee Lodge</div>
-      <div style="font-size:10px;color:var(--mt);line-height:1.6;">Set menu · Private dining room available · Elewana Collection · July 2025</div>
-      <button class="gbtn" onclick="go('s-acl-menu')" style="margin-top:10px;">View full menu</button>
-      <a class="wa-btn" href="https://wa.me/255692312366?text=I+would+like+to+reserve+a+table+at+The+Grill+Room+ACL" target="_blank" style="margin-top:8px;"><i class="ti ti-brand-whatsapp"></i>Reserve via WhatsApp</a>
+
+  <div style="padding:14px;display:grid;gap:0;" id="dining-list"></div>
+
+  <div class="spacer"></div>
+</div>
+
+
+<!-- ════════════════════ ACL GRILL ROOM — MENU ════════════════════ -->
+<div class="screen" id="s-acl-menu">
+  <div class="topbar">
+    <button class="tb-back" onclick="go('s-dining')"><i class="ti ti-arrow-left"></i></button>
+    <span class="tb-title">The Grill Room</span>
+    <div style="width:32px"></div>
+  </div>
+
+  <div class="gem-hero-wrap">
+    <div class="luxury-hero-eyebrow">Arusha Coffee Lodge · Elewana Collection</div>
+    <div class="luxury-hero-title">The Set<br><em>Menu.</em></div>
+    <div class="luxury-hero-sub">A seasonal five-course journey, served nightly in the candlelit grill room among the coffee plantation. Updated July 2026.</div>
+    <div class="luxury-hero-rule"></div>
+  </div>
+
+  <div id="acl-menu-list" style="padding:6px 14px 4px;"></div>
+
+  <div style="margin:14px 14px 24px;">
+    <div class="fwrap" style="padding:0;">
+      <button class="gbtn" onclick="go('s-dining');openDiningDetail('acl-grill');"><i class="ti ti-brand-whatsapp"></i> Reserve a table</button>
     </div>
   </div>
-  <div class="sec" style="padding-top:4px;"><div class="slbl">Partner restaurants</div></div>
-  <div id="dining-list"></div>
   <div class="spacer"></div>
 </div>
 
@@ -2566,14 +2595,61 @@ var DISCOVER_FEED = [
   {tag:'EMPTY LEGS · LIVE',title:'Fly Private. Pay Fraction.',sub:'Real-time deals · Up to 75% off',action:"go('s-emptylegs')",color:'#4CAF50'},
   {tag:'SPA · MEMBERS',title:'Restore. Renew. Rise.',sub:'Peaberries · Arusha Coffee Lodge',action:'openSpaWithTierCheck()',color:'var(--gl)'},
   {tag:'HIDDEN GEMS',title:'Stay Extraordinary.',sub:'10 exclusive properties · Gold & Obsidian',action:'openGemsWithTierCheck()',color:'var(--ocean-soft)'},
-  {tag:'PRIVATE DINING',title:'The Table is Set.',sub:'ACL Grill · Serena · Mount Meru',action:"go('s-dining')",color:'var(--gold)'},
+  {tag:'PRIVATE DINING',title:'The Table is Set.',sub:'ACL Grill · Gran Meliá',action:"go('s-dining')",color:'var(--gold)'},
 ];
 
 var DINING_VENUES = [
-  {id:'acl-grill',name:'The Grill at Arusha Coffee Lodge',location:'Arusha Coffee Lodge · Elewana Collection',desc:'An intimate candlelit grill restaurant nestled within the coffee plantation. Farm-to-table dining at its finest.',cuisine:'Contemporary African Grill',dress:'Smart casual to formal',hours:'Lunch 12:00–15:00 · Dinner 19:00–22:30',note:'Private dining room available. Full menu on request.',icon:'🍽️'},
-  {id:'serena',name:'The Serena Restaurant',location:'Arusha Serena Hotel',desc:'Elegant international cuisine with Kilimanjaro views. Perfect for business entertaining and private celebrations.',cuisine:'International · East African',dress:'Smart casual',hours:'All day dining · 06:30–22:30',note:'Private event catering available.',icon:'🕯️'},
-  {id:'mount-meru-grill',name:'Mount Meru Grill Room',location:'Mount Meru Hotel · Arusha',desc:'Classic grill in a colonial setting. Known for premium cuts and East African wines.',cuisine:'Continental Grill',dress:'Smart casual',hours:'Dinner 19:00–22:00',note:'Barafu Luxe preferred table reservations.',icon:'🥩'},
+  {id:'acl-grill',name:'The Grill Room',location:'Arusha Coffee Lodge · Elewana Collection',desc:'An intimate candlelit grill nestled within the coffee plantation. Contemporary African grill cuisine in one of Arusha\'s most celebrated settings.',cuisine:'Contemporary African Grill',dress:'Smart casual to formal',hours:'Lunch 12:00–15:00 · Dinner 19:00–22:30',note:'Full seasonal set menu — updated July 2026.',icon:'🍽️',hasMenu:true},
+  {id:'gran-melia-grill',name:'The Grill',location:'Gran Meliá Arusha',desc:'A signature steakhouse experience on the hotel\'s top floor, known for premium cuts and sweeping views toward Mount Meru.',cuisine:'Steakhouse · Premium Grill',dress:'Smart casual to formal',hours:'Dinner · hours confirmed at booking',note:'Full menu coming soon — reservations already available through your concierge.',icon:'🥩',hasMenu:false},
 ];
+
+// The Grill Room, Arusha Coffee Lodge — set menu, updated July 2026.
+// Real menu supplied by Chance. No pricing shown — this is a fixed set menu.
+var ACL_MENU = [
+  {course:'To Start', dishes:[
+    {name:'Artisan Bread Basket', desc:'Artichoke & parmesan pâté, red pepper hummus, butter, balsamic vinegar and extra virgin olive oil.', veg:true}
+  ]},
+  {course:'Starters', dishes:[
+    {name:'Caprese', desc:'Ripe tomatoes, fresh mozzarella and basil pesto, drizzled with aged balsamic reduction and extra virgin olive oil.'},
+    {name:'Pickled Carrot & Halloumi Salad', desc:'Masala chickpeas, lentil sprouts and sumac dressing.', veg:true},
+    {name:'Roasted Cauliflower Soup', desc:'Toasted almonds and curry oil.', veg:true},
+    {name:'Crispy Calamari', desc:'Avocado, rocket, harissa and lemon aioli.'}
+  ]},
+  {course:'Vegetarian & Fish', dishes:[
+    {name:'Aubergine Risotto with Red Pepper', desc:'Lemon-scented marrow, fresh oregano, seeded dukkah and parmesan.', veg:true},
+    {name:'Mushroom & Truffle Tortellini', desc:'Sage & "mchicha" cream, marinated tomato and toasted "boga" seeds.', veg:true},
+    {name:'Pan-Seared Red Snapper with Herb Crust', desc:'Sweet potato spuds, buttered zucchini, beurre blanc and citrus herb oil.'}
+  ]},
+  {course:'Meaty Mains', dishes:[
+    {name:'Sous Vide Chicken Roulade', desc:'Smoked "bringaniya" purée, peas, roasted mushrooms & marrow, thyme jus.'},
+    {name:'Grilled Beef Fillet with Mash Potato', desc:'Butternut, sautéed marrow, red wine jus.'},
+    {name:'Duo of Slow-Cooked Pork Fillet with Carrot Purée', desc:'Beetroot, fine beans and honey mustard jus.'},
+    {name:'Succulent Lamb Roast Medallion', desc:'Parisian potatoes, spinach, brinjals and mint reduction.'}
+  ]},
+  {course:'To Finish', dishes:[
+    {name:'Whipped Coconut Panna Cotta', desc:'Rosemary meringue, mixed berry compote, strawberry consommé. Can be made gluten-free on request.', veg:true},
+    {name:'Dark Chocolate Tart with Lime', desc:'78% dark chocolate finished with fleur de sel, whipped yoghurt, berries and lime.', veg:true},
+    {name:'Fruit Platter with Honey Yoghurt', desc:'A selection of tropical and exotic fruits and berries.', veg:true},
+    {name:'East African Cheese Board', desc:'Preserves, crackers and fresh fruit.', veg:true}
+  ]}
+];
+
+function renderACLMenu(){
+  var el=document.getElementById('acl-menu-list');
+  if(!el) return;
+  var html='';
+  ACL_MENU.forEach(function(section){
+    html+='<div class="spa-section-rule" style="padding-left:2px;padding-right:2px;"><div class="spa-rule-lbl">'+section.course+'</div><div class="spa-rule-line"></div></div>';
+    section.dishes.forEach(function(d){
+      html+='<div class="menu-dish">'
+        +'<div class="menu-dish-name">'+d.name+(d.veg?' <span class="menu-veg-tag">Vegetarian</span>':'')+'</div>'
+        +'<div class="menu-dish-desc">'+d.desc+'</div>'
+        +'</div>';
+    });
+  });
+  el.innerHTML=html;
+}
+
 
 var COMMUNITIES = [
   {id:'golf',name:'Golf Club',icon:'⛳',color:'golf',desc:'Tee times, tournaments, handicap chat and course reviews across East Africa.',messages:[]},
@@ -2922,6 +2998,7 @@ function go(id){
     renderGems('all');
   }
   if(id==='s-gemstones'){ setTimeout(function(){ try{ renderGemstoneCats(); }catch(e){} },100); }
+  if(id==='s-acl-menu'){ setTimeout(function(){ try{ renderACLMenu(); }catch(e){} },100); }
   if(id==='s-realestate'){ setTimeout(function(){ try{ renderRealEstateCats(); }catch(e){} },100); }
 }
 function setNav(el){
@@ -6086,18 +6163,23 @@ function openGemsWithTierCheck(){
 function renderDining(){
   var el=document.getElementById('dining-list');
   if(!el) return;
-  var html='';
-  DINING_VENUES.forEach(function(v){
-    var div=document.createElement('div');
-    div.className='sv feat';
-    div.style.cursor='pointer';
-    div.setAttribute('onclick','openDiningDetail("'+v.id+'")');
-    div.innerHTML='<div class="sv-ico-w"><span style="font-size:22px;">'+v.icon+'</span></div>'
-      +'<div><div class="sv-name">'+v.name+'</div>'
-      +'<div class="sv-desc">'+v.cuisine+' · '+v.location.split('·')[0].trim()+'</div>'
-      +'<div class="sv-desc" style="margin-top:2px;">'+v.hours+'</div>'
-      +'<span class="sv-badge">Concierge reservation</span></div>';
-    el.appendChild(div);
+  el.innerHTML='';
+  DINING_VENUES.forEach(function(v,i){
+    var card=document.createElement('div');
+    card.className='gem-prop-card';
+    var num=String(i+1).padStart(2,'0');
+    card.innerHTML=
+      '<div class="gem-prop-inner">'
+      +(v.hasMenu ? '<div class="gem-new-badge">Full Menu ✦</div>' : '')
+      +'<div class="gem-prop-num">'+num+'</div>'
+      +'<div class="gem-prop-icon">'+v.icon+'</div>'
+      +'<div class="gem-prop-name">'+v.name+'</div>'
+      +'<div class="gem-prop-loc"><i class="ti ti-map-pin" style="font-size:11px;color:var(--gold);opacity:0.5;"></i>'+v.location+'</div>'
+      +'<div class="gem-prop-desc">'+v.desc+'</div>'
+      +'<div class="gem-prop-feats"><span class="gem-feat-tag">'+v.cuisine+'</span><span class="gem-feat-tag">'+v.hours+'</span></div>'
+      +'</div>';
+    card.onclick=function(){ openDiningDetail(v.id); };
+    el.appendChild(card);
   });
 }
 
@@ -6106,14 +6188,19 @@ function openDiningDetail(id){
   if(!v) return;
   document.getElementById('modal-ttl').textContent=v.name;
   document.getElementById('modal-body').innerHTML='<div class="fwrap">'
+    +'<div style="text-align:center;padding:8px 0 16px;">'
+    +'<div style="font-size:36px;margin-bottom:8px;">'+v.icon+'</div>'
+    +'<div style="font-family:Cormorant Garamond,serif;font-size:22px;color:var(--ow);margin-bottom:3px;">'+v.name+'</div>'
+    +'<div style="font-size:10px;color:var(--mt);"><i class="ti ti-map-pin" style="font-size:11px;"></i> '+v.location+'</div>'
+    +'</div>'
     +'<div style="font-size:11px;color:var(--mt);line-height:1.7;margin-bottom:12px;">'+v.desc+'</div>'
     +'<div style="background:var(--card);border:0.5px solid var(--bd);padding:12px 14px;border-radius:2px;margin-bottom:14px;">'
     +'<div class="pc-row"><span class="pc-label">Cuisine</span><span style="font-size:11px;color:var(--ow);">'+v.cuisine+'</span></div>'
     +'<div class="pc-row"><span class="pc-label">Hours</span><span style="font-size:11px;color:var(--ow);">'+v.hours+'</span></div>'
     +'<div class="pc-row"><span class="pc-label">Dress code</span><span style="font-size:11px;color:var(--ow);">'+v.dress+'</span></div>'
-    +'<div class="pc-row"><span class="pc-label">Location</span><span style="font-size:11px;color:var(--ow);">'+v.location+'</span></div>'
     +'</div>'
-    +'<div style="font-size:10px;color:var(--gold);margin-bottom:14px;letter-spacing:0.06em;">'+v.note+'</div>'
+    +'<div style="font-size:10px;color:var(--gold);margin-bottom:14px;letter-spacing:0.03em;line-height:1.6;">'+v.note+'</div>'
+    +(v.hasMenu ? '<button class="gghst" style="width:100%;margin-bottom:14px;" onclick="document.getElementById(\'modal-bg\').classList.remove(\'open\');go(\'s-acl-menu\');">View full menu</button>' : '')
     +'<div class="fgrp"><label class="flbl">Your name</label><input class="finp" id="dn-name" placeholder="Full name"></div>'
     +'<div class="fgrp"><label class="flbl">Date</label><input class="finp" id="dn-date" type="date" style="color-scheme:dark"></div>'
     +'<div class="fgrp"><label class="flbl">Time</label><select class="fsel" id="dn-time"><option>Lunch — 12:00</option><option>Lunch — 13:00</option><option>Dinner — 19:00</option><option>Dinner — 20:00</option><option>Dinner — 21:00</option></select></div>'
@@ -7325,7 +7412,7 @@ var CIRCLE_POSTS = [
     type:'event',
     tag:'Members Only',
     tagColor:'purple',
-    title:'Obsidian Dinner — Mount Meru Grill Room',
+    title:'Obsidian Dinner — The Grill, Gran Meliá',
     body:'An intimate dinner for Obsidian members this Friday at 20:00. 8 seats only. Seasonal menu, curated wine pairing, and a private conversation with a special guest. By invitation.',
     cta:'Request invitation',
     wa:'Obsidian+Dinner+Circle',
