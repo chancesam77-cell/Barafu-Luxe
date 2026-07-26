@@ -1752,9 +1752,9 @@ function removeBookingFB(fbKey){
   </div>
   <div class="sec" style="padding-bottom:8px;"><div class="slbl">Membership tiers</div></div>
   <div class="tier-cards">
-    <div class="tier-c active-tier"><div class="tier-n">Tier 1</div><div class="tier-name">Silver</div><div class="tier-f">All services<br>Booking history<br>App access</div></div>
-    <div class="tier-c"><div class="tier-n">Tier 2</div><div class="tier-name">Gold ✦</div><div class="tier-f">Priority booking<br>Dedicated concierge<br>10% loyalty</div></div>
-    <div class="tier-c" onclick="openUpgradeTier()" style="cursor:pointer;"><div class="tier-n">Tier 3</div><div class="tier-name">Obsidian</div><div class="tier-f">24/7 personal<br>First access<br>Annual experience</div></div>
+    <div class="tier-c" data-tier="silver"><div class="tier-n">Tier 1</div><div class="tier-name">Silver</div><div class="tier-f">All services<br>Booking history<br>App access</div></div>
+    <div class="tier-c" data-tier="gold"><div class="tier-n">Tier 2</div><div class="tier-name">Gold ✦</div><div class="tier-f">Priority booking<br>Dedicated concierge<br>10% loyalty</div></div>
+    <div class="tier-c" data-tier="obsidian" onclick="openUpgradeTier()" style="cursor:pointer;"><div class="tier-n">Tier 3</div><div class="tier-name">Obsidian</div><div class="tier-f">24/7 personal<br>First access<br>Annual experience</div></div>
   </div>
   <div id="upgrade-banner" style="margin:0 14px 4px;background:linear-gradient(135deg,#0a0a08,#141208);border:0.5px solid rgba(184,137,42,0.25);border-radius:2px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;">
     <div style="font-size:11px;color:var(--mt);">Upgrade your membership</div>
@@ -5532,6 +5532,12 @@ function updateProfileForTier(user) {
   if(wrapper) {
     wrapper.className = 'tier-'+tier;
   }
+
+  // Highlight the card matching the member's actual tier (admin previews as Obsidian)
+  var highlightTier = (tier==='admin') ? 'obsidian' : tier;
+  document.querySelectorAll('.tier-c').forEach(function(card){
+    card.classList.toggle('active-tier', card.getAttribute('data-tier')===highlightTier);
+  });
 
   if(nameEl) nameEl.textContent = user.name;
   if(profAv) { var avTxt=document.getElementById('profile-av-text'); if(avTxt) avTxt.textContent = user.initials || user.name.split(' ').map(function(n){return n[0];}).join('').slice(0,2).toUpperCase(); }
