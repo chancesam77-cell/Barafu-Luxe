@@ -945,6 +945,16 @@ window.FB = {
     return update(ref(db, 'members/' + safe), { tier });
   },
 
+  // Live listener on a single member's own tier — lets a logged-in session
+  // pick up admin-side tier changes immediately, without a re-login.
+  listenMyTier: (email, callback) => {
+    const safe = email.replace(/\./g,'_').replace(/@/g,'_at_');
+    onValue(ref(db, 'members/' + safe + '/tier'), snap => {
+      const tier = snap.val();
+      if(tier) callback(tier);
+    });
+  },
+
   removeMember: (email) => {
     const safe = email.replace(/\./g,'_').replace(/@/g,'_at_');
     return remove(ref(db, 'members/' + safe));
@@ -3575,6 +3585,7 @@ function enterApp(user){
     if(typeof startFlightAutoRefresh==='function') startFlightAutoRefresh();
     if(typeof startEmptyLegsRefresh==='function') startEmptyLegsRefresh();
     if(typeof startEventsRefresh==='function') startEventsRefresh();
+    if(typeof startMyTierListener==='function') startMyTierListener();
   },3000);
   // Start community activity simulation
   setTimeout(function(){
@@ -6390,6 +6401,55 @@ function startEventsRefresh(){
   window._evRefreshTimer = setInterval(function(){
     _eventsFetched=false; fetchLiveEvents();
   }, 6*60*60*1000);
+}
+
+// ── LIVE TIER SYNC — picks up admin-side tier changes without re-login ──
+function startMyTierListener(){
+  if(window._myTierListenerStarted) return;
+  if(!currentUser || !currentUser.email || currentUser.tier==='admin') return;
+  if(!window.FB || typeof window.FB.listenMyTier !== 'function') return;
+  window._myTierListenerStarted = true;
+
+  var firstFire = true;
+  var lastKnownTier = currentUser.tier;
+
+  window.FB.listenMyTier(currentUser.email, function(newTier){
+    if(firstFire){
+      // Initial sync on subscribe — not a real change, just confirms current state.
+      firstFire = false;
+      lastKnownTier = newTier;
+      currentUser.tier = newTier;
+      return;
+    }
+    if(newTier === lastKnownTier) return;
+
+    var oldTier = lastKnownTier;
+    lastKnownTier = newTier;
+    currentUser.tier = newTier;
+
+    // Keep the session cache consistent too
+    try{
+      var sess = getSession();
+      if(sess){ sess.tier = newTier; setSession(sess); }
+    }catch(e){}
+
+    // Refresh whatever's currently on screen — badge, tier card highlight, etc.
+    if(typeof updateProfileForTier==='function'){
+      try{ updateProfileForTier(currentUser); }catch(e){}
+    }
+
+    var tierLabel = newTier.charAt(0).toUpperCase()+newTier.slice(1);
+    var isUpgrade = ['silver','gold','obsidian'].indexOf(newTier) > ['silver','gold','obsidian'].indexOf(oldTier);
+    var title = isUpgrade ? 'Membership Upgraded ✦' : 'Membership Updated';
+    var body = 'You are now a '+tierLabel+' member.'+(isUpgrade?' Enjoy your new benefits.':'');
+
+    if(typeof addNotification==='function'){
+      addNotification('info', title, body, "go('s-profile')");
+    }
+    if(typeof showToast==='function'){
+      showToast(title);
+    }
+  });
 }
 
 // ── 4. HOME SCREEN — fix fake "47 online" count ──
