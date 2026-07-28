@@ -4197,6 +4197,22 @@ function installApp(){
   localStorage.setItem('bl_install_dismissed','1');
   showInstallGuide();
 }
+function showPushNeedsInstallGuide(){
+  document.getElementById('modal-ttl').textContent='One Step First';
+  document.getElementById('modal-body').innerHTML =
+    '<div class="fwrap"><div style="text-align:center;margin-bottom:18px;">'
+    +'<div style="font-size:36px;margin-bottom:8px;">🔔</div>'
+    +'<div style="font-size:11px;color:var(--mt);line-height:1.7;">iPhone only allows notifications for apps added to your Home Screen — not for regular Safari tabs. This is an Apple rule, not something we can change.</div>'
+    +'</div>'
+    +'<div class="ig-step"><div class="ig-num">1</div><div class="ig-txt">Tap the <b>Share</b> icon <i class="ti ti-square-arrow-up" style="color:var(--gold);"></i> in the Safari toolbar.</div></div>'
+    +'<div class="ig-step"><div class="ig-num">2</div><div class="ig-txt">Scroll down and tap <b>"Add to Home Screen"</b>, then <b>"Add"</b>.</div></div>'
+    +'<div class="ig-step"><div class="ig-num">3</div><div class="ig-txt">Close Safari, then open <b>Barafu Luxe from the new icon</b> on your Home Screen.</div></div>'
+    +'<div class="ig-step"><div class="ig-num">4</div><div class="ig-txt">Go to Profile and turn Push Notifications on again — it will work this time.</div></div>'
+    +'<button class="gbtn" style="margin-top:18px;" onclick="document.getElementById(\'modal-bg\').classList.remove(\'open\')">Got it</button>'
+    +'</div>';
+  document.getElementById('modal-bg').classList.add('open');
+}
+
 function showInstallGuide(){
   var ios=isIOSDevice();
   document.getElementById('modal-ttl').textContent='Add to Home Screen';
@@ -4243,11 +4259,22 @@ function isPushSupported(){
 
 function enablePushNotifications(){
   if(!isPushSupported()){
-    showToast('Push notifications aren\'t supported on this browser');
+    var alreadyInstalled = window.navigator.standalone===true || (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
+    if(isIOSDevice() && !alreadyInstalled){
+      updateNotifSettingUI(false);
+      showPushNeedsInstallGuide();
+    } else if(isIOSDevice() && alreadyInstalled){
+      showToast('Notifications need iOS 16.4 or later — please update iOS');
+      updateNotifSettingUI(false);
+    } else {
+      showToast('Push notifications aren\'t supported on this browser');
+      updateNotifSettingUI(false);
+    }
     return;
   }
   if(!currentUser || !currentUser.email){
     showToast('Please sign in first');
+    updateNotifSettingUI(false);
     return;
   }
 
