@@ -1,11 +1,10 @@
 // Barafu Luxe — Service Worker
 // Handles offline caching (existing behavior) plus Web Push notifications.
 
-const CACHE = 'bl-v6';
+const CACHE = 'bl-v7';
 
 self.addEventListener('install', function(e){
   self.skipWaiting();
-  e.waitUntil(caches.open(CACHE).then(function(c){ return c.addAll(['/']); }));
 });
 
 self.addEventListener('activate', function(e){
@@ -19,9 +18,20 @@ self.addEventListener('activate', function(e){
   );
 });
 
+// Network-first: always try to get the latest version first. Only fall
+// back to the cached copy if the network request fails (offline). This
+// matters a lot during active development — a cache-first strategy would
+// mean every update gets silently hidden behind the old cached copy,
+// invisible to anyone who already has the app installed.
 self.addEventListener('fetch', function(e){
   e.respondWith(
-    caches.match(e.request).then(function(r){ return r || fetch(e.request); })
+    fetch(e.request).then(function(response){
+      var copy = response.clone();
+      caches.open(CACHE).then(function(c){ c.put(e.request, copy); });
+      return response;
+    }).catch(function(){
+      return caches.match(e.request);
+    })
   );
 });
 
