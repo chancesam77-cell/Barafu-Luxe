@@ -233,6 +233,12 @@
 .f1-hero-season{font-size:8px;letter-spacing:0.3em;color:rgba(225,6,0,0.6);text-transform:uppercase;margin-bottom:10px;text-align:center;}
 .f1-hero-title{font-family:'Cormorant Garamond',serif;font-size:38px;font-weight:300;color:#fff;line-height:1.1;margin-bottom:16px;text-align:center;}
 .f1-hero-title em{color:#E10600;font-style:italic;}
+.f1-last-race{background:linear-gradient(135deg,rgba(225,6,0,0.08),rgba(225,6,0,0.02));border:0.5px solid rgba(225,6,0,0.2);border-radius:3px;padding:14px 16px;margin-bottom:14px;}
+.f1-lr-label{font-size:8px;letter-spacing:0.18em;text-transform:uppercase;color:#E10600;margin-bottom:10px;}
+.f1-lr-podium{display:flex;gap:0;}
+.f1-lr-pos{flex:1;display:flex;flex-direction:column;gap:2px;}
+.f1-lr-p{font-family:'Cormorant Garamond',serif;font-size:15px;color:var(--gold);}
+.f1-lr-n{font-size:10.5px;color:var(--ow);font-weight:500;}
 .f1-standings-strip{display:flex;gap:0;border-top:0.5px solid rgba(225,6,0,0.15);padding-top:14px;}
 .f1-standing-item{flex:1;display:flex;align-items:center;gap:8px;padding:0 4px;}
 .f1-standing-item:not(:last-child){border-right:0.5px solid rgba(225,6,0,0.1);}
@@ -1692,10 +1698,20 @@ function removeBookingFB(fbKey){
   <div class="f1-hero">
     <div class="f1-hero-season">2026 Formula 1 World Championship</div>
     <div class="f1-hero-title">Race the World <em>in Luxury.</em></div>
+
+    <div class="f1-last-race" id="f1-last-race">
+      <div class="f1-lr-label">Last Race · Hungarian GP</div>
+      <div class="f1-lr-podium" id="f1-lr-podium">
+        <div class="f1-lr-pos"><span class="f1-lr-p">P1</span><span class="f1-lr-n">Norris</span></div>
+        <div class="f1-lr-pos"><span class="f1-lr-p">P2</span><span class="f1-lr-n">Verstappen</span></div>
+        <div class="f1-lr-pos"><span class="f1-lr-p">P3</span><span class="f1-lr-n">Antonelli</span></div>
+      </div>
+    </div>
+
     <div class="f1-standings-strip" id="f1-standings-strip">
-      <div class="f1-standing-item"><span class="f1-pos">1</span><span class="f1-sname">Antonelli</span><span class="f1-pts">204pts</span></div>
-      <div class="f1-standing-item"><span class="f1-pos">2</span><span class="f1-sname">Hamilton</span><span class="f1-pts">159pts</span></div>
-      <div class="f1-standing-item"><span class="f1-pos">3</span><span class="f1-sname">Russell</span><span class="f1-pts">154pts</span></div>
+      <div class="f1-standing-item"><span class="f1-pos">1</span><span class="f1-sname">Antonelli</span><span class="f1-pts">219pts</span></div>
+      <div class="f1-standing-item"><span class="f1-pos">2</span><span class="f1-sname">Hamilton</span><span class="f1-pts">169pts</span></div>
+      <div class="f1-standing-item"><span class="f1-pos">3</span><span class="f1-sname">Russell</span><span class="f1-pts">160pts</span></div>
     </div>
   </div>
 
@@ -2754,8 +2770,7 @@ var ROUTES = [
 ];
 var F1_LIVE = null;
 var F1_FALLBACK = [
-  {r:11,n:'🇭🇺 Hungarian Grand Prix',d:'24–26 July 2026',v:'Hungaroring, Budapest',next:true},
-  {r:12,n:'🇳🇱 Dutch Grand Prix',d:'22–24 Aug 2026',v:'Zandvoort · Sprint'},
+  {r:12,n:'🇳🇱 Dutch Grand Prix',d:'21–23 Aug 2026',v:'Zandvoort · Sprint',next:true},
   {r:13,n:'🇮🇹 Italian Grand Prix',d:'5–7 Sep 2026',v:'Monza — Temple of Speed'},
   {r:14,n:'🇪🇸 Spanish GP — Madrid',d:'11–13 Sep 2026',v:'Madring Circuit · Debut venue'},
   {r:15,n:'🇦🇿 Azerbaijan Grand Prix',d:'25–27 Sep 2026',v:'Baku City Circuit'},
@@ -2821,6 +2836,22 @@ function updateF1HeroStrip(standings){
   }).join('');
 }
 
+function updateF1LastRace(results){
+  if(!results || !results.length) return;
+  var latest = results.slice().sort(function(a,b){ return b.r-a.r; })[0];
+  if(!latest || !latest.p1) return;
+  var labelEl = document.querySelector('#f1-last-race .f1-lr-label');
+  var podiumEl = document.getElementById('f1-lr-podium');
+  if(labelEl) labelEl.textContent = 'Last Race · '+latest.n;
+  if(podiumEl){
+    var lastName = function(full){ return (full||'').split(' ').slice(-1)[0]; };
+    podiumEl.innerHTML =
+      '<div class="f1-lr-pos"><span class="f1-lr-p">P1</span><span class="f1-lr-n">'+lastName(latest.p1)+'</span></div>'
+      +'<div class="f1-lr-pos"><span class="f1-lr-p">P2</span><span class="f1-lr-n">'+lastName(latest.p2)+'</span></div>'
+      +'<div class="f1-lr-pos"><span class="f1-lr-p">P3</span><span class="f1-lr-n">'+lastName(latest.p3)+'</span></div>';
+  }
+}
+
 function fetchF1Live(){
   fetch('/api/f1?type=all')
     .then(function(r){ return r.json(); })
@@ -2830,6 +2861,7 @@ function fetchF1Live(){
       var badge = document.getElementById('f1-live-badge');
       if(badge) badge.innerHTML = '<span class="live-dot"></span>LIVE';
       if(data.standings) updateF1HeroStrip(data.standings);
+      if(data.results) updateF1LastRace(data.results);
       try{ buildF1(); }catch(e){}
       var resultsTab = document.getElementById('f1-tab-results');
       if(resultsTab && resultsTab.style.display!=='none'){ try{ renderF1Results(); }catch(e){} }
@@ -2855,6 +2887,7 @@ function buildF1(){
     {r:8,n:'Austrian GP',d:'26-28 Jun 2026',v:'Red Bull Ring',p1:'Russell',p2:'Verstappen',p3:'Antonelli',margin:'1.611s'},
     {r:9,n:'British GP',d:'3-5 Jul 2026',v:'Silverstone',p1:'Leclerc',p2:'Russell',p3:'Hamilton',margin:'0.427s'},
     {r:10,n:'Belgian GP',d:'17-19 Jul 2026',v:'Spa-Francorchamps',p1:'Antonelli',p2:'Leclerc',p3:'Verstappen',margin:'1.952s'},
+    {r:11,n:'Hungarian GP',d:'24-26 Jul 2026',v:'Hungaroring',p1:'Norris',p2:'Verstappen',p3:'Antonelli',margin:'15s'},
   ];
 
   var DONE = DONE_FALLBACK;
@@ -7256,6 +7289,7 @@ function renderF1Results(){
   var el = document.getElementById('f1-results-list');
   if(!el) return;
   var R_FALLBACK = [
+    {r:11,n:'Hungarian GP',d:'24-26 Jul 2026',v:'Hungaroring',p1:'Lando Norris',p2:'Max Verstappen',p3:'Kimi Antonelli',margin:'15s'},
     {r:10,n:'Belgian GP',d:'17-19 Jul 2026',v:'Spa-Francorchamps',p1:'Kimi Antonelli',p2:'Charles Leclerc',p3:'Max Verstappen',margin:'1.952s'},
     {r:9,n:'British GP',d:'3-5 Jul 2026',v:'Silverstone',p1:'Charles Leclerc',p2:'George Russell',p3:'Lewis Hamilton',margin:'0.427s'},
     {r:8,n:'Austrian GP',d:'26-28 Jun 2026',v:'Red Bull Ring',p1:'George Russell',p2:'Max Verstappen',p3:'Kimi Antonelli',margin:'1.611s'},
@@ -7269,7 +7303,7 @@ function renderF1Results(){
   ];
 
   var R = R_FALLBACK;
-  var rangeLabel = 'R1-R10';
+  var rangeLabel = 'R1-R11';
   if(F1_LIVE && F1_LIVE.results && F1_LIVE.results.length){
     R = F1_LIVE.results.slice().sort(function(a,b){return b.r-a.r;}).map(function(r){
       return {r:r.r,n:r.n,d:formatF1Date(r.date),v:r.v,p1:r.p1,p2:r.p2,p3:r.p3,margin:r.margin};
@@ -7316,20 +7350,20 @@ function renderF1Standings(){
   var el=document.getElementById('f1-standings-full');
   if(!el) return;
   var S_FALLBACK=[
-    {pos:1,driver:'Kimi Antonelli',team:'Mercedes',pts:204,flag:'🇮🇹'},
-    {pos:2,driver:'Lewis Hamilton',team:'Ferrari',pts:159,flag:'🇬🇧'},
-    {pos:3,driver:'George Russell',team:'Mercedes',pts:154,flag:'🇬🇧'},
-    {pos:4,driver:'Charles Leclerc',team:'Ferrari',pts:126,flag:'🇲🇨'},
-    {pos:5,driver:'Lando Norris',team:'McLaren',pts:103,flag:'🇬🇧'},
-    {pos:6,driver:'Oscar Piastri',team:'McLaren',pts:92,flag:'🇦🇺'},
-    {pos:7,driver:'Max Verstappen',team:'Red Bull Racing',pts:91,flag:'🇳🇱'},
-    {pos:8,driver:'Isack Hadjar',team:'Red Bull Racing',pts:60,flag:'🇫🇷'},
-    {pos:9,driver:'Pierre Gasly',team:'Alpine',pts:42,flag:'🇫🇷'},
-    {pos:10,driver:'Liam Lawson',team:'Racing Bulls',pts:39,flag:'🇳🇿'},
+    {pos:1,driver:'Kimi Antonelli',team:'Mercedes',pts:219,flag:'🇮🇹'},
+    {pos:2,driver:'Lewis Hamilton',team:'Ferrari',pts:169,flag:'🇬🇧'},
+    {pos:3,driver:'George Russell',team:'Mercedes',pts:160,flag:'🇬🇧'},
+    {pos:4,driver:'Charles Leclerc',team:'Ferrari',pts:138,flag:'🇲🇨'},
+    {pos:5,driver:'Lando Norris',team:'McLaren',pts:128,flag:'🇬🇧'},
+    {pos:6,driver:'Max Verstappen',team:'Red Bull Racing',pts:109,flag:'🇳🇱'},
+    {pos:7,driver:'Oscar Piastri',team:'McLaren',pts:92,flag:'🇦🇺'},
+    {pos:8,driver:'Isack Hadjar',team:'Red Bull Racing',pts:66,flag:'🇫🇷'},
+    {pos:9,driver:'Pierre Gasly',team:'Alpine',pts:44,flag:'🇫🇷'},
+    {pos:10,driver:'Liam Lawson',team:'Racing Bulls',pts:41,flag:'🇳🇿'},
   ];
 
   var S = S_FALLBACK;
-  var afterLabel = 'After R10 \u00b7 Belgium';
+  var afterLabel = 'After R11 \u00b7 Hungary';
   if(F1_LIVE && F1_LIVE.standings && F1_LIVE.standings.length){
     S = F1_LIVE.standings.map(function(d){
       return {pos:d.pos,driver:d.driver,team:d.team,pts:d.pts,flag:d.flag};
