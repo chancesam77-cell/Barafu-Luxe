@@ -648,6 +648,12 @@ html,body{height:100%;background:var(--black);color:var(--ow);font-family:'Monts
 .pli-name{flex:1;font-size:12px;color:var(--ow);}
 .pli-sub{font-size:10px;color:var(--mt);margin-top:1px;}
 .pli-arr{font-size:14px;color:var(--mt);}
+.bl-switch{position:relative;display:inline-block;width:38px;height:22px;flex-shrink:0;}
+.bl-switch input{opacity:0;width:0;height:0;}
+.bl-switch-track{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:var(--soft);border:0.5px solid var(--bd);border-radius:22px;transition:background .2s ease;}
+.bl-switch-track::before{position:absolute;content:"";height:16px;width:16px;left:2px;top:2px;background:var(--mt);border-radius:50%;transition:transform .2s ease,background .2s ease;}
+.bl-switch input:checked + .bl-switch-track{background:rgba(184,137,42,0.25);border-color:var(--gold);}
+.bl-switch input:checked + .bl-switch-track::before{transform:translateX(16px);background:var(--gold);}
 .tier-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 14px 14px;}
 .tier-c{border:0.5px solid var(--bd);padding:12px;text-align:center;border-radius:2px;}
 .tier-c.active-tier{border-color:rgba(184,137,42,0.45);}
@@ -953,6 +959,24 @@ window.FB = {
       const tier = snap.val();
       if(tier) callback(tier);
     });
+  },
+
+  // ── PUSH NOTIFICATIONS ──
+  saveMySubscription: (email, subscription) => {
+    const safe = email.replace(/\./g,'_').replace(/@/g,'_at_');
+    return set(ref(db, 'pushSubscriptions/' + safe), subscription);
+  },
+
+  removeMySubscription: (email) => {
+    const safe = email.replace(/\./g,'_').replace(/@/g,'_at_');
+    return remove(ref(db, 'pushSubscriptions/' + safe));
+  },
+
+  getMemberSubscription: (email, callback) => {
+    const safe = email.replace(/\./g,'_').replace(/@/g,'_at_');
+    get(ref(db, 'pushSubscriptions/' + safe)).then(snap => {
+      callback(snap.exists() ? snap.val() : null);
+    }).catch(() => callback(null));
   },
 
   removeMember: (email) => {
@@ -1869,6 +1893,12 @@ function removeBookingFB(fbKey){
     <div class="pli" onclick="openMyBookings()"><i class="ti ti-file-invoice pli-ico"></i><div><div class="pli-name">My Bookings</div><div class="pli-sub">View confirmed and pending</div></div><i class="ti ti-chevron-right pli-arr"></i></div>
     <div class="pli" onclick="openPaymentDetails()"><i class="ti ti-credit-card pli-ico"></i><div><div class="pli-name">Payment Details</div><div class="pli-sub">Bank · Airtel Money · M-Pesa</div></div><i class="ti ti-chevron-right pli-arr"></i></div>
     <div class="pli" onclick="openTrustPolicies()"><i class="ti ti-shield-check pli-ico" style="color:#7CB88A;"></i><div><div class="pli-name">Trust & Policies</div><div class="pli-sub">Response times · Cancellations · Privacy</div></div><i class="ti ti-chevron-right pli-arr"></i></div>
+    <div class="pli" style="cursor:default;"><i class="ti ti-bell-ringing pli-ico" style="color:var(--gold);"></i><div><div class="pli-name">Push Notifications</div><div class="pli-sub">Booking updates, tier changes & more</div></div>
+      <label class="bl-switch">
+        <input type="checkbox" id="push-notif-toggle" onchange="this.checked ? enablePushNotifications() : disablePushNotifications()">
+        <span class="bl-switch-track"></span>
+      </label>
+    </div>
     <div class="pli" onclick="window.open('https://wa.me/255692312366','_blank')"><i class="ti ti-brand-whatsapp pli-ico" style="color:#128C7E;"></i><div><div class="pli-name">WhatsApp Concierge</div><div class="pli-sub">+255 692 312 366 · Tap to open</div></div><i class="ti ti-external-link pli-arr"></i></div>
     <div class="pli" onclick="window.open('mailto:barafuluxe@gmail.com','_blank')"><i class="ti ti-mail pli-ico"></i><div><div class="pli-name">Email</div><div class="pli-sub">barafuluxe@gmail.com</div></div><i class="ti ti-external-link pli-arr"></i></div>
     <div class="pli" onclick="window.open('https://barafuluxe.com','_blank')"><i class="ti ti-world pli-ico"></i><div><div class="pli-name">Website</div><div class="pli-sub">barafuluxe.com</div></div><i class="ti ti-external-link pli-arr"></i></div>
@@ -3106,7 +3136,16 @@ function go(id){
       }
     }catch(e){}
   },100); }
-  if(id==='s-profile' && currentUser) updateProfileForTier(currentUser);
+  if(id==='s-profile' && currentUser){
+    updateProfileForTier(currentUser);
+    if(isPushSupported() && navigator.serviceWorker){
+      navigator.serviceWorker.ready.then(function(reg){
+        return reg.pushManager.getSubscription();
+      }).then(function(sub){
+        updateNotifSettingUI(!!sub);
+      }).catch(function(){});
+    }
+  }
   if(id==='s-spa' && (document.getElementById('spa-content') && document.getElementById('spa-content').style.display!=='none')){
     buildSpaPartnerTabs(); renderSpa('all','all');
   }
@@ -3963,7 +4002,13 @@ function setMemberTier(email, newTier, silent){
   // UI shows the new tier, but it never actually saves, and the next sync
   // from Firebase quietly reverts it. Surface real failures instead.
   if(fbPromise && typeof fbPromise.then === 'function'){
-    fbPromise.catch(function(err){
+    fbPromise.then(function(){
+      // Only push once the write is actually confirmed saved.
+      if(typeof sendPushToMember==='function'){
+        var tierLabel = newTier.charAt(0).toUpperCase()+newTier.slice(1);
+        sendPushToMember(email, 'Membership Updated', 'You are now a '+tierLabel+' member.', '/');
+      }
+    }).catch(function(err){
       console.log('setMemberTier Firebase write failed:', err);
       showToast('⚠ Could not save to server — check connection and try again');
     });
@@ -4175,9 +4220,101 @@ function showInstallGuide(){
 }
 
 if('serviceWorker' in navigator){
-  var SW=`const CACHE='bl-v5';self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(['/']))));self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request))));`;
-  navigator.serviceWorker.register(URL.createObjectURL(new Blob([SW],{type:'application/javascript'}))).catch(()=>{});
+  navigator.serviceWorker.register('/sw.js').catch(function(){});
 }
+
+// ── PUSH NOTIFICATIONS — opt-in subscribe/unsubscribe ──
+var VAPID_PUBLIC_KEY = 'BBJC1-EXPf60EK0Ao-2ySMwWvLmXgNh5_bYA18aKSYd4-daZfbcbwa-FG4xpxD53ETFB4-c3hy2RcN-ZUjc_4CI';
+
+function urlBase64ToUint8Array(base64String){
+  var padding = '='.repeat((4 - base64String.length % 4) % 4);
+  var base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  var rawData = window.atob(base64);
+  var outputArray = new Uint8Array(rawData.length);
+  for (var i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i);
+  }
+  return outputArray;
+}
+
+function isPushSupported(){
+  return 'serviceWorker' in navigator && 'PushManager' in window;
+}
+
+function enablePushNotifications(){
+  if(!isPushSupported()){
+    showToast('Push notifications aren\'t supported on this browser');
+    return;
+  }
+  if(!currentUser || !currentUser.email){
+    showToast('Please sign in first');
+    return;
+  }
+
+  Notification.requestPermission().then(function(permission){
+    if(permission !== 'granted'){
+      showToast('Notifications permission was not granted');
+      updateNotifSettingUI(false);
+      return;
+    }
+    navigator.serviceWorker.ready.then(function(reg){
+      return reg.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+      });
+    }).then(function(subscription){
+      var subJson = subscription.toJSON();
+      if(window.FB && typeof window.FB.saveMySubscription==='function'){
+        window.FB.saveMySubscription(currentUser.email, subJson).catch(function(err){
+          console.log('saveMySubscription failed:', err);
+        });
+      }
+      DB.set('push_enabled_'+currentUser.email, true);
+      showToast('Notifications enabled ✓');
+      updateNotifSettingUI(true);
+    }).catch(function(err){
+      console.log('Push subscribe failed:', err);
+      showToast('Could not enable notifications — try again');
+    });
+  });
+}
+
+function disablePushNotifications(){
+  if(!isPushSupported() || !currentUser || !currentUser.email) return;
+  navigator.serviceWorker.ready.then(function(reg){
+    return reg.pushManager.getSubscription();
+  }).then(function(subscription){
+    if(subscription) return subscription.unsubscribe();
+  }).then(function(){
+    if(window.FB && typeof window.FB.removeMySubscription==='function'){
+      window.FB.removeMySubscription(currentUser.email).catch(function(){});
+    }
+    DB.set('push_enabled_'+currentUser.email, false);
+    showToast('Notifications turned off');
+    updateNotifSettingUI(false);
+  }).catch(function(err){ console.log('Push unsubscribe failed:', err); });
+}
+
+function updateNotifSettingUI(enabled){
+  var toggle = document.getElementById('push-notif-toggle');
+  if(toggle) toggle.checked = !!enabled;
+}
+
+// Send a push to a specific member — call this from any admin-side trigger
+// point (tier changes, booking confirmed, etc). Looks up their subscription
+// in Firebase, then asks the serverless function to deliver it.
+function sendPushToMember(email, title, body, url){
+  if(!window.FB || typeof window.FB.getMemberSubscription!=='function') return;
+  window.FB.getMemberSubscription(email, function(subscription){
+    if(!subscription) return; // member never opted in — nothing to send
+    fetch('/api/send-push', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ subscription: subscription, title: title, body: body, url: url || '/' })
+    }).catch(function(err){ console.log('send-push request failed:', err); });
+  });
+}
+
 // Inject proper PWA manifest for Android home screen icon
 (function(){
   try {
