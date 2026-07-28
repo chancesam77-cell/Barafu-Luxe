@@ -4013,7 +4013,18 @@ function setMemberTier(email, newTier, silent){
       // Only push once the write is actually confirmed saved.
       if(typeof sendPushToMember==='function'){
         var tierLabel = newTier.charAt(0).toUpperCase()+newTier.slice(1);
-        sendPushToMember(email, 'Membership Updated', 'You are now a '+tierLabel+' member.', '/');
+        sendPushToMember(email, 'Membership Updated', 'You are now a '+tierLabel+' member.', '/', function(status){
+          if(silent) return; // bulk operations show their own combined summary
+          if(status==='sent'){
+            showToast('Notification sent ✓');
+          } else if(status==='not-subscribed'){
+            // Member hasn't turned notifications on — not an error, nothing to report
+          } else if(status==='expired'){
+            showToast('⚠ Push subscription expired for this member — they need to re-enable it');
+          } else {
+            showToast('⚠ Notification failed to send — check server logs');
+          }
+        });
       }
     }).catch(function(err){
       console.log('setMemberTier Firebase write failed:', err);
@@ -4318,14 +4329,23 @@ function enablePushNotifications(){
       });
     }).then(function(subscription){
       var subJson = subscription.toJSON();
-      if(window.FB && typeof window.FB.saveMySubscription==='function'){
-        window.FB.saveMySubscription(currentUser.email, subJson).catch(function(err){
-          console.log('saveMySubscription failed:', err);
-        });
+      if(!window.FB || typeof window.FB.saveMySubscription!=='function'){
+        showToast('⚠ Could not save — Firebase not connected');
+        updateNotifSettingUI(false);
+        return;
       }
-      DB.set('push_enabled_'+currentUser.email, true);
-      showToast('Notifications enabled ✓');
-      updateNotifSettingUI(true);
+      // This save is the whole point — if it fails, the subscription only
+      // exists on this device and nobody can ever actually send to it.
+      // Don't claim success until it's actually confirmed saved.
+      window.FB.saveMySubscription(currentUser.email, subJson).then(function(){
+        DB.set('push_enabled_'+currentUser.email, true);
+        showToast('Notifications enabled ✓');
+        updateNotifSettingUI(true);
+      }).catch(function(err){
+        console.log('saveMySubscription failed:', err);
+        showToast('⚠ Enabled on this device, but could not save — try again');
+        updateNotifSettingUI(false);
+      });
     }).catch(function(err){
       console.log('Push subscribe failed:', err);
       showToast('Could not enable notifications — try again');
@@ -4357,15 +4377,34 @@ function updateNotifSettingUI(enabled){
 // Send a push to a specific member — call this from any admin-side trigger
 // point (tier changes, booking confirmed, etc). Looks up their subscription
 // in Firebase, then asks the serverless function to deliver it.
-function sendPushToMember(email, title, body, url){
-  if(!window.FB || typeof window.FB.getMemberSubscription!=='function') return;
+// callback(status) receives: 'sent' | 'not-subscribed' | 'expired' | 'error'
+function sendPushToMember(email, title, body, url, callback){
+  callback = callback || function(){};
+  if(!window.FB || typeof window.FB.getMemberSubscription!=='function'){
+    callback('error');
+    return;
+  }
   window.FB.getMemberSubscription(email, function(subscription){
-    if(!subscription) return; // member never opted in — nothing to send
+    if(!subscription){ callback('not-subscribed'); return; } // member never opted in
     fetch('/api/send-push', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ subscription: subscription, title: title, body: body, url: url || '/' })
-    }).catch(function(err){ console.log('send-push request failed:', err); });
+    }).then(function(res){ return res.json(); })
+      .then(function(result){
+        if(result && result.ok){
+          callback('sent');
+        } else if(result && result.expired){
+          callback('expired');
+        } else {
+          console.log('send-push returned failure:', result);
+          callback('error');
+        }
+      })
+      .catch(function(err){
+        console.log('send-push request failed:', err);
+        callback('error');
+      });
   });
 }
 
