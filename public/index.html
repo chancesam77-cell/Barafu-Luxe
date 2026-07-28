@@ -367,6 +367,7 @@
 .gem-prop-card{padding:24px 0;border-bottom:0.5px solid rgba(255,255,255,0.05);cursor:pointer;}
 .gem-prop-card:last-child{border-bottom:none;}
 .gem-prop-inner{position:relative;}
+.verified-badge{display:inline-flex;align-items:center;gap:4px;font-size:8px;letter-spacing:0.14em;color:#7CB88A;text-transform:uppercase;border:0.5px solid rgba(124,184,138,0.35);background:rgba(124,184,138,0.06);padding:3px 10px;border-radius:10px;}
 .gem-new-badge{display:inline-block;font-size:8px;letter-spacing:0.2em;color:var(--gold);text-transform:uppercase;border:0.5px solid rgba(184,137,42,0.3);padding:3px 12px;border-radius:10px;margin-bottom:12px;}
 .gem-prop-num{font-family:Montserrat,Georgia,sans-serif;font-size:10px;letter-spacing:0.22em;color:rgba(184,137,42,0.3);margin-bottom:10px;}
 .gem-prop-icon{font-size:42px;margin-bottom:14px;line-height:1;}
@@ -1786,6 +1787,7 @@ function removeBookingFB(fbKey){
   <div class="plist"><div class="pli" id="profile-spa-access" onclick="openSpaWithTierCheck()" style="display:none;"><i class="ti ti-sparkles pli-ico" style="color:var(--gold);"></i><div><div class="pli-name">Spa & Wellness</div><div class="pli-sub">Peaberries · Siringit · Book treatment</div></div><i class="ti ti-chevron-right pli-arr"></i></div><div class="pli" id="profile-gems-access" onclick="openGemsWithTierCheck()" style="display:none;"><i class="ti ti-diamond pli-ico" style="color:var(--ocean-soft);"></i><div><div class="pli-name">Hidden Gems</div><div class="pli-sub">Exclusive stays · Members only</div></div><i class="ti ti-chevron-right pli-arr"></i></div>
     <div class="pli" onclick="openMyBookings()"><i class="ti ti-file-invoice pli-ico"></i><div><div class="pli-name">My Bookings</div><div class="pli-sub">View confirmed and pending</div></div><i class="ti ti-chevron-right pli-arr"></i></div>
     <div class="pli" onclick="openPaymentDetails()"><i class="ti ti-credit-card pli-ico"></i><div><div class="pli-name">Payment Details</div><div class="pli-sub">Bank · Airtel Money · M-Pesa</div></div><i class="ti ti-chevron-right pli-arr"></i></div>
+    <div class="pli" onclick="openTrustPolicies()"><i class="ti ti-shield-check pli-ico" style="color:#7CB88A;"></i><div><div class="pli-name">Trust & Policies</div><div class="pli-sub">Response times · Cancellations · Privacy</div></div><i class="ti ti-chevron-right pli-arr"></i></div>
     <div class="pli" onclick="window.open('https://wa.me/255692312366','_blank')"><i class="ti ti-brand-whatsapp pli-ico" style="color:#128C7E;"></i><div><div class="pli-name">WhatsApp Concierge</div><div class="pli-sub">+255 692 312 366 · Tap to open</div></div><i class="ti ti-external-link pli-arr"></i></div>
     <div class="pli" onclick="window.open('mailto:barafuluxe@gmail.com','_blank')"><i class="ti ti-mail pli-ico"></i><div><div class="pli-name">Email</div><div class="pli-sub">barafuluxe@gmail.com</div></div><i class="ti ti-external-link pli-arr"></i></div>
     <div class="pli" onclick="window.open('https://barafuluxe.com','_blank')"><i class="ti ti-world pli-ico"></i><div><div class="pli-name">Website</div><div class="pli-sub">barafuluxe.com</div></div><i class="ti ti-external-link pli-arr"></i></div>
@@ -2615,8 +2617,8 @@ var DISCOVER_FEED = [
 ];
 
 var DINING_VENUES = [
-  {id:'acl-grill',name:'The Grill Room',location:'Arusha Coffee Lodge · Elewana Collection',desc:'An intimate candlelit grill nestled within the coffee plantation. Contemporary African grill cuisine in one of Arusha\'s most celebrated settings.',cuisine:'Contemporary African Grill',dress:'Smart casual to formal',hours:'Lunch 12:00–15:00 · Dinner 19:00–22:30',note:'Full seasonal set menu — updated July 2026.',icon:'🍽️',hasMenu:true},
-  {id:'gran-melia-grill',name:'The Grill',location:'Gran Meliá Arusha',desc:'A signature steakhouse experience on the hotel\'s top floor, known for premium cuts and sweeping views toward Mount Meru.',cuisine:'Steakhouse · Premium Grill',dress:'Smart casual to formal',hours:'Dinner · hours confirmed at booking',note:'Full menu coming soon — reservations already available through your concierge.',icon:'🥩',hasMenu:false},
+  {id:'acl-grill',name:'The Grill Room',location:'Arusha Coffee Lodge · Elewana Collection',desc:'An intimate candlelit grill nestled within the coffee plantation. Contemporary African grill cuisine in one of Arusha\'s most celebrated settings.',cuisine:'Contemporary African Grill',dress:'Smart casual to formal',hours:'Lunch 12:00–15:00 · Dinner 19:00–22:30',note:'Full seasonal set menu — updated July 2026.',icon:'🍽️',hasMenu:true,verified:true},
+  {id:'gran-melia-grill',name:'The Grill',location:'Gran Meliá Arusha',desc:'A signature steakhouse experience on the hotel\'s top floor, known for premium cuts and sweeping views toward Mount Meru.',cuisine:'Steakhouse · Premium Grill',dress:'Smart casual to formal',hours:'Dinner · hours confirmed at booking',note:'Full menu coming soon — reservations already available through your concierge.',icon:'🥩',hasMenu:false,verified:true},
 ];
 
 // The Grill Room, Arusha Coffee Lodge — set menu, updated July 2026.
@@ -3785,12 +3787,45 @@ function copyMemberDetails(name,email,pass){
 
 
 function submitForm(service){
-  if(window.FB&&window.submitFormFB)window.submitFormFB(service,currentUser?currentUser.name:'Guest');
-  var bk=DB.get('bookings')||DEFAULT_BOOKINGS;
   var now=new Date();
   var t=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
-  bk.unshift({id:'b'+Date.now(),service,client:currentUser?currentUser.name:'Guest',detail:'App enquiry',price:'—',status:'pending',time:t});
+  var clientName = currentUser?currentUser.name:'Guest';
+  var clientEmail = currentUser?currentUser.email:'';
+
+  // Save to Firebase — the real, shared source of truth for bookings across
+  // every device, so admin sees it and the member's own "My Bookings" can
+  // reflect live status (pending → confirmed) once admin actions it.
+  if(window.FB && typeof window.FB.saveBooking==='function'){
+    try{
+      window.FB.saveBooking({
+        service: service,
+        client: clientName,
+        email: clientEmail,
+        detail: 'App enquiry',
+        price: '—',
+        status: 'pending',
+        time: t
+      });
+    }catch(e){ console.log('FB saveBooking failed:', e); }
+  }
+
+  // Local admin-device cache (instant paint, same as before)
+  var bk=DB.get('bookings')||DEFAULT_BOOKINGS;
+  bk.unshift({id:'b'+Date.now(),service,client:clientName,detail:'App enquiry',price:'—',status:'pending',time:t});
   DB.set('bookings',bk);
+
+  // Local per-user cache too, so My Bookings shows something instantly even
+  // before the Firebase round-trip completes.
+  if(clientEmail){
+    try{
+      var myKey = 'bookings_'+clientEmail;
+      var mine = JSON.parse(DB.get(myKey) || '[]');
+      mine.unshift({service: service, date: now.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}), amount:'', status:'pending'});
+      if(mine.length>50) mine = mine.slice(0,50);
+      DB.set(myKey, mine);
+    }catch(e){}
+  }
+
   document.getElementById('modal-body').innerHTML='<div class="success">     <div class="success-ico"><i class="ti ti-circle-check"></i></div>     <div class="success-h">Request received.</div>     <div class="success-p">Your '+(service)+' enquiry has been received. Your concierge will contact you within 2 hours via WhatsApp (+255 692 312 366).</div>     <a class="wa-btn" href="https://wa.me/255692312366?text=Booking:" target="_blank"><i class="ti ti-brand-whatsapp"></i>Open WhatsApp now</a>     <button class="gghst" onclick="document.getElementById(\'modal-bg\').classList.remove(\'open\')">Done</button>   </div>';
 }
 
@@ -4154,7 +4189,7 @@ var GEMS = [
    desc:'Six-suite private villa outside Arusha. Gateway to Kilimanjaro and the Northern Circuit. Healing Earth Spa, infinity pool, farm-to-table dining.',
    base:330,per:'per person/night',
    features:['6 luxury suites','Healing Earth Spa','Infinity pool','Farm-to-table dining','Kilimanjaro views'],
-   icon:'🏡',new:true,
+   icon:'🏡',new:true,verified:true,
    // Real photos supplied by Chance from Siringit's own site (contracted partner).
    // Ordered as a natural tour: exterior → living spaces → suites → grounds → dining.
    gallery:[
@@ -4851,7 +4886,7 @@ function renderSpaRetreats(){
       +'<div class="gem-prop-num">'+num+'</div>'
       +'<div class="gem-prop-icon">'+r.icon+'</div>'
       +'<div class="gem-prop-name">'+r.name+'</div>'
-      +'<div class="gem-prop-loc"><i class="ti ti-map-pin" style="font-size:11px;color:var(--gold);opacity:0.5;"></i>'+r.location+'</div>'
+      +'<div class="gem-prop-loc"><i class="ti ti-map-pin" style="font-size:11px;color:var(--gold);opacity:0.5;"></i>'+r.location+' &nbsp;<span class="verified-badge"><i class="ti ti-check"></i>Verified Partner</span></div>'
       +'<div class="gem-prop-desc">'+r.desc+'</div>'
       +'<div class="gem-prop-feats"><span class="gem-feat-tag">'+r.nights+' nights</span></div>'
       +'</div>';
@@ -5075,51 +5110,6 @@ function filterGems(btn,f){
   gemFilter=f;
   renderGems(f);
 }
-function renderGems(f){
-  var el=document.getElementById('gems-list');
-  if(!el) return;
-  var filtered=GEMS.filter(function(g){return f==='all'||g.type===f;});
-  if(!filtered.length){
-    el.innerHTML='<div class="info-box" style="margin:0 14px;">No properties for this filter.</div>';
-    return;
-  }
-  el.innerHTML='';
-  var _typesSeen={};var types=[];filtered.forEach(function(g){if(!_typesSeen[g.type]){_typesSeen[g.type]=true;types.push(g.type);}});;
-  types.forEach(function(type){
-    var lbl=document.createElement('div');
-    lbl.className='gem-section-lbl';
-    lbl.textContent=(gemTypeLabels[type]||type)+'s';
-    el.appendChild(lbl);
-    filtered.filter(function(g){return g.type===type;}).forEach(function(g){
-      var card=document.createElement('div');
-      card.className='gem-card';
-      card.dataset.gid=g.id;
-      card.onclick=function(){openGemDetail(this.dataset.gid);};
-      var badgesHtml='<span class="gem-badge type">'+(gemTypeLabels[g.type]||g.type)+'</span>'
-        +'<span class="gem-badge exclusive">Members only</span>'
-        +(g.new?'<span class="gem-badge new">New ✦</span>':'');
-      var featsHtml=g.features.slice(0,4).map(function(feat){return '<span class="gem-feature">'+feat+'</span>';}).join('');
-      card.innerHTML='<div class="gem-card-img">'
-        +'<div class="gem-card-img-icon">'+(g.icon||'🏡')+'</div>'
-        +'<div class="gem-card-img-overlay"></div>'
-        +'<div class="gem-card-img-badges">'+badgesHtml+'</div>'
-        +'</div>'
-        +'<div class="gem-card-body">'
-        +'<div class="gem-name">'+(g.name||'')+'</div>'
-        +'<div class="gem-location"><i class="ti ti-map-pin" style="font-size:11px;color:var(--ocean-soft);"></i>'+(g.location||'')+'</div>'
-        +'<div class="gem-desc">'+(g.desc||'')+'</div>'
-        +'<div class="gem-features">'+featsHtml+'</div>'
-        +'<div class="gem-bot">'
-        +'<div class="gem-price-block"><div class="gem-from">From</div>'+gemPriceLine(g.base,g.per)+'</div>'
-        +'<button class="gem-book-btn">Enquire</button>'
-        +'</div></div>';
-      var btn=card.querySelector('.gem-book-btn');
-      if(btn){btn.onclick=function(e){e.stopPropagation();openGemDetail(g.id);};}
-      el.appendChild(card);
-    });
-  });
-}
-// ════ HIDDEN GEMS PHOTO GALLERY ════
 function buildGemGalleryHtml(g){
   var imgs = (g.gallery && g.gallery.length) ? g.gallery : [];
   if(!imgs.length){
@@ -6207,7 +6197,7 @@ function renderDining(){
       +'<div class="gem-prop-num">'+num+'</div>'
       +'<div class="gem-prop-icon">'+v.icon+'</div>'
       +'<div class="gem-prop-name">'+v.name+'</div>'
-      +'<div class="gem-prop-loc"><i class="ti ti-map-pin" style="font-size:11px;color:var(--gold);opacity:0.5;"></i>'+v.location+'</div>'
+      +'<div class="gem-prop-loc"><i class="ti ti-map-pin" style="font-size:11px;color:var(--gold);opacity:0.5;"></i>'+v.location+(v.verified?' &nbsp;<span class="verified-badge"><i class="ti ti-check"></i>Verified Partner</span>':'')+'</div>'
       +'<div class="gem-prop-desc">'+v.desc+'</div>'
       +'<div class="gem-prop-feats"><span class="gem-feat-tag">'+v.cuisine+'</span><span class="gem-feat-tag">'+v.hours+'</span></div>'
       +'</div>';
@@ -6765,105 +6755,6 @@ function openProfileSettings(){
   document.getElementById('modal-bg').classList.add('open');
 }
 
-function openPaymentDetails(){
-  document.getElementById('modal-ttl').textContent = 'Payment & Billing';
-  var el = document.getElementById('modal-body');
-  el.innerHTML = '';
-  var f = document.createElement('div');
-  f.className = 'fwrap';
-
-  f.innerHTML =
-    '<div style="background:rgba(184,137,42,0.06);border:0.5px solid rgba(184,137,42,0.2);border-radius:2px;padding:12px 14px;margin-bottom:14px;">'
-    +'<div style="font-size:9px;letter-spacing:0.16em;color:var(--gold);text-transform:uppercase;margin-bottom:4px;">Payment policy</div>'
-    +'<div style="font-size:10px;color:var(--mt);line-height:1.8;">All service fees are invoiced per booking. Accepted: bank transfer, Airtel Money, M-Pesa, and international card via concierge. Deposits may be required for high-value bookings.</div>'
-    +'</div>'
-    +'<div class="fgrp"><label class="flbl">Preferred payment method</label>'
-    +'<select class="fsel" id="pay-method">'
-    +'<option>Bank Transfer (TZS)</option>'
-    +'<option>Bank Transfer (USD)</option>'
-    +'<option>Airtel Money</option>'
-    +'<option>M-Pesa</option>'
-    +'<option>Credit card via concierge</option>'
-    +'</select></div>'
-    +'<div class="fgrp"><label class="flbl">Billing name</label>'
-    +'<input class="finp" id="pay-name" placeholder="Full name or company"></div>'
-    +'<div class="fgrp"><label class="flbl">Billing email</label>'
-    +'<input class="finp" id="pay-email" placeholder="email@example.com"></div>'
-    +'<div style="font-size:10px;color:var(--mt);line-height:1.8;margin-bottom:14px;">Bank details and payment instructions are provided at time of booking. Your concierge handles all payment coordination.</div>';
-
-  var btn = document.createElement('button');
-  btn.className = 'gbtn';
-  btn.textContent = 'Save payment preferences';
-  btn.onclick = function(){
-    var method = document.getElementById('pay-method').value;
-    var name = document.getElementById('pay-name').value;
-    if(currentUser){
-      currentUser.payMethod = method;
-      currentUser.payName = name;
-      DB.set('user_'+currentUser.email, JSON.stringify(currentUser));
-      showToast('Payment preferences saved ✓');
-      document.getElementById('modal-bg').classList.remove('open');
-    }
-  };
-  f.appendChild(btn);
-
-  var wa = document.createElement('a');
-  wa.className = 'wa-btn';
-  wa.href = 'https://wa.me/255692312366?text=Payment+enquiry';
-  wa.target = '_blank';
-  wa.innerHTML = '<i class="ti ti-brand-whatsapp"></i>Billing enquiry via concierge';
-  f.appendChild(wa);
-
-  el.appendChild(f);
-  document.getElementById('modal-bg').classList.add('open');
-}
-
-function openMyBookings(){
-  document.getElementById('modal-ttl').textContent = 'My Bookings';
-  var el = document.getElementById('modal-body');
-  el.innerHTML = '';
-  var f = document.createElement('div');
-  f.className = 'fwrap';
-
-  // Load bookings from localStorage
-  var bookings = [];
-  try{ bookings = JSON.parse(DB.get('bookings_'+(currentUser?currentUser.email:'')) || '[]'); }catch(e){}
-
-  if(!bookings.length){
-    f.innerHTML =
-      '<div style="text-align:center;padding:20px 0;">'
-      +'<div style="font-size:36px;margin-bottom:10px;">📋</div>'
-      +'<div style="font-family:Cormorant Garamond,serif;font-size:18px;color:var(--ow);margin-bottom:6px;">No bookings yet</div>'
-      +'<div style="font-size:11px;color:var(--mt);line-height:1.8;">Your confirmed bookings and service requests will appear here after your concierge confirms them.</div>'
-      +'</div>'
-      +'<div style="background:rgba(184,137,42,0.04);border:0.5px solid rgba(184,137,42,0.15);padding:12px 14px;border-radius:2px;font-size:10px;color:var(--mt);line-height:1.8;">'
-      +'All bookings are managed personally by your Barafu Luxe concierge. You will receive WhatsApp confirmation for every service.</div>';
-  } else {
-    var html = '';
-    bookings.forEach(function(b){
-      var statusColor = b.status==='confirmed' ? '#4CAF50' : b.status==='pending' ? '#FF9800' : 'var(--mt)';
-      html += '<div style="background:var(--card);border:0.5px solid var(--bd);border-radius:2px;padding:12px 14px;margin-bottom:8px;">'
-        +'<div style="display:flex;justify-content:space-between;align-items:flex-start;">'
-        +'<div style="font-size:13px;color:var(--ow);font-family:Cormorant Garamond,serif;">'+(b.service||'Service')+'</div>'
-        +'<span style="font-size:9px;color:'+statusColor+';letter-spacing:0.1em;text-transform:uppercase;">'+(b.status||'pending')+'</span>'
-        +'</div>'
-        +'<div style="font-size:10px;color:var(--mt);margin-top:4px;">'+(b.date||'')+(b.amount?' · '+b.amount:'')+'</div>'
-        +'</div>';
-    });
-    f.innerHTML = html;
-  }
-
-  var wa = document.createElement('a');
-  wa.className = 'wa-btn';
-  wa.href = 'https://wa.me/255692312366?text=Booking+enquiry';
-  wa.target = '_blank';
-  wa.innerHTML = '<i class="ti ti-brand-whatsapp"></i>Contact concierge about a booking';
-  f.appendChild(wa);
-
-  el.appendChild(f);
-  document.getElementById('modal-bg').classList.add('open');
-}
-
 function openUpgradeTier(){
   var tier = currentUser ? currentUser.tier : 'silver';
   if(tier === 'obsidian'){
@@ -7077,6 +6968,42 @@ function openProfileSettings(){
   document.getElementById('modal-bg').classList.add('open');
 }
 
+function openTrustPolicies(){
+  document.getElementById('modal-ttl').textContent = 'Trust & Policies';
+  var el = document.getElementById('modal-body');
+  el.innerHTML = '';
+  var f = document.createElement('div');
+  f.className = 'fwrap';
+
+  f.innerHTML =
+    '<div style="font-size:9px;letter-spacing:0.2em;color:var(--gold);text-transform:uppercase;margin-bottom:10px;">Response time</div>'
+    +'<div class="info-box" style="margin:0 0 18px;">'
+    +'Every request is personally reviewed — not automated. Booking enquiries from members typically receive a WhatsApp reply within <b style="color:var(--ow);">2 hours</b> during business hours (08:00–20:00 EAT). New membership requests (Request Access) are reviewed within <b style="color:var(--ow);">24 hours</b>. Outside business hours, expect a response first thing the next morning.'
+    +'</div>'
+
+    +'<div style="font-size:9px;letter-spacing:0.2em;color:var(--gold);text-transform:uppercase;margin-bottom:10px;">Cancellations & refunds</div>'
+    +'<div class="info-box" style="margin:0 0 18px;">'
+    +'Cancellation terms vary by service and by partner property, since each villa, charter, and restaurant sets its own policy. Your concierge will confirm the specific cancellation window and any deposit terms in writing before you pay for a booking — never after.'
+    +'</div>'
+
+    +'<div style="font-size:9px;letter-spacing:0.2em;color:var(--gold);text-transform:uppercase;margin-bottom:10px;">Your privacy</div>'
+    +'<div class="info-box" style="margin:0 0 18px;">'
+    +'Your name, contact details, and booking information are used only to arrange and confirm your requests. They are shared only with the specific partner needed to fulfil a booking — never sold, and never shared for marketing. Payment details are never stored in this app; every payment is arranged directly and privately over WhatsApp.'
+    +'</div>'
+
+    +'<div style="font-size:10px;color:var(--mt);line-height:1.8;margin-bottom:14px;">Questions about a specific booking or policy? Your concierge can clarify anything before you commit.</div>';
+
+  var wa = document.createElement('a');
+  wa.className = 'wa-btn';
+  wa.href = 'https://wa.me/255692312366?text=I+have+a+question+about+your+policies';
+  wa.target = '_blank';
+  wa.innerHTML = '<i class="ti ti-brand-whatsapp"></i>Ask your concierge';
+  f.appendChild(wa);
+
+  el.appendChild(f);
+  document.getElementById('modal-bg').classList.add('open');
+}
+
 function openPaymentDetails(){
   document.getElementById('modal-ttl').textContent = 'Payment & Billing';
   var el = document.getElementById('modal-body');
@@ -7130,40 +7057,39 @@ function openPaymentDetails(){
   document.getElementById('modal-bg').classList.add('open');
 }
 
+function renderMyBookingsList(bookings){
+  var el = document.getElementById('mb-list-body');
+  if(!el) return;
+  if(!bookings || !bookings.length){
+    el.innerHTML =
+      '<div style="text-align:center;padding:20px 0;">'
+      +'<div style="font-size:36px;margin-bottom:10px;">📋</div>'
+      +'<div style="font-family:Cormorant Garamond,serif;font-size:18px;color:var(--ow);margin-bottom:6px;">No bookings yet</div>'
+      +'<div style="font-size:11px;color:var(--mt);line-height:1.8;">Your confirmed bookings and service requests will appear here after your concierge confirms them.</div>'
+      +'</div>';
+    return;
+  }
+  var html = '';
+  bookings.forEach(function(b){
+    var statusColor = b.status==='confirmed' ? '#4CAF50' : b.status==='pending' ? '#FF9800' : 'var(--mt)';
+    html += '<div style="background:var(--card);border:0.5px solid var(--bd);border-radius:2px;padding:12px 14px;margin-bottom:8px;">'
+      +'<div style="display:flex;justify-content:space-between;align-items:flex-start;">'
+      +'<div style="font-size:13px;color:var(--ow);font-family:Cormorant Garamond,serif;">'+(b.service||'Service')+'</div>'
+      +'<span style="font-size:9px;color:'+statusColor+';letter-spacing:0.1em;text-transform:uppercase;">'+(b.status||'pending')+'</span>'
+      +'</div>'
+      +'<div style="font-size:10px;color:var(--mt);margin-top:4px;">'+(b.date||b.time||'')+(b.price&&b.price!=='—'?' · '+b.price:'')+'</div>'
+      +'</div>';
+  });
+  el.innerHTML = html;
+}
+
 function openMyBookings(){
   document.getElementById('modal-ttl').textContent = 'My Bookings';
   var el = document.getElementById('modal-body');
   el.innerHTML = '';
   var f = document.createElement('div');
   f.className = 'fwrap';
-
-  // Load bookings from localStorage
-  var bookings = [];
-  try{ bookings = JSON.parse(DB.get('bookings_'+(currentUser?currentUser.email:'')) || '[]'); }catch(e){}
-
-  if(!bookings.length){
-    f.innerHTML =
-      '<div style="text-align:center;padding:20px 0;">'
-      +'<div style="font-size:36px;margin-bottom:10px;">📋</div>'
-      +'<div style="font-family:Cormorant Garamond,serif;font-size:18px;color:var(--ow);margin-bottom:6px;">No bookings yet</div>'
-      +'<div style="font-size:11px;color:var(--mt);line-height:1.8;">Your confirmed bookings and service requests will appear here after your concierge confirms them.</div>'
-      +'</div>'
-      +'<div style="background:rgba(184,137,42,0.04);border:0.5px solid rgba(184,137,42,0.15);padding:12px 14px;border-radius:2px;font-size:10px;color:var(--mt);line-height:1.8;">'
-      +'All bookings are managed personally by your Barafu Luxe concierge. You will receive WhatsApp confirmation for every service.</div>';
-  } else {
-    var html = '';
-    bookings.forEach(function(b){
-      var statusColor = b.status==='confirmed' ? '#4CAF50' : b.status==='pending' ? '#FF9800' : 'var(--mt)';
-      html += '<div style="background:var(--card);border:0.5px solid var(--bd);border-radius:2px;padding:12px 14px;margin-bottom:8px;">'
-        +'<div style="display:flex;justify-content:space-between;align-items:flex-start;">'
-        +'<div style="font-size:13px;color:var(--ow);font-family:Cormorant Garamond,serif;">'+(b.service||'Service')+'</div>'
-        +'<span style="font-size:9px;color:'+statusColor+';letter-spacing:0.1em;text-transform:uppercase;">'+(b.status||'pending')+'</span>'
-        +'</div>'
-        +'<div style="font-size:10px;color:var(--mt);margin-top:4px;">'+(b.date||'')+(b.amount?' · '+b.amount:'')+'</div>'
-        +'</div>';
-    });
-    f.innerHTML = html;
-  }
+  f.innerHTML = '<div id="mb-list-body"><div style="font-size:11px;color:var(--mt);padding:10px 0;">Loading...</div></div>';
 
   var wa = document.createElement('a');
   wa.className = 'wa-btn';
@@ -7174,6 +7100,24 @@ function openMyBookings(){
 
   el.appendChild(f);
   document.getElementById('modal-bg').classList.add('open');
+
+  // Paint instantly from local cache while Firebase loads
+  var localCache = [];
+  if(currentUser && currentUser.email){
+    try{ localCache = JSON.parse(DB.get('bookings_'+currentUser.email) || '[]'); }catch(e){}
+  }
+  renderMyBookingsList(localCache);
+
+  // Then refresh with the live, shared Firebase list — this is what actually
+  // reflects status changes (e.g. once a concierge marks something confirmed)
+  if(window.FB && typeof window.FB.listenBookings==='function' && currentUser && currentUser.email){
+    window.FB.listenBookings(function(allBookings){
+      var mine = allBookings.filter(function(b){
+        return b.email === currentUser.email || (!b.email && b.client === currentUser.name);
+      });
+      if(mine.length) renderMyBookingsList(mine);
+    });
+  }
 }
 
 function openUpgradeTier(){
@@ -7761,69 +7705,6 @@ function filterGemsTab(type, btn){
   renderGems(type);
 }
 
-function renderGems(filter){
-  var el = document.getElementById('gems-list');
-  if(!el) return;
-
-  var filtered = (GEMS||[]).filter(function(g){
-    return !filter || filter==='all' || g.type===filter;
-  });
-
-  el.innerHTML = '';
-
-  if(!filtered.length){
-    el.innerHTML='<div style="text-align:center;padding:40px 0;">'
-      +'<div style="font-size:32px;margin-bottom:12px;">🗝️</div>'
-      +'<div style="font-family:Cormorant Garamond,serif;font-size:18px;color:var(--ow);margin-bottom:6px;">No properties yet</div>'
-      +'<div style="font-size:11px;color:var(--mt);line-height:1.8;">New gems are added regularly. Contact your concierge to request access to a specific property.</div>'
-      +'</div>';
-    return;
-  }
-
-  filtered.forEach(function(g, i){
-    var card = document.createElement('div');
-    card.className = 'gem-prop-card';
-    card.dataset.gid = g.id;
-
-    var num = String(i+1).padStart(2,'0');
-    var priceFrom = g.seasons && g.seasons.low ? g.seasons.low.bb
-      : g.seasons && g.seasons.mid ? g.seasons.mid.bb
-      : g.base || 0;
-    var perLabel = g.per || 'per person / night';
-
-    var featsHtml = (g.features||[]).slice(0,5).map(function(f){
-      return '<span class="gem-feat-tag">'+f+'</span>';
-    }).join('');
-
-    card.innerHTML =
-      '<div class="gem-prop-inner">'
-      +(g.new ? '<div class="gem-new-badge">New ✦</div>' : '')
-      +'<div class="gem-prop-num">'+num+'</div>'
-      +'<div class="gem-prop-icon">'+(g.icon||'🏡')+'</div>'
-      +'<div class="gem-prop-name">'+(g.name||'')+'</div>'
-      +'<div class="gem-prop-loc"><i class="ti ti-map-pin" style="font-size:11px;color:var(--gold);opacity:0.5;"></i>'+(g.location||'')+'</div>'
-      +'<div class="gem-prop-desc">'+(g.desc||'')+'</div>'
-      +'<div class="gem-prop-feats">'+featsHtml+'</div>'
-      +'<div class="gem-prop-bottom">'
-      +'<div>'
-      +'<div class="gem-prop-from">From</div>'
-      +'<div class="gem-prop-price">$'+priceFrom+'</div>'
-      +'<div class="gem-prop-per">'+perLabel+'</div>'
-      +'</div>'
-      +'<button class="gem-enquire-btn">View rates</button>'
-      +'</div>'
-      +'</div>';
-
-    var btn = card.querySelector('.gem-enquire-btn');
-    if(btn) btn.onclick = function(e){ e.stopPropagation(); openGemDetail(g.id); };
-    card.onclick = function(){ openGemDetail(this.dataset.gid); };
-    el.appendChild(card);
-  });
-}
-
-
-
-
 function sendToTelegram(memberName, memberTier, memberEmail, message){
   var tierLabel = memberTier==='obsidian'?'OBSIDIAN':memberTier==='gold'?'GOLD':'SILVER';
   var text = 'NEW CONCIERGE MESSAGE'
@@ -7941,7 +7822,7 @@ function renderGems(filter){
       +'<div class="gem-prop-num">'+num+'</div>'
       +'<div class="gem-prop-icon">'+(g.icon||'🏡')+'</div>'
       +'<div class="gem-prop-name">'+(g.name||'')+'</div>'
-      +'<div class="gem-prop-loc"><i class="ti ti-map-pin" style="font-size:11px;color:var(--gold);opacity:0.5;"></i>'+(g.location||'')+'</div>'
+      +'<div class="gem-prop-loc"><i class="ti ti-map-pin" style="font-size:11px;color:var(--gold);opacity:0.5;"></i>'+(g.location||'')+(g.verified?' &nbsp;<span class="verified-badge"><i class="ti ti-check"></i>Verified Partner</span>':'')+'</div>'
       +'<div class="gem-prop-desc">'+(g.desc||'')+'</div>'
       +'<div class="gem-prop-feats">'+featsHtml+'</div>'
       +'<div class="gem-prop-bottom">'
