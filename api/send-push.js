@@ -14,9 +14,13 @@ module.exports = async function(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Use POST' });
 
   try {
-    const VAPID_PUBLIC_KEY = process.env.VAPID_PUBLIC_KEY;
-    const VAPID_PRIVATE_KEY = process.env.VAPID_PRIVATE_KEY;
-    const VAPID_SUBJECT = process.env.VAPID_SUBJECT || 'mailto:concierge@barafuluxe.com';
+    // .trim() guards against stray whitespace or a trailing newline that can
+    // sneak in when pasting a key into Vercel's environment variable field —
+    // web-push validates the key format strictly and will reject it outright
+    // if there's so much as an extra space or line break at the end.
+    const VAPID_PUBLIC_KEY = (process.env.VAPID_PUBLIC_KEY || '').trim();
+    const VAPID_PRIVATE_KEY = (process.env.VAPID_PRIVATE_KEY || '').trim();
+    const VAPID_SUBJECT = (process.env.VAPID_SUBJECT || 'mailto:concierge@barafuluxe.com').trim();
 
     if (!VAPID_PUBLIC_KEY || !VAPID_PRIVATE_KEY) {
       return res.status(500).json({ error: 'VAPID keys not configured on server' });
