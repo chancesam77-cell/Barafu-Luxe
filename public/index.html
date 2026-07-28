@@ -4013,7 +4013,7 @@ function setMemberTier(email, newTier, silent){
       // Only push once the write is actually confirmed saved.
       if(typeof sendPushToMember==='function'){
         var tierLabel = newTier.charAt(0).toUpperCase()+newTier.slice(1);
-        sendPushToMember(email, 'Membership Updated', 'You are now a '+tierLabel+' member.', '/', function(status){
+        sendPushToMember(email, 'Membership Updated', 'You are now a '+tierLabel+' member.', '/', function(status, detail){
           if(silent) return; // bulk operations show their own combined summary
           if(status==='sent'){
             showToast('Notification sent ✓');
@@ -4022,7 +4022,7 @@ function setMemberTier(email, newTier, silent){
           } else if(status==='expired'){
             showToast('⚠ Push subscription expired for this member — they need to re-enable it');
           } else {
-            showToast('⚠ Notification failed to send — check server logs');
+            showToast('⚠ Push failed: ' + (detail || 'unknown error'));
           }
         });
       }
@@ -4381,7 +4381,7 @@ function updateNotifSettingUI(enabled){
 function sendPushToMember(email, title, body, url, callback){
   callback = callback || function(){};
   if(!window.FB || typeof window.FB.getMemberSubscription!=='function'){
-    callback('error');
+    callback('error', 'Firebase not connected');
     return;
   }
   window.FB.getMemberSubscription(email, function(subscription){
@@ -4397,13 +4397,14 @@ function sendPushToMember(email, title, body, url, callback){
         } else if(result && result.expired){
           callback('expired');
         } else {
+          var detail = (result && (result.error || result.message)) || 'Unknown server error';
           console.log('send-push returned failure:', result);
-          callback('error');
+          callback('error', detail);
         }
       })
       .catch(function(err){
         console.log('send-push request failed:', err);
-        callback('error');
+        callback('error', (err && err.message) || 'Network request failed');
       });
   });
 }
