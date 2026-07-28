@@ -1350,6 +1350,18 @@ function removeBookingFB(fbKey){
     </div>
     <div class="admin-section">
       <div class="admin-sec-title">All members</div>
+      <div id="adm-bulk-bar" style="display:none;align-items:center;gap:8px;flex-wrap:wrap;background:rgba(184,137,42,0.06);border:0.5px solid rgba(184,137,42,0.2);padding:10px 12px;border-radius:2px;margin-bottom:10px;">
+        <span id="adm-bulk-count" style="font-size:10px;color:var(--mt);white-space:nowrap;">0 selected</span>
+        <select class="admin-inp" id="adm-bulk-tier" style="width:auto;margin-bottom:0;flex:1;min-width:90px;">
+          <option value="silver">Silver</option>
+          <option value="gold">Gold</option>
+          <option value="obsidian">Obsidian</option>
+        </select>
+        <button class="ab-btn confirm" onclick="applyBulkTier()">Apply to Selected</button>
+      </div>
+      <label style="display:flex;align-items:center;gap:8px;font-size:10px;color:var(--mt);margin-bottom:10px;cursor:pointer;">
+        <input type="checkbox" id="adm-select-all" onchange="toggleSelectAllMembers(this.checked)"> Select all members
+      </label>
       <div id="adm-members-list"></div>
     </div>
 
@@ -1476,7 +1488,7 @@ function removeBookingFB(fbKey){
   <div class="sec"><div class="slbl">Quick request</div></div>
   <div class="qgrid">
     <div class="qc" onclick="go('s-transfers')"><span class="qc-ico" style="color:var(--gold)"><i class="ti ti-car"></i></span><div class="qc-name">Transfer</div><div class="qc-sub">From $60</div></div>
-    <div class="qc" onclick="go('s-heli')"><span class="qc-ico" style="color:var(--gold)"><i class="ti ti-helicopter"></i></span><div class="qc-name">Helicopter</div><div class="qc-sub">From $9,500</div></div>
+    <div class="qc" onclick="go('s-heli')"><span class="qc-ico" style="color:var(--gold)"><i class="ti ti-helicopter"></i></span><div class="qc-name">Helicopter</div><div class="qc-sub">From $8,930</div></div>
     <div class="qc" onclick="go('s-yacht')"><span class="qc-ico" style="color:var(--ocean-soft)"><i class="ti ti-sailboat"></i></span><div class="qc-name">Yacht</div><div class="qc-sub">From $2,000</div></div>
     <div class="qc" onclick="go('s-f1')"><span class="qc-ico" style="color:var(--red)"><i class="ti ti-steering-wheel"></i></span><div class="qc-name">F1 Hospitality</div><div class="qc-sub">14 races</div></div>
     <div class="qc" onclick="go('s-events')"><span class="qc-ico" style="color:#9C27B0"><i class="ti ti-calendar-event"></i></span><div class="qc-name">Events</div><div class="qc-sub">Galas & more</div></div>
@@ -1620,6 +1632,14 @@ function removeBookingFB(fbKey){
     <span class="tb-title">Helicopter</span>
     <div style="width:32px"></div>
   </div>
+
+  <div class="luxury-tabs" style="margin:14px 14px 0;">
+    <button class="luxury-tab active" id="heli-mode-meru" onclick="switchHeliMode('meru')">Mt. Meru</button>
+    <button class="luxury-tab" id="heli-mode-znz" onclick="switchHeliMode('znz')">Zanzibar &amp; Pemba</button>
+  </div>
+
+  <div id="heli-meru-mode">
+
   <div class="sec"><div class="slbl">Signature packages · 2025/2026</div></div>
   <div class="helicard star">
     <div class="hc-stamp">Most exclusive ✦</div>
@@ -1630,9 +1650,9 @@ function removeBookingFB(fbKey){
   </div>
   <div class="helicard">
     <div class="hc-vname">The Summit <em>Picnic</em></div>
-    <div class="hc-vdesc">Breakfast at 12,500 ft on Kilimanjaro's Shira Plateau. Alpine wildflowers, giant groundsels, and silence above the clouds.</div>
-    <ul class="hc-inc"><li>Tropic Base departure · Arusha</li><li>Shira Plateau landing · 12,500 ft</li><li>Curated mountain breakfast · 4–5 hrs total</li><li>Champagne & Caviar upgrades available</li></ul>
-    <div class="hc-bot"><div><div class="hc-pr">$9,500</div><div class="hc-prnote">from · per flight · Picnic +$54/pp</div></div><button class="hc-cta" onclick="openHeliBook()">Enquire</button></div>
+    <div class="hc-vdesc">A scenic flight over Mount Meru's ancient afromontane forest, landing at the Ash Cone summit — 12,000 ft, with views across the caldera to Kilimanjaro.</div>
+    <ul class="hc-inc"><li>Tropic Base departure · Arusha</li><li>Ash Cone summit landing · 12,000 ft</li><li>2.0 hrs flight · 3–4 hrs total experience</li><li>TANAPA park fees included in rate</li></ul>
+    <div class="hc-bot"><div><div class="hc-pr">$8,930</div><div class="hc-prnote">from · per flight · Picnic +$55/pp</div></div><button class="hc-cta" onclick="openHeliBook()">Enquire</button></div>
   </div>
   <div class="helicard">
     <div class="hc-vname">The <em>Caviar</em> Flight</div>
@@ -1641,13 +1661,64 @@ function removeBookingFB(fbKey){
     <div class="hc-bot"><div><div class="hc-pr">Custom</div><div class="hc-prnote">White-glove add-on</div></div><button class="hc-cta" onclick="openModal('Caviar Flight','custom')">Enquire</button></div>
   </div>
   <div class="sec" style="padding-top:4px;"><div class="slbl">Sundowner add-on</div></div>
-  <div class="info-box">Golden hour flight available on any route — +$34 per person (base $25 + 35% margin). Private bar setup at altitude or lakeside.</div>
+  <div class="info-box">Golden hour flight, landing at Rhino Point for sunset over the Great Rift Valley — +$35 per person. Available on any afternoon route.</div>
+  <div class="sec" style="padding-top:4px;"><div class="slbl">Last-minute rates</div></div>
+  <div class="info-box">Afternoon slots sometimes open at reduced rates, confirmed 24 hours in advance — from $5,015 (Tropic Base) subject to availability. Ask your concierge to check.</div>
   <div class="sec" style="padding-top:4px;"><div class="slbl">Departure points & pricing</div></div>
-  <div class="rc"><div class="rc-head" onclick="tr(this)"><div><div class="rc-name">Tropic Base, Dolly — Arusha</div><div class="rc-tzs">Recommended departure</div></div><div class="rc-price">$9,500</div></div><div class="rc-body"><div class="rc-line"><i class="ti ti-info-circle"></i>Earliest available slot · Best value departure</div><button class="gbtn" style="margin-top:10px;" onclick="openHeliBook('Tropic Base','$9,500')">Book from Tropic Base</button></div></div>
-  <div class="rc"><div class="rc-head" onclick="tr(this)"><div><div class="rc-name">Arusha Area pickup</div><div class="rc-tzs">Hotel or villa collection</div></div><div class="rc-price">$11,600</div></div><div class="rc-body"><button class="gbtn" style="margin-top:10px;" onclick="openHeliBook('Arusha Area','$11,600')">Book Arusha pickup</button></div></div>
-  <div class="rc"><div class="rc-head" onclick="tr(this)"><div><div class="rc-name">Kilimanjaro Intl Airport (JRO)</div><div class="rc-tzs">Direct from arrival</div></div><div class="rc-price">$9,900</div></div><div class="rc-body"><button class="gbtn" style="margin-top:10px;" onclick="openHeliBook('JRO Airport','$9,900')">Book from JRO</button></div></div>
-  <div class="rc"><div class="rc-head" onclick="tr(this)"><div><div class="rc-name">Moshi Airport</div><div class="rc-tzs">Mt. Meru add-on +$1,000</div></div><div class="rc-price">$9,600</div></div><div class="rc-body"><button class="gbtn" style="margin-top:10px;" onclick="openHeliBook('Moshi Airport','$9,600')">Book from Moshi</button></div></div>
+  <div class="rc"><div class="rc-head" onclick="tr(this)"><div><div class="rc-name">Tropic Base, Dolly — Arusha</div><div class="rc-tzs">Recommended departure</div></div><div class="rc-price">$8,930</div></div><div class="rc-body"><div class="rc-line"><i class="ti ti-info-circle"></i>Earliest available slot · Best value departure</div><button class="gbtn" style="margin-top:10px;" onclick="openHeliBook('Tropic Base','$8,930')">Book from Tropic Base</button></div></div>
+  <div class="rc"><div class="rc-head" onclick="tr(this)"><div><div class="rc-name">Arusha Area pickup</div><div class="rc-tzs">Hotel or villa collection</div></div><div class="rc-price">$9,065</div></div><div class="rc-body"><button class="gbtn" style="margin-top:10px;" onclick="openHeliBook('Arusha Area','$9,065')">Book Arusha pickup</button></div></div>
+  <div class="rc"><div class="rc-head" onclick="tr(this)"><div><div class="rc-name">Kilimanjaro Intl Airport (JRO)</div><div class="rc-tzs">Direct from arrival</div></div><div class="rc-price">$9,255</div></div><div class="rc-body"><button class="gbtn" style="margin-top:10px;" onclick="openHeliBook('JRO Airport','$9,255')">Book from JRO</button></div></div>
+  <div class="rc"><div class="rc-head" onclick="tr(this)"><div><div class="rc-name">Legendary Lodge pickup</div><div class="rc-tzs">Custom quote — ask concierge</div></div><div class="rc-price">POA</div></div><div class="rc-body"><button class="gbtn" style="margin-top:10px;" onclick="openHeliBook('Legendary Lodge','Custom quote')">Enquire — Legendary Lodge</button></div></div>
   <div style="padding:14px;"><button class="gbtn" onclick="go('s-concierge')">Speak to concierge about helicopter</button></div>
+
+  </div>
+
+  <!-- ZANZIBAR & PEMBA TRANSFERS -->
+  <div id="heli-znz-mode" style="display:none;">
+    <div class="gem-hero-wrap">
+      <div class="luxury-hero-eyebrow">Tropic Helicopters · First Licensed Operator on Zanzibar</div>
+      <div class="luxury-hero-title">Skip the Road.<br><em>Fly to Your Resort.</em></div>
+      <div class="luxury-hero-sub">Direct helicopter transfers between Zanzibar Airport and leading resorts across Zanzibar & Pemba — no ferry queues, no long transfers by road.</div>
+      <div class="luxury-hero-rule"></div>
+    </div>
+
+    <div class="info-box" style="margin:0 14px 14px;">
+      <b style="color:var(--ow);">Two fleet periods, different rates</b><br>
+      Jan–May 2026: Airbus H130 / H125 (5–6 passengers). Jun–Dec 2026: Airbus H120 (4 passengers), lower rates. Prices below are <b style="color:var(--ow);">per helicopter</b>, not per person.
+    </div>
+
+    <div style="padding:0 14px;display:grid;gap:0;" id="heli-znz-zones"></div>
+
+    <div class="info-box" style="margin:14px 14px;">
+      <b style="color:var(--ow);">Landing fees (not included above)</b><br>
+      $40 per person at Zanzibar · $65 per person at Dar es Salaam Airport
+    </div>
+    <div class="info-box" style="margin:0 14px 14px;">
+      <b style="color:var(--ow);">Luggage</b><br>
+      15kg per person, soft-sided bags only — hard cases and wheeled luggage aren't suitable for the helicopter compartment. Additional luggage can be transferred separately for a fee.
+    </div>
+
+    <div style="margin:0 14px 24px;">
+      <div class="fwrap" style="padding:0;">
+        <div class="fgrp"><label class="flbl">Your name</label><input class="finp" id="hz-name" placeholder="Full name"></div>
+        <div class="fgrp"><label class="flbl">Destination</label><select class="fsel" id="hz-zone">
+          <option value="Zone 1 (Kiwengwa/Pongwe/Uora/Bawe/Melia/Sea Cliff/Ycona/Tulia)">Zone 1 — Kiwengwa, Pongwe, Uora, Bawe, Melia, Sea Cliff, Ycona, Tulia</option>
+          <option value="Zone 2 (Qambani/Pingwe/Dongwe/Matemwe/Kijambani)">Zone 2 — Qambani, Pingwe, Dongwe, Matemwe, Kijambani</option>
+          <option value="Zone 3 (Paje/Jambiani/Nungwi/Kendwa/Kilindi/Residence/White Sand)">Zone 3 — Paje, Jambiani, Nungwi, Kendwa, Kilindi, The Residence, White Sand</option>
+          <option value="Pemba - Fundu Lagoon">Pemba — Fundu Lagoon</option>
+          <option value="Pemba - Aiyana Resort & Spa">Pemba — Aiyana Resort & Spa</option>
+          <option value="Pemba - The Manta Resort">Pemba — The Manta Resort</option>
+          <option value="Dar es Salaam">Dar es Salaam</option>
+        </select></div>
+        <div class="fgrp"><label class="flbl">Preferred date</label><input class="finp" id="hz-date" type="date" style="color-scheme:dark"></div>
+        <div class="fgrp"><label class="flbl">Guests</label><select class="fsel" id="hz-guests"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select></div>
+        <div class="fgrp"><label class="flbl">Notes</label><textarea class="ftxt" id="hz-notes" placeholder="Flight number, scenic add-on, special requests..."></textarea></div>
+        <button class="gbtn" id="hz-confirm-btn" onclick="submitHeliZanzibarEnquiry()"><i class="ti ti-brand-whatsapp"></i> Send transfer enquiry</button>
+      </div>
+    </div>
+
+  </div>
+
   <div class="spacer"></div>
 </div>
 
@@ -2607,7 +2678,7 @@ var COMM_TIER_LABELS = {
 };
 
 var DISCOVER_FEED = [
-  {tag:'HELICOPTER · ARUSHA',title:'Breakfast Above the Clouds',sub:'Kilimanjaro · 12,500 ft · From $9,500',action:"go('s-heli')",color:'var(--gold)'},
+  {tag:'HELICOPTER · ARUSHA',title:'Breakfast Above the Clouds',sub:'Mount Meru · 12,000 ft · From $8,930',action:"go('s-heli')",color:'var(--gold)'},
   {tag:'YACHT · ZANZIBAR',title:'Your Private Ocean',sub:'Sofia Luxury · Full day from $3,800',action:"go('s-yacht')",color:'var(--ocean-soft)'},
   {tag:'F1 · 2026',title:'Paddock Access. Private Travel.',sub:'14 races remaining · Custom packages',action:"go('s-f1')",color:'var(--red)'},
   {tag:'EMPTY LEGS · LIVE',title:'Fly Private. Pay Fraction.',sub:'Real-time deals · Up to 75% off',action:"go('s-emptylegs')",color:'#4CAF50'},
@@ -3125,9 +3196,119 @@ function openTransferBook(route, usd, tzs){
   el.appendChild(f);
   document.getElementById('modal-bg').classList.add('open');
 }
+// ════ ZANZIBAR & PEMBA HELICOPTER TRANSFERS — Tropic Helicopters ════
+// Real rates supplied by Chance (Tropic Helicopters rate sheet), marked up
+// with the standard 35% margin via bl(). Prices are per helicopter.
+var HELI_ZNZ_ZONES=[
+  {
+    name:'Zone 1',
+    resorts:'Kiwengwa, Pongwe, Uora, Bawe Island, Melia Zanzibar, Sea Cliff Resort, Ycona Luxury Resort, Tulia Resort',
+    priceJanMay:1565, priceJunDec:970
+  },
+  {
+    name:'Zone 2',
+    resorts:'Qambani, Pingwe, Dongwe, Matemwe, Kijambani',
+    priceJanMay:1960, priceJunDec:1215
+  },
+  {
+    name:'Zone 3',
+    resorts:'Paje, Jambiani, Nungwi, Kendwa, Kilindi, The Residence, White Sand Luxury Villas',
+    priceJanMay:2350, priceJunDec:1460
+  },
+  {
+    name:'Pemba — Fundu Lagoon',
+    resorts:'Fundu Lagoon',
+    priceJanMay:5090, priceJunDec:3160
+  },
+  {
+    name:'Pemba — Aiyana Resort & Spa',
+    resorts:'Aiyana Resort & Spa Hotel',
+    priceJanMay:5090, priceJunDec:3160
+  },
+  {
+    name:'Pemba — The Manta Resort',
+    resorts:'The Manta Resort',
+    priceJanMay:6655, priceJunDec:4130
+  },
+  {
+    name:'Dar es Salaam',
+    resorts:'Direct transfer to/from Dar es Salaam',
+    priceJanMay:5090, priceJunDec:3160
+  }
+];
+
+function switchHeliMode(mode){
+  var meruBtn=document.getElementById('heli-mode-meru');
+  var znzBtn=document.getElementById('heli-mode-znz');
+  var meruMode=document.getElementById('heli-meru-mode');
+  var znzMode=document.getElementById('heli-znz-mode');
+  if(mode==='znz'){
+    if(meruBtn) meruBtn.classList.remove('active');
+    if(znzBtn) znzBtn.classList.add('active');
+    if(meruMode) meruMode.style.display='none';
+    if(znzMode) znzMode.style.display='block';
+    renderHeliZones();
+  } else {
+    if(znzBtn) znzBtn.classList.remove('active');
+    if(meruBtn) meruBtn.classList.add('active');
+    if(znzMode) znzMode.style.display='none';
+    if(meruMode) meruMode.style.display='block';
+  }
+}
+
+function renderHeliZones(){
+  var el=document.getElementById('heli-znz-zones');
+  if(!el) return;
+  el.innerHTML='';
+  HELI_ZNZ_ZONES.forEach(function(z,i){
+    var card=document.createElement('div');
+    card.className='gem-prop-card';
+    var num=String(i+1).padStart(2,'0');
+    card.innerHTML=
+      '<div class="gem-prop-inner">'
+      +'<div class="gem-prop-num">'+num+'</div>'
+      +'<div class="gem-prop-name">'+z.name+'</div>'
+      +'<div class="gem-prop-desc" style="margin-bottom:10px;">'+z.resorts+'</div>'
+      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">'
+      +'<div class="pbox"><div class="pbox-val" style="font-size:16px;">$'+z.priceJanMay.toLocaleString()+'</div><div class="pbox-lbl">Jan–May 2026</div></div>'
+      +'<div class="pbox"><div class="pbox-val" style="font-size:16px;">$'+z.priceJunDec.toLocaleString()+'</div><div class="pbox-lbl">Jun–Dec 2026</div></div>'
+      +'</div>'
+      +'</div>';
+    card.onclick=function(){
+      var sel=document.getElementById('hz-zone');
+      if(sel){
+        for(var o=0;o<sel.options.length;o++){
+          if(sel.options[o].text.indexOf(z.name.replace('Pemba — ',''))===0 || sel.options[o].text.indexOf(z.name)>=0){ sel.selectedIndex=o; break; }
+        }
+      }
+      var form=document.getElementById('hz-name');
+      if(form) form.scrollIntoView({behavior:'smooth',block:'center'});
+    };
+    el.appendChild(card);
+  });
+}
+
+function submitHeliZanzibarEnquiry(){
+  var name=(document.getElementById('hz-name')||{}).value||'';
+  var zone=(document.getElementById('hz-zone')||{}).value||'';
+  var date=(document.getElementById('hz-date')||{}).value||'';
+  var guests=(document.getElementById('hz-guests')||{}).value||'1';
+  var notes=(document.getElementById('hz-notes')||{}).value||'';
+
+  var msg='Zanzibar/Pemba Helicopter Transfer Enquiry\n'
+    +'Name: '+(name||'Guest')+'\n'
+    +'Destination: '+zone+'\n'
+    +'Date: '+(date||'Not specified')+'\n'
+    +'Guests: '+guests
+    +(notes?'\nNotes: '+notes:'');
+
+  if(typeof submitForm==='function') submitForm('Heli Transfer: '+zone);
+  window.open('https://wa.me/255692312366?text='+encodeURIComponent(msg), '_blank');
+}
+
 function openHeliBook(dep,price){
   document.getElementById('modal-ttl').textContent='Helicopter Enquiry';
-  document.getElementById('modal-body').innerHTML='     <div class="fwrap">       <div class="fgrp"><label class="flbl">Your name</label><input class="finp" id="hb-name" placeholder="Full name"></div>       <div class="fgrp"><label class="flbl">Preferred date</label><input class="finp" id="hb-date" type="date" style="color-scheme:dark"></div>       <div class="fgrp"><label class="flbl">Departure point</label><select class="fsel" id="hb-dep"><option '+(dep==='Tropic Base'?'selected':'')+'>Tropic Base, Dolly — $9,500</option><option '+(dep==='Arusha Area'?'selected':'')+'>Arusha Area — $11,600</option><option '+(dep==='JRO Airport'?'selected':'')+'>Kilimanjaro Airport — $9,900</option><option '+(dep==='Moshi Airport'?'selected':'')+'>Moshi Airport — $9,600</option></select></div>       <div class="fgrp"><label class="flbl">Guests (max 4 landing)</label><select class="fsel" id="hb-guests"><option>1</option><option>2</option><option>3</option><option>4</option></select></div>       <div class="flbl" style="margin-bottom:7px;">Upgrades</div>       <label class="fchk"><input type="checkbox" id="hb-up1"><span class="fchk-name">Mountain picnic breakfast</span><span class="fchk-price">+$54/pp</span></label>       <label class="fchk"><input type="checkbox" id="hb-up2"><span class="fchk-name">Champagne upgrade</span><span class="fchk-price">On request</span></label>       <label class="fchk"><input type="checkbox" id="hb-up3"><span class="fchk-name">Nomad Caviar experience</span><span class="fchk-price">Custom</span></label>       <label class="fchk"><input type="checkbox" id="hb-up4"><span class="fchk-name">Sundowner add-on</span><span class="fchk-price">+$34/pp</span></label>       <div class="fgrp" style="margin-top:10px;"><label class="flbl">Special requests / occasion</label><textarea class="ftxt" id="hb-notes" placeholder="Anniversary, corporate, specific experience..."></textarea></div>       <button class="gbtn" id="hb-confirm-btn"><i class="ti ti-brand-whatsapp"></i> Send enquiry</button>     </div>';
+  document.getElementById('modal-body').innerHTML='     <div class="fwrap">       <div class="fgrp"><label class="flbl">Your name</label><input class="finp" id="hb-name" placeholder="Full name"></div>       <div class="fgrp"><label class="flbl">Preferred date</label><input class="finp" id="hb-date" type="date" style="color-scheme:dark"></div>       <div class="fgrp"><label class="flbl">Departure point</label><select class="fsel" id="hb-dep"><option '+(dep==='Tropic Base'?'selected':'')+'>Tropic Base, Dolly — $8,930</option><option '+(dep==='Arusha Area'?'selected':'')+'>Arusha Area — $9,065</option><option '+(dep==='JRO Airport'?'selected':'')+'>Kilimanjaro Airport — $9,255</option><option '+(dep==='Legendary Lodge'?'selected':'')+'>Legendary Lodge — Custom quote</option></select></div>       <div class="fgrp"><label class="flbl">Guests (max 4 landing, 6 without landing)</label><select class="fsel" id="hb-guests"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select></div>       <div class="flbl" style="margin-bottom:7px;">Upgrades</div>       <label class="fchk"><input type="checkbox" id="hb-up1"><span class="fchk-name">Mountain picnic breakfast</span><span class="fchk-price">+$55/pp</span></label>       <label class="fchk"><input type="checkbox" id="hb-up2"><span class="fchk-name">Sundowner add-on (Rhino Point)</span><span class="fchk-price">+$35/pp</span></label>       <label class="fchk"><input type="checkbox" id="hb-up3"><span class="fchk-name">Nomad Caviar experience</span><span class="fchk-price">Custom</span></label>       <label class="fchk"><input type="checkbox" id="hb-up4"><span class="fchk-name">Champagne upgrade</span><span class="fchk-price">On request</span></label>       <div class="fgrp" style="margin-top:10px;"><label class="flbl">Special requests / occasion</label><textarea class="ftxt" id="hb-notes" placeholder="Anniversary, corporate, specific experience..."></textarea></div>       <button class="gbtn" id="hb-confirm-btn"><i class="ti ti-brand-whatsapp"></i> Send enquiry</button>     </div>';
   var btn = document.getElementById('hb-confirm-btn');
   if(btn) btn.onclick = function(){
     var name = (document.getElementById('hb-name')||{}).value||'';
@@ -3137,9 +3318,9 @@ function openHeliBook(dep,price){
     var notes = (document.getElementById('hb-notes')||{}).value||'';
     var ups = [];
     if((document.getElementById('hb-up1')||{}).checked) ups.push('Mountain picnic breakfast');
-    if((document.getElementById('hb-up2')||{}).checked) ups.push('Champagne upgrade');
+    if((document.getElementById('hb-up2')||{}).checked) ups.push('Sundowner add-on (Rhino Point)');
     if((document.getElementById('hb-up3')||{}).checked) ups.push('Nomad Caviar experience');
-    if((document.getElementById('hb-up4')||{}).checked) ups.push('Sundowner add-on');
+    if((document.getElementById('hb-up4')||{}).checked) ups.push('Champagne upgrade');
     var msg = 'Helicopter Picnic Enquiry\n'
       +'Name: '+(name||'Guest')+'\n'
       +'Date: '+(date||'Not specified')+'\n'
@@ -3410,7 +3591,7 @@ function enterApp(user){
 function doLogout(){clearSession();location.reload();}
 
 var DEFAULT_BOOKINGS=[
-  {id:'b1',service:'Summit Picnic — Helicopter',client:'Demo Member',detail:'Tropic Base · 2 guests',price:'$9,500',status:'confirmed',time:'2h ago'},
+  {id:'b1',service:'Summit Picnic — Helicopter',client:'Demo Member',detail:'Tropic Base · 2 guests',price:'$8,930',status:'confirmed',time:'2h ago'},
   {id:'b2',service:'Sofia Luxury — Full Day',client:'Gold Member',detail:'Zanzibar · 10 guests',price:'$3,800',status:'pending',time:'4h ago'},
   {id:'b3',service:'JRO Transfer + Red Carpet',client:'Obsidian Member',detail:'Arrival 14:30',price:'$350',status:'pending',time:'6h ago'},
   {id:'b4',service:'British GP F1 Hospitality',client:'Demo Member',detail:'Silverstone · 2 guests',price:'Custom',status:'pending',time:'1d ago'},
@@ -3592,6 +3773,10 @@ function deleteBooking(id){
 function renderAdminMembers(){
   var us=(DB.get('users')||DEFAULT_USERS).filter(function(u){return u.tier!=='admin';});
   var el=document.getElementById('adm-members-list');
+  var bulkBar=document.getElementById('adm-bulk-bar');
+  var selectAll=document.getElementById('adm-select-all');
+  if(bulkBar) bulkBar.style.display='none';
+  if(selectAll) selectAll.checked=false;
   if(!el) return;
   el.innerHTML='';
 
@@ -3605,6 +3790,13 @@ function renderAdminMembers(){
   us.forEach(function(u){
     var row=document.createElement('div');
     row.className='admin-member';
+
+    var checkbox=document.createElement('input');
+    checkbox.type='checkbox';
+    checkbox.className='adm-member-check';
+    checkbox.setAttribute('data-email', u.email);
+    checkbox.style.cssText='margin-right:10px;flex-shrink:0;';
+    checkbox.onchange=updateBulkBar;
 
     var removeBtn=document.createElement('button');
     removeBtn.className='ab-btn done';
@@ -3627,37 +3819,105 @@ function renderAdminMembers(){
       try{ joinedStr=' · Joined '+new Date(u.joinedAt).toLocaleDateString(); }catch(e){}
     }
 
-    row.innerHTML=
-      '<div class="am-info">'
-      +'<div class="am-name">'+(u.name||'Member')+'</div>'
-      +'<div class="am-detail">'+(u.email||'')+(u.phone?' · '+u.phone:'')+joinedStr+'</div>'
-      +'</div>'
-      +'<div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">'
-      +'<div style="display:flex;gap:6px;align-items:center;">'
-      +'<select class="admin-inp" style="font-size:9px;padding:4px 6px;width:auto;" id="tier-sel-'+(u.email.replace(/[^a-z0-9]/gi,''))+'">'
+    row.style.display='flex';
+    row.style.alignItems='center';
+
+    var infoWrap=document.createElement('div');
+    infoWrap.style.cssText='flex:1;display:flex;align-items:center;';
+    infoWrap.appendChild(checkbox);
+
+    var infoInner=document.createElement('div');
+    infoInner.className='am-info';
+    infoInner.innerHTML='<div class="am-name">'+(u.name||'Member')+'</div><div class="am-detail">'+(u.email||'')+(u.phone?' · '+u.phone:'')+joinedStr+'</div>';
+    infoWrap.appendChild(infoInner);
+    row.appendChild(infoWrap);
+
+    var rightWrap=document.createElement('div');
+    rightWrap.style.cssText='display:flex;flex-direction:column;align-items:flex-end;gap:6px;';
+    rightWrap.innerHTML=
+      '<div style="display:flex;gap:6px;align-items:center;">'
+      +'<select class="admin-inp" style="font-size:9px;padding:4px 6px;width:auto;margin-bottom:0;" id="tier-sel-'+(u.email.replace(/[^a-z0-9]/gi,''))+'">'
       +'<option value="silver"'+(u.tier==='silver'?' selected':'')+'>Silver</option>'
       +'<option value="gold"'+(u.tier==='gold'?' selected':'')+'>Gold</option>'
       +'<option value="obsidian"'+(u.tier==='obsidian'?' selected':'')+'>Obsidian</option>'
       +'</select>'
       +'<button class="ab-btn confirm" style="padding:4px 8px;">Set</button>'
       +'</div>'
-      +'<div class="am-btns"></div>'
-      +'</div>';
+      +'<div class="am-btns"></div>';
+    row.appendChild(rightWrap);
 
-    var setBtn = row.querySelector('.ab-btn.confirm');
-    var tierSel = row.querySelector('select');
+    var setBtn = rightWrap.querySelector('.ab-btn.confirm');
+    var tierSel = rightWrap.querySelector('select');
     setBtn.onclick = function(){
       setMemberTier(u.email, tierSel.value);
     };
 
-    var btnRow=row.querySelector('.am-btns');
+    var btnRow=rightWrap.querySelector('.am-btns');
     btnRow.appendChild(msgBtn);
     btnRow.appendChild(removeBtn);
     el.appendChild(row);
   });
 }
 
-function setMemberTier(email, newTier){
+function updateBulkBar(){
+  var checked = document.querySelectorAll('.adm-member-check:checked');
+  var bar = document.getElementById('adm-bulk-bar');
+  var countEl = document.getElementById('adm-bulk-count');
+  if(!bar || !countEl) return;
+  if(checked.length > 0){
+    bar.style.display = 'flex';
+    countEl.textContent = checked.length + ' selected';
+  } else {
+    bar.style.display = 'none';
+  }
+  // Keep "select all" checkbox in sync
+  var all = document.querySelectorAll('.adm-member-check');
+  var selectAll = document.getElementById('adm-select-all');
+  if(selectAll) selectAll.checked = all.length > 0 && checked.length === all.length;
+}
+
+function toggleSelectAllMembers(checked){
+  document.querySelectorAll('.adm-member-check').forEach(function(cb){ cb.checked = checked; });
+  updateBulkBar();
+}
+
+function applyBulkTier(){
+  var checked = document.querySelectorAll('.adm-member-check:checked');
+  if(!checked.length) return;
+  var tier = (document.getElementById('adm-bulk-tier')||{}).value || 'silver';
+  var tierLabel = tier.charAt(0).toUpperCase()+tier.slice(1);
+
+  if(!confirm('Set '+checked.length+' member'+(checked.length>1?'s':'')+' to '+tierLabel+'?')) return;
+
+  var emails = [];
+  checked.forEach(function(cb){ emails.push(cb.getAttribute('data-email')); });
+
+  var promises = [];
+  emails.forEach(function(email){
+    var p = setMemberTier(email, tier, true); // silent — we'll re-render once at the end
+    if(p && typeof p.then === 'function') promises.push(p);
+  });
+
+  showToast('Updating '+emails.length+' member'+(emails.length>1?'s':'')+'...');
+
+  Promise.all(promises.map(function(p){ return p.catch(function(e){ return {error:e}; }); }))
+    .then(function(results){
+      var failed = results.filter(function(r){ return r && r.error; }).length;
+      renderAdminMembers();
+      renderAdminStats();
+      if(failed > 0){
+        showToast('⚠ '+failed+' of '+emails.length+' failed to save — check connection');
+      } else {
+        showToast(emails.length+' member'+(emails.length>1?'s':'')+' set to '+tierLabel+' ✓');
+      }
+    })
+    .catch(function(){
+      renderAdminMembers();
+      renderAdminStats();
+    });
+}
+
+function setMemberTier(email, newTier, silent){
   var us=DB.get('users');
   if(!us||!Array.isArray(us)) us=DEFAULT_USERS.slice();
   var found=false;
@@ -3667,22 +3927,38 @@ function setMemberTier(email, newTier){
       found=true;
     }
   });
+
+  var fbPromise = null;
   if(window.FB && typeof window.FB.updateMemberTier==='function'){
-    try{ window.FB.updateMemberTier(email,newTier); }catch(e){}
+    try{ fbPromise = window.FB.updateMemberTier(email,newTier); }catch(e){ fbPromise = null; }
   }
+
   if(found){
     DB.set('users',us);
-    showToast('Member set to '+newTier.charAt(0).toUpperCase()+newTier.slice(1)+' ✓');
-    renderAdminMembers();
-    renderAdminStats();
-  } else {
-    // Not in local cache yet (e.g. added on another device) — still push
-    // the tier change to Firebase directly, then re-sync.
+    if(!silent){
+      showToast('Member set to '+newTier.charAt(0).toUpperCase()+newTier.slice(1)+' ✓');
+      renderAdminMembers();
+      renderAdminStats();
+    }
+  } else if(!silent){
     showToast('Updating...');
     if(window.FB && typeof window.FB.getMembers==='function'){
       window.FB.getMembers(function(){ renderAdminMembers(); });
     }
   }
+
+  // Firebase writes are async — if this isn't awaited and checked, a failed
+  // write (permissions, offline, etc.) fails completely silently: the local
+  // UI shows the new tier, but it never actually saves, and the next sync
+  // from Firebase quietly reverts it. Surface real failures instead.
+  if(fbPromise && typeof fbPromise.then === 'function'){
+    fbPromise.catch(function(err){
+      console.log('setMemberTier Firebase write failed:', err);
+      showToast('⚠ Could not save to server — check connection and try again');
+    });
+  }
+
+  return fbPromise;
 }
 
 // Kept for backward compatibility with any old references — now delegates
