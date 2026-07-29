@@ -687,7 +687,7 @@ html,body{height:100%;background:var(--black);color:var(--ow);font-family:'Monts
 .is-lbl{font-size:8px;color:var(--mt);margin-top:3px;letter-spacing:0.1em;text-transform:uppercase;}
 
 /* ── NOTIFICATION DOT ── */
-.notif{position:absolute;top:2px;right:2px;width:7px;height:7px;background:var(--gold);border-radius:50%;border:1.5px solid var(--black);}
+.notif{position:absolute;top:-4px;right:-6px;min-width:16px;height:16px;padding:0 3px;background:var(--gold);border-radius:8px;border:1.5px solid var(--black);display:none;align-items:center;justify-content:center;font-size:9px;font-family:'Montserrat',sans-serif;font-weight:600;color:var(--black);line-height:1;}
 
 
 
@@ -3645,6 +3645,11 @@ function enterApp(user){
     if(item) item.style.display='flex';
     if(!DB.get('bookings')) DB.set('bookings',DEFAULT_BOOKINGS);
   }
+  // Clear the app icon badge as soon as the app opens — matches how badges
+  // work in most apps (opening it is what counts as "seen"), rather than
+  // requiring a specific tap on the bell icon.
+  if('clearAppBadge' in navigator) navigator.clearAppBadge().catch(function(){});
+  if(typeof resetServiceWorkerBadge==='function') resetServiceWorkerBadge();
   setTimeout(function(){
     if(typeof maybeShowWelcomeBack==='function') maybeShowWelcomeBack(user);
   },2300);
@@ -7113,10 +7118,32 @@ function addNotification(type, title, body, action){
   updateNotifBadge();
 }
 
+function resetServiceWorkerBadge(){
+  if(navigator.serviceWorker && navigator.serviceWorker.controller){
+    navigator.serviceWorker.controller.postMessage({type:'resetBadge'});
+  }
+}
+
 function updateNotifBadge(){
   var dot = document.getElementById('notif-dot');
   var unread = NOTIFICATIONS.filter(function(n){return !n.read;}).length;
-  if(dot) dot.style.display = unread>0 ? 'block' : 'none';
+  if(dot){
+    if(unread > 0){
+      dot.textContent = unread > 9 ? '9+' : String(unread);
+      dot.style.display = 'flex';
+    } else {
+      dot.style.display = 'none';
+    }
+  }
+
+  // OS-level app icon badge (the actual number on the Home Screen icon,
+  // same as iMessage/Mail). Supported on iOS 16.4+ and Android Chrome, only
+  // for installed (Add to Home Screen) apps — silently does nothing
+  // otherwise, which is fine, it's a bonus on top of the in-app badge above.
+  if('setAppBadge' in navigator){
+    if(unread > 0) navigator.setAppBadge(unread).catch(function(){});
+    else if('clearAppBadge' in navigator) navigator.clearAppBadge().catch(function(){});
+  }
 }
 
 function openNotifications(){
@@ -7124,6 +7151,7 @@ function openNotifications(){
   // Mark all as read
   NOTIFICATIONS.forEach(function(n){n.read=true;});
   updateNotifBadge();
+  resetServiceWorkerBadge();
 
   // Build notification panel
   document.getElementById('modal-ttl').textContent = 'Notifications';
@@ -7154,6 +7182,13 @@ function openNotifications(){
 
 // Auto-generate notifications from app activity
 function initNotifications(){
+  // Was previously called every time Profile opened (via updateProfileForTier),
+  // silently re-adding these same 3 notifications each visit — with a numbered
+  // badge, that bug would show an ever-growing, meaningless count. Gate to
+  // once per app session.
+  if(window._notificationsInitialized) return;
+  window._notificationsInitialized = true;
+
   // Welcome notification
   if(currentUser){
     addNotification('info','Welcome back, '+currentUser.name.split(' ')[0]+'.','Your concierge is ready. Tap here to send a request.','go("s-concierge")');
