@@ -1,7 +1,41 @@
 // Barafu Luxe — Service Worker
 // Handles offline caching (existing behavior) plus Web Push notifications.
 
-const CACHE = 'bl-v7';
+const CACHE = 'bl-v8';
+
+// ── APP ICON BADGE COUNTER ──
+// Service workers don't share memory between wake-ups and can't see
+// localStorage, so the running unread count needs its own small persistent
+// store. IndexedDB is the standard tool available here.
+function getBadgeCount(){
+  return new Promise(function(resolve){
+    var req = indexedDB.open('bl-badge-db', 1);
+    req.onupgradeneeded = function(e){ e.target.result.createObjectStore('badge'); };
+    req.onsuccess = function(e){
+      var db = e.target.result;
+      var tx = db.transaction('badge', 'readonly');
+      var getReq = tx.objectStore('badge').get('count');
+      getReq.onsuccess = function(){ resolve(getReq.result || 0); };
+      getReq.onerror = function(){ resolve(0); };
+    };
+    req.onerror = function(){ resolve(0); };
+  });
+}
+
+function setBadgeCount(count){
+  return new Promise(function(resolve){
+    var req = indexedDB.open('bl-badge-db', 1);
+    req.onupgradeneeded = function(e){ e.target.result.createObjectStore('badge'); };
+    req.onsuccess = function(e){
+      var db = e.target.result;
+      var tx = db.transaction('badge', 'readwrite');
+      tx.objectStore('badge').put(count, 'count');
+      tx.oncomplete = function(){ resolve(); };
+      tx.onerror = function(){ resolve(); };
+    };
+    req.onerror = function(){ resolve(); };
+  });
+}
 
 self.addEventListener('install', function(e){
   self.skipWaiting();
@@ -50,7 +84,31 @@ self.addEventListener('push', function(e){
     renotify: !!data.tag
   };
 
-  e.waitUntil(self.registration.showNotification(title, options));
+  e.waitUntil(
+    getBadgeCount().then(function(current){
+      var next = current + 1;
+      return setBadgeCount(next).then(function(){
+        if('setAppBadge' in self.registration){
+          return self.registration.setAppBadge(next);
+        }
+      });
+    }).then(function(){
+      return self.registration.showNotification(title, options);
+    })
+  );
+});
+
+// The main app tells us to reset once someone's actually opened it and seen
+// what's new — keeps the OS icon badge and the in-app bell badge in sync
+// rather than tracking two independent, possibly-conflicting counts.
+self.addEventListener('message', function(e){
+  if(e.data && e.data.type === 'resetBadge'){
+    e.waitUntil(
+      setBadgeCount(0).then(function(){
+        if('clearAppBadge' in self.registration) return self.registration.clearAppBadge();
+      })
+    );
+  }
 });
 
 self.addEventListener('notificationclick', function(e){
