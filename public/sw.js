@@ -1,7 +1,7 @@
 // Barafu Luxe — Service Worker
 // Handles offline caching (existing behavior) plus Web Push notifications.
 
-const CACHE = 'bl-v8';
+const CACHE = 'bl-v9';
 
 // ── APP ICON BADGE COUNTER ──
 // Service workers don't share memory between wake-ups and can't see
@@ -88,8 +88,8 @@ self.addEventListener('push', function(e){
     getBadgeCount().then(function(current){
       var next = current + 1;
       return setBadgeCount(next).then(function(){
-        if('setAppBadge' in self.registration){
-          return self.registration.setAppBadge(next);
+        if(self.navigator && 'setAppBadge' in self.navigator){
+          return self.navigator.setAppBadge(next);
         }
       });
     }).then(function(){
@@ -105,7 +105,7 @@ self.addEventListener('message', function(e){
   if(e.data && e.data.type === 'resetBadge'){
     e.waitUntil(
       setBadgeCount(0).then(function(){
-        if('clearAppBadge' in self.registration) return self.registration.clearAppBadge();
+        if(self.navigator && 'clearAppBadge' in self.navigator) return self.navigator.clearAppBadge();
       })
     );
   }
