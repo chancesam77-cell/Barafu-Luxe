@@ -1430,6 +1430,18 @@ function removeBookingFB(fbKey){
     </div>
 
     <div class="admin-section">
+      <div class="admin-sec-title">Push a Discover highlight</div>
+      <div style="font-size:10px;color:var(--mt);line-height:1.7;padding:0 2px 12px;">Send any of the app's own Discover cards as a push notification — same content, zero writing. Members who tap it land right on that screen.</div>
+      <select class="admin-inp" id="adm-discover-tier" style="appearance:none;cursor:pointer;margin-bottom:10px;">
+        <option value="all">Send to ALL members</option>
+        <option value="gold">Gold members only</option>
+        <option value="obsidian">Obsidian members only</option>
+        <option value="silver">Silver members only</option>
+      </select>
+      <div id="adm-discover-list"></div>
+    </div>
+
+    <div class="admin-section">
       <div class="admin-sec-title">Add empty leg deal</div>
       <div class="admin-add-form">
         <input class="admin-inp" id="adm-el-route" placeholder="Route e.g. DAR → JRO">
@@ -3619,8 +3631,27 @@ function enterApp(user){
     if(!DB.get('bookings')) DB.set('bookings',DEFAULT_BOOKINGS);
   }
   setTimeout(showInstallBanner,3000);
+  // Deep-link from a tapped push notification (e.g. /?screen=s-yacht) —
+  // navigate there once the app shell is visible, then clean the URL so a
+  // later refresh doesn't keep re-triggering it.
+  try{
+    var params = new URLSearchParams(window.location.search);
+    var targetScreen = params.get('screen');
+    if(targetScreen){
+      setTimeout(function(){
+        if(typeof go==='function') go(targetScreen);
+      }, 400);
+      var cleanUrl = window.location.pathname;
+      window.history.replaceState({}, '', cleanUrl);
+    }
+  }catch(e){}
   if(user.tier!=='admin'&&!DB.get('comm_picked_'+user.email)){
     setTimeout(function(){showCommunityPicker(user);},1500);
+  }
+  if(user.tier!=='admin'){
+    setTimeout(function(){
+      if(typeof maybeShowNotifPrimer==='function') maybeShowNotifPrimer(user);
+    },8000);
   }
   // Apply tier styling to profile
   setTimeout(function(){
@@ -3666,6 +3697,7 @@ function openAdmin(){
   // then refresh live from Firebase, which is the actual source of truth.
   renderAdminMembers();
   renderAdminRequestsFromLocal();
+  renderAdminDiscoverList();
 
   if(window.FB && typeof window.FB.getMembers==='function'){
     window.FB.getMembers(function(members){
@@ -4295,6 +4327,48 @@ function isPushSupported(){
   return 'serviceWorker' in navigator && 'PushManager' in window;
 }
 
+// Shown automatically, once, to new members — a friendly explainer BEFORE
+// the real browser permission dialog. Asking cold with no context tends to
+// get reflexively denied, and once denied, browsers won't let you ask again
+// automatically. A custom "why" screen first, with a genuine "maybe later"
+// option, means we don't burn that one shot.
+function maybeShowNotifPrimer(user){
+  if(!user || !user.email) return;
+  if(!isPushSupported()) return; // e.g. iOS not yet installed to Home Screen — nothing to prime yet
+  if(typeof Notification==='undefined' || Notification.permission!=='default') return; // already decided, on this device
+  if(DB.get('notif_primer_shown_'+user.email)) return; // already offered before
+
+  var modalBg = document.getElementById('modal-bg');
+  if(modalBg && modalBg.classList.contains('open')) return; // something else is already showing — don't stack
+
+  DB.set('notif_primer_shown_'+user.email, true);
+  showNotifPrimer();
+}
+
+function showNotifPrimer(){
+  document.getElementById('modal-ttl').textContent = 'Stay In The Loop';
+  document.getElementById('modal-body').innerHTML =
+    '<div class="fwrap"><div style="text-align:center;margin-bottom:6px;">'
+    +'<div style="font-size:36px;margin-bottom:10px;">🔔</div>'
+    +'<div style="font-family:Cormorant Garamond,serif;font-size:19px;color:var(--ow);margin-bottom:10px;">Never miss a moment</div>'
+    +'<div style="font-size:11px;color:var(--mt);line-height:1.8;margin-bottom:18px;">Get notified the instant an empty leg deal drops, a new event opens, or your membership status changes. Nothing else — just the things worth knowing about.</div>'
+    +'</div>'
+    +'<button class="gbtn" onclick="dismissNotifPrimer(true)"><i class="ti ti-bell-ringing"></i> Enable Notifications</button>'
+    +'<button class="gghst" style="margin-top:10px;" onclick="dismissNotifPrimer(false)">Maybe later</button>'
+    +'</div>';
+  document.getElementById('modal-bg').classList.add('open');
+}
+
+function dismissNotifPrimer(shouldEnable){
+  var bg = document.getElementById('modal-bg');
+  if(bg) bg.classList.remove('open');
+  if(shouldEnable && typeof enablePushNotifications==='function'){
+    // Small delay so the modal has visibly closed before the native
+    // permission dialog appears — feels like two distinct steps, not a glitch.
+    setTimeout(function(){ enablePushNotifications(); }, 300);
+  }
+}
+
 function enablePushNotifications(){
   if(!isPushSupported()){
     var alreadyInstalled = window.navigator.standalone===true || (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
@@ -4406,6 +4480,37 @@ function sendPushToMember(email, title, body, url, callback){
         console.log('send-push request failed:', err);
         callback('error', (err && err.message) || 'Network request failed');
       });
+  });
+}
+
+// Sends a push to every member matching a tier filter (or 'all'). Used for
+// new events, empty legs, hidden gems, spa additions, and the general
+// broadcast tool. Reports back a summary so admin isn't left guessing
+// whether it actually reached anyone.
+function sendBroadcastPush(title, body, url, tierFilter, callback){
+  callback = callback || function(){};
+  tierFilter = tierFilter || 'all';
+
+  var users = (DB.get('users') || DEFAULT_USERS).filter(function(u){ return u.tier !== 'admin'; });
+  var targets = tierFilter === 'all' ? users : users.filter(function(u){ return u.tier === tierFilter; });
+
+  if (!targets.length) { callback({ sent: 0, notSubscribed: 0, failed: 0, total: 0 }); return; }
+
+  var sent = 0, notSubscribed = 0, failed = 0, expired = 0;
+  var completed = 0;
+
+  targets.forEach(function(u){
+    sendPushToMember(u.email, title, body, url, function(status){
+      completed++;
+      if (status === 'sent') sent++;
+      else if (status === 'not-subscribed') notSubscribed++;
+      else if (status === 'expired') expired++;
+      else failed++;
+
+      if (completed === targets.length) {
+        callback({ sent: sent, notSubscribed: notSubscribed, expired: expired, failed: failed, total: targets.length });
+      }
+    });
   });
 }
 
@@ -6016,6 +6121,9 @@ function adminAddEmptyLeg(){
   renderEL('all');
   ['adm-el-route','adm-el-aircraft','adm-el-date','adm-el-seats','adm-el-was','adm-el-now'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
   alert('Empty leg posted: '+route+' at $'+now2.toLocaleString()+' ('+saving+'% off)');
+  sendBroadcastPush('⚡ Empty Leg Alert', route+' — $'+now2.toLocaleString()+' ('+saving+'% off). Limited seats.', '/?screen=s-emptylegs', 'all', function(r){
+    console.log('Empty leg broadcast:', r);
+  });
 }
 function adminAddSpa(){
   var name=(document.getElementById('adm-spa-name')||{}).value||'';
@@ -6028,6 +6136,9 @@ function adminAddSpa(){
   if((document.getElementById('spa-content') && document.getElementById('spa-content').style.display!=='none')) renderSpa(spaCatFilter,spaPartnerFilter);
   ['adm-spa-name','adm-spa-cat','adm-spa-duration','adm-spa-desc','adm-spa-base'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
   alert('Spa treatment added: '+name+' — Partner $'+base+' → Your price $'+bl(base));
+  sendBroadcastPush('💆 New at Spa & Wellness', name+' is now available to book.', '/?screen=s-spa', 'all', function(r){
+    console.log('Spa broadcast:', r);
+  });
 }
 function adminAddGem(){
   var name=(document.getElementById('adm-gem-name')||{}).value||'';
@@ -6041,6 +6152,9 @@ function adminAddGem(){
   if((document.getElementById('gems-content') && document.getElementById('gems-content').style.display!=='none')) renderGems(gemFilter);
   ['adm-gem-name','adm-gem-type','adm-gem-location','adm-gem-desc','adm-gem-base','adm-gem-icon'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
   alert('Hidden Gem added: '+name+' → Your price $'+bl(base)+'/night');
+  sendBroadcastPush('✦ New Hidden Gem', name+' — '+(loc||'Tanzania')+'. Now open for booking.', '/?screen=s-gems', 'all', function(r){
+    console.log('Hidden Gem broadcast:', r);
+  });
 }
 function adminAddEvent(){
   var name=(document.getElementById('adm-ev-name')||{}).value||'';
@@ -6057,6 +6171,9 @@ function adminAddEvent(){
   renderCalendar();renderEvents();
   ['adm-ev-name','adm-ev-cat','adm-ev-date','adm-ev-time','adm-ev-venue','adm-ev-price','adm-ev-capacity','adm-ev-desc'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
   alert('Event posted: '+name+' on '+date);
+  sendBroadcastPush('✦ New Event', name+' — '+date+' at '+venue, '/?screen=s-events', 'all', function(r){
+    console.log('Event broadcast:', r);
+  });
 }
 
 // ════ BROADCAST TEMPLATES ════
@@ -6075,6 +6192,63 @@ function loadBroadcastTemplate(key){
   var ta=document.getElementById('adm-bc-message');
   if(ta) ta.value=BROADCAST_TEMPLATES[key]||'';
 }
+function renderAdminDiscoverList(){
+  var el = document.getElementById('adm-discover-list');
+  if(!el) return;
+  el.innerHTML = '';
+  DISCOVER_FEED.forEach(function(item, idx){
+    var row = document.createElement('div');
+    row.style.cssText = 'background:var(--card);border:0.5px solid var(--bd);border-radius:2px;padding:12px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:10px;';
+    row.innerHTML =
+      '<div style="flex:1;min-width:0;">'
+      +'<div style="font-size:8px;letter-spacing:0.14em;color:'+(item.color||'var(--gold)')+';text-transform:uppercase;margin-bottom:3px;">'+item.tag+'</div>'
+      +'<div style="font-size:12px;color:var(--ow);font-family:Cormorant Garamond,serif;margin-bottom:2px;">'+item.title+'</div>'
+      +'<div style="font-size:10px;color:var(--mt);">'+item.sub+'</div>'
+      +'<div id="adm-discover-status-'+idx+'" style="font-size:9px;color:var(--mt);margin-top:4px;"></div>'
+      +'</div>'
+      +'<button class="ab-btn confirm" style="flex-shrink:0;" onclick="pushDiscoverHighlight('+idx+')">Send</button>';
+    el.appendChild(row);
+  });
+}
+
+// Maps a Discover card's action (or any known action string) to the actual
+// in-app screen ID, so a push notification can deep-link straight there
+// instead of just opening to Home.
+function extractScreenFromAction(action){
+  if(!action) return null;
+  var m = /go\('([^']+)'\)/.exec(action);
+  if(m) return m[1];
+  if(action.indexOf('openSpaWithTierCheck')===0) return 's-spa';
+  if(action.indexOf('openGemsWithTierCheck')===0) return 's-gems';
+  return null;
+}
+
+function pushDiscoverHighlight(idx){
+  var item = DISCOVER_FEED[idx];
+  if(!item) return;
+  var tier = (document.getElementById('adm-discover-tier')||{}).value || 'all';
+  var statusEl = document.getElementById('adm-discover-status-'+idx);
+  if(statusEl) statusEl.textContent = 'Sending...';
+
+  var screen = extractScreenFromAction(item.action);
+  var url = screen ? ('/?screen=' + screen) : '/';
+
+  sendBroadcastPush(item.title, item.sub, url, tier, function(r){
+    if(statusEl){
+      statusEl.textContent = 'Sent: ' + r.sent + ' of ' + r.total + (r.failed ? ' (' + r.failed + ' failed)' : '');
+      statusEl.style.color = r.sent > 0 ? '#4CAF50' : 'var(--mt)';
+    }
+  });
+}
+
+function deriveShortPushText(message){
+  var lines = message.split('\n').filter(function(l){ return l.trim().length>0; });
+  var title = (lines[0] || 'Barafu Luxe').replace(/^[^\w]*/, '').trim(); // strip leading emoji
+  var bodyLines = lines.slice(1).filter(function(l){ return l.indexOf('Barafu Luxe · Private Concierge')===-1; });
+  var body = bodyLines.join(' ').slice(0, 150);
+  return { title: title || 'Barafu Luxe', body: body };
+}
+
 function sendBroadcast(){
   var message=(document.getElementById('adm-bc-message')||{}).value||'';
   var tier=(document.getElementById('adm-bc-tier')||{}).value||'all';
@@ -6088,10 +6262,22 @@ function sendBroadcast(){
       result.style.display='block';
       result.innerHTML='<div style="font-size:12px;color:#128C7E;font-weight:500;margin-bottom:8px;">✓ Message copied</div>'
         +'<div style="font-size:11px;color:var(--mt);line-height:1.7;">Sending to '+filtered.length+' '+(tier==='all'?'members':tier+' members')+'.<br>Open WhatsApp, go to your broadcast list, paste and send.</div>'
-        +'<a href="'+waUrl+'" target="_blank" style="display:block;margin-top:10px;background:#128C7E;color:#fff;padding:10px;text-align:center;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;border-radius:2px;text-decoration:none;font-family:Montserrat,sans-serif;">Open WhatsApp now</a>';
+        +'<a href="'+waUrl+'" target="_blank" style="display:block;margin-top:10px;background:#128C7E;color:#fff;padding:10px;text-align:center;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;border-radius:2px;text-decoration:none;font-family:Montserrat,sans-serif;">Open WhatsApp now</a>'
+        +'<div id="adm-bc-push-status" style="font-size:10px;color:var(--mt);margin-top:10px;">Sending push notifications...</div>';
     }
   }).catch(function(){
     alert('Message: paste this into WhatsApp:\n\n'+message);
+  });
+
+  // Also send a real push notification to the same audience — this is what
+  // actually reaches members who aren't in your WhatsApp broadcast list, or
+  // who have you muted there.
+  var short = deriveShortPushText(message);
+  sendBroadcastPush(short.title, short.body, '/', tier, function(r){
+    var statusEl = document.getElementById('adm-bc-push-status');
+    if(statusEl){
+      statusEl.textContent = 'Push: ' + r.sent + ' sent' + (r.failed ? ', ' + r.failed + ' failed' : '') + ' (of ' + r.total + ' ' + (tier==='all'?'members':tier+' members') + ')';
+    }
   });
 }
 
