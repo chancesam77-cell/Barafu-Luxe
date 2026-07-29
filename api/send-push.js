@@ -11,30 +11,6 @@ module.exports = async function(req, res) {
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') return res.status(200).end();
-
-  // One-time diagnostic, reachable via GET so it can be opened directly in a
-  // browser: reveals exactly what the server is reading for the VAPID keys,
-  // without exposing the private key itself. Remove this block once push is
-  // confirmed working.
-  if (req.query && req.query.debug === '1') {
-    const pub = (process.env.VAPID_PUBLIC_KEY || '').trim();
-    const priv = (process.env.VAPID_PRIVATE_KEY || '').trim();
-    const subj = (process.env.VAPID_SUBJECT || '').trim();
-    return res.status(200).json({
-      publicKeySet: !!process.env.VAPID_PUBLIC_KEY,
-      publicKeyLength: pub.length,
-      publicKeyFirst10: pub.slice(0, 10),
-      publicKeyLast10: pub.slice(-10),
-      publicKeyHasPlus: pub.includes('+'),
-      publicKeyHasSlash: pub.includes('/'),
-      publicKeyHasEquals: pub.includes('='),
-      privateKeySet: !!process.env.VAPID_PRIVATE_KEY,
-      privateKeyLength: priv.length,
-      subjectSet: !!process.env.VAPID_SUBJECT,
-      subject: subj
-    });
-  }
-
   if (req.method !== 'POST') return res.status(405).json({ error: 'Use POST' });
 
   try {
