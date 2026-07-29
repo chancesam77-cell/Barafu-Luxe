@@ -297,8 +297,10 @@
 .luxury-hero-rule{width:28px;height:1px;background:linear-gradient(to right,transparent,var(--gold),transparent);margin:0 auto;}
 .luxury-tabs{display:flex;border-bottom:0.5px solid var(--bd);overflow-x:auto;scrollbar-width:none;}
 .luxury-tabs::-webkit-scrollbar{display:none;}
-.luxury-tab{flex:1;min-width:fit-content;background:transparent;border:none;padding:12px 14px;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--mt);font-family:Montserrat,sans-serif;cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;white-space:nowrap;}
-.luxury-tab.active{color:var(--gold);border-bottom-color:var(--gold);}
+@keyframes tabBounce{0%{transform:scale(1);}35%{transform:scale(1.1);}55%{transform:scale(0.96);}75%{transform:scale(1.04);}100%{transform:scale(1);}}
+.luxury-tab{flex:1;min-width:fit-content;background:transparent;border:none;padding:12px 14px;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--mt);font-family:Montserrat,sans-serif;cursor:pointer;border-bottom:2px solid transparent;transition:color 0.2s,border-color 0.2s,transform .15s cubic-bezier(0.34,1.56,0.64,1);white-space:nowrap;}
+.luxury-tab:active{transform:scale(0.9);}
+.luxury-tab.active{color:var(--gold);border-bottom-color:var(--gold);animation:tabBounce 0.5s cubic-bezier(0.34,1.56,0.64,1);}
 .luxury-tab-body{padding-bottom:14px;}
 /* ════ YACHT ════ */
 .yacht-flagship-card{background:var(--card);border:0.5px solid rgba(184,137,42,0.2);border-radius:3px;padding:18px;display:grid;gap:12px;}
@@ -510,8 +512,35 @@ html,body{height:100%;background:var(--black);color:var(--ow);font-family:'Monts
 
 /* ── QUICK GRID ── */
 .qgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 14px 14px;}
-.qc{background:var(--card);border:0.5px solid var(--bd);padding:14px;cursor:pointer;transition:border-color 0.15s;border-radius:2px;}
-.qc:active{background:var(--card2);}
+.qc{background:var(--card);border:0.5px solid var(--bd);padding:14px;cursor:pointer;transition:border-color 0.15s,transform .15s cubic-bezier(0.34,1.56,0.64,1);border-radius:2px;}
+.qc:active{background:var(--card2);transform:scale(0.9);}
+.discover-card{flex-shrink:0;width:200px;background:var(--card);border:0.5px solid var(--bd);border-radius:2px;padding:16px;cursor:pointer;position:relative;overflow:hidden;transition:transform .15s cubic-bezier(0.34,1.56,0.64,1),border-color .15s;}
+.discover-card:active{transform:scale(0.92);border-color:rgba(184,137,42,0.35);}
+
+/* App-wide jellybean press feedback — every tappable element gets a soft
+   squish on press. .ni, .qc, .luxury-tab and .discover-card already have
+   their own more pronounced version above; this covers everything else
+   consistently in one place rather than touching ~50 individual rules. */
+.ab-btn,.admin-close,.admin-submit,.apt-tab,.chat-room-send,.chat-send,.circle-tab,
+.cmsg-rx,.comm-card,.el-book-btn,.el-card,.el-filter,.ev-book-btn,.ev-card,.ev-day,
+.ev-filter,.ev-nav-btn,.ev-rsvp-btn,.f1-book-btn,.f1-btn,.f1-hospitality-btn,.f1-tab,
+.fchk,.ft-board-tab,.ft-book-btn,.ft-row,.ft-search-btn,.gbtn,.gem-enquire-btn,
+.gem-prop-card,.gg-dot,.gg-lb-close,.gg-lb-nav,.gg-thumb,.gghst,.hc-cta,.install-btn,
+.install-close,.login-btn,.login-ghost,.login-tab,.member-pill,.modal-x,.notify-strip,
+.pli,.rc,.rc-head,.spa-book-btn,.spa-chip,.spa-pkg,.spa-ptab,.spa-trt,.sv,.tb-back,
+.tb-icon{
+  transition:transform .15s cubic-bezier(0.34,1.56,0.64,1);
+}
+.ab-btn:active,.admin-close:active,.admin-submit:active,.apt-tab:active,.chat-room-send:active,.chat-send:active,.circle-tab:active,
+.cmsg-rx:active,.comm-card:active,.el-book-btn:active,.el-card:active,.el-filter:active,.ev-book-btn:active,.ev-card:active,.ev-day:active,
+.ev-filter:active,.ev-nav-btn:active,.ev-rsvp-btn:active,.f1-book-btn:active,.f1-btn:active,.f1-hospitality-btn:active,.f1-tab:active,
+.fchk:active,.ft-board-tab:active,.ft-book-btn:active,.ft-row:active,.ft-search-btn:active,.gbtn:active,.gem-enquire-btn:active,
+.gem-prop-card:active,.gg-dot:active,.gg-lb-close:active,.gg-lb-nav:active,.gg-thumb:active,.gghst:active,.hc-cta:active,.install-btn:active,
+.install-close:active,.login-btn:active,.login-ghost:active,.login-tab:active,.member-pill:active,.modal-x:active,.notify-strip:active,
+.pli:active,.rc:active,.rc-head:active,.spa-book-btn:active,.spa-chip:active,.spa-pkg:active,.spa-ptab:active,.spa-trt:active,.sv:active,.tb-back:active,
+.tb-icon:active{
+  transform:scale(0.96);
+}
 .qc-ico{font-size:22px;margin-bottom:8px;display:block;}
 .qc-name{font-size:12px;font-weight:400;color:var(--ow);margin-bottom:2px;}
 .qc-sub{font-size:10px;color:var(--mt);}
@@ -2759,6 +2788,13 @@ var DISCOVER_FEED = [
   {tag:'SPA · MEMBERS',title:'Restore. Renew. Rise.',sub:'Peaberries · Arusha Coffee Lodge',action:'openSpaWithTierCheck()',color:'var(--gl)'},
   {tag:'HIDDEN GEMS',title:'Stay Extraordinary.',sub:'10 exclusive properties · Gold & Obsidian',action:'openGemsWithTierCheck()',color:'var(--ocean-soft)'},
   {tag:'PRIVATE DINING',title:'The Table is Set.',sub:'ACL Grill · Gran Meliá',action:"go('s-dining')",color:'var(--gold)'},
+  {tag:'TRANSFERS · ARUSHA',title:'Arrive Without Waiting.',sub:'Airport & hotel transfers · From $60',action:"go('s-transfers')",color:'var(--gold)'},
+  {tag:'EVENTS & GALAS',title:'Where Arusha Gathers.',sub:'Curated invitations · Members only',action:"go('s-events')",color:'#9C27B0'},
+  {tag:'FLIGHT TRACKER · LIVE',title:'Know Before They Land.',sub:'JRO · ARK · DAR · ZNZ · MYW',action:"go('s-flights')",color:'var(--mt)'},
+  {tag:'THE CIRCLE',title:'A Room Worth Being In.',sub:'Private members\' network',action:"go('s-circle')",color:'#D4AF37'},
+  {tag:'EQUESTRIAN',title:'Ride the Rift Valley.',sub:'Guided safari rides · By arrangement',action:"go('s-equestrian')",color:'#8D6E63'},
+  {tag:'TANZANITE & GEMSTONES',title:'Straight From the Source.',sub:'Mererani · Umba · Direct sourcing',action:"go('s-gemstones')",color:'#7C4DFF'},
+  {tag:'REAL ESTATE',title:'Property, Off the Market.',sub:'Off-market introductions · Licensed counsel',action:"go('s-realestate')",color:'var(--gold)'},
 ];
 
 var DINING_VENUES = [
@@ -3193,6 +3229,46 @@ function go(id){
   if(id==='s-acl-menu'){ setTimeout(function(){ try{ renderACLMenu(); }catch(e){} },100); }
   if(id==='s-realestate'){ setTimeout(function(){ try{ renderRealEstateCats(); }catch(e){} },100); }
 }
+// Same selector list as the CSS squish rule — kept as one shared constant so
+// the visual squish and the audio tone always stay in sync with each other.
+var JELLYBEAN_SELECTOR = '.ni,.qc,.luxury-tab,.discover-card,.ab-btn,.admin-close,'
+  +'.admin-submit,.apt-tab,.chat-room-send,.chat-send,.circle-tab,.cmsg-rx,.comm-card,'
+  +'.el-book-btn,.el-card,.el-filter,.ev-book-btn,.ev-card,.ev-day,.ev-filter,.ev-nav-btn,'
+  +'.ev-rsvp-btn,.f1-book-btn,.f1-btn,.f1-hospitality-btn,.f1-tab,.fchk,.ft-board-tab,'
+  +'.ft-book-btn,.ft-row,.ft-search-btn,.gbtn,.gem-enquire-btn,.gem-prop-card,.gg-dot,'
+  +'.gg-lb-close,.gg-lb-nav,.gg-thumb,.gghst,.hc-cta,.install-btn,.install-close,.login-btn,'
+  +'.login-ghost,.login-tab,.member-pill,.modal-x,.notify-strip,.pli,.rc,.rc-head,'
+  +'.spa-book-btn,.spa-chip,.spa-pkg,.spa-ptab,.spa-trt,.sv,.tb-back,.tb-icon';
+
+var _blAudioCtx = null;
+function playTapTone(){
+  try{
+    if(!_blAudioCtx){
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if(!AC) return;
+      _blAudioCtx = new AC();
+    }
+    if(_blAudioCtx.state === 'suspended') _blAudioCtx.resume();
+    var now = _blAudioCtx.currentTime;
+    var osc = _blAudioCtx.createOscillator();
+    var gain = _blAudioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = 640;
+    // Quick, quiet blip — attack then fade, not a beep
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(0.045, now + 0.008);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.09);
+    osc.connect(gain);
+    gain.connect(_blAudioCtx.destination);
+    osc.start(now);
+    osc.stop(now + 0.1);
+  }catch(e){}
+}
+
+document.addEventListener('click', function(e){
+  if(e.target.closest && e.target.closest(JELLYBEAN_SELECTOR)) playTapTone();
+}, true);
+
 function setNav(el){
   document.querySelectorAll('.ni').forEach(function(n){n.classList.remove('active');});
   void el.offsetWidth; // force reflow so the bounce animation restarts even if this tab was already active
@@ -7086,9 +7162,7 @@ function renderDiscoverFeed(){
   if(!el) return;
   var html='';
   DISCOVER_FEED.forEach(function(item){
-    html+='<div onclick="'+item.action+'" style="'
-      +'flex-shrink:0;width:200px;background:var(--card);border:0.5px solid var(--bd);'
-      +'border-radius:2px;padding:16px;cursor:pointer;position:relative;overflow:hidden;">'
+    html+='<div class="discover-card" onclick="'+item.action+'">'
       +'<div style="font-size:8px;letter-spacing:0.18em;color:'+item.color+';text-transform:uppercase;margin-bottom:8px;font-weight:500;">'+item.tag+'</div>'
       +'<div style="font-family:Cormorant Garamond,serif;font-size:18px;color:var(--ow);line-height:1.2;margin-bottom:6px;">'+item.title+'</div>'
       +'<div style="font-size:10px;color:var(--mt);">'+item.sub+'</div>'
