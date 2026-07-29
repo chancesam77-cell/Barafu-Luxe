@@ -461,6 +461,12 @@
   --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
 
+body.outdoor-mode{
+  --mt:#B8A888;
+  --bd:rgba(184,137,42,0.4);
+  filter:contrast(1.18) brightness(1.08);
+}
+
 html,body{height:100%;background:var(--black);color:var(--ow);font-family:'Montserrat',sans-serif;font-weight:300;overflow:hidden;-webkit-tap-highlight-color:transparent;}
 
 /* ── SHELL ── */
@@ -476,7 +482,7 @@ html,body{height:100%;background:var(--black);color:var(--ow);font-family:'Monts
 .tb-logo{width:36px;height:36px;object-fit:contain;}
 .ph-av-cam{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.5);text-align:center;font-size:9px;color:#fff;padding:2px;letter-spacing:0.06em;}
 .tb-title{font-family:'Cormorant Garamond',serif;font-size:17px;color:var(--gl);letter-spacing:0.06em;font-weight:400;}
-.tb-icon{font-size:20px;color:var(--mt);cursor:pointer;padding:4px;background:none;border:none;}
+.tb-icon{font-size:20px;color:var(--mt);cursor:pointer;padding:11px;background:none;border:none;}
 .tb-back{font-size:20px;color:var(--mt);cursor:pointer;padding:4px;background:none;border:none;}
 
 /* ── BOTTOM NAV ── */
@@ -487,7 +493,7 @@ html,body{height:100%;background:var(--black);color:var(--ow);font-family:'Monts
 @keyframes niIconBounce{0%{transform:scale(1);}35%{transform:scale(1.32);}55%{transform:scale(0.9);}75%{transform:scale(1.1);}100%{transform:scale(1);}}
 .ni-ico{font-size:21px;color:var(--mt);transition:color 0.15s;display:inline-block;}
 .ni.active .ni-ico{animation:niIconBounce 0.55s cubic-bezier(0.34,1.56,0.64,1);}
-.ni-lbl{font-size:8px;letter-spacing:0.12em;text-transform:uppercase;color:var(--mt);transition:color 0.15s;font-weight:400;}
+.ni-lbl{font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--mt);transition:color 0.15s;font-weight:400;}
 .ni.active .ni-ico,.ni.active .ni-lbl{color:var(--gold);}
 
 /* ── HERO CARD ── */
@@ -702,7 +708,7 @@ html,body{height:100%;background:var(--black);color:var(--ow);font-family:'Monts
 .modal-handle{width:36px;height:3px;background:var(--bd);border-radius:2px;margin:14px auto 16px;}
 .modal-hd{padding:0 18px 14px;border-bottom:0.5px solid var(--bd);display:flex;justify-content:space-between;align-items:center;}
 .modal-title{font-family:'Cormorant Garamond',serif;font-size:21px;color:var(--gl);}
-.modal-x{font-size:20px;color:var(--mt);cursor:pointer;background:none;border:none;padding:4px;}
+.modal-x{font-size:20px;color:var(--mt);cursor:pointer;background:none;border:none;padding:11px;}
 .modal-body{padding:16px 18px 0;}
 
 /* ── SUCCESS ── */
@@ -1554,7 +1560,10 @@ function removeBookingFB(fbKey){
   <div class="topbar">
     <img class="tb-logo" src="data:image/png;base64,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" alt="BL">
     <span class="tb-title">Barafu Luxe</span>
-    <button class="tb-icon" style="position:relative;" onclick="openNotifications()"><i class="ti ti-bell"></i><span class="notif" id="notif-dot" style="display:none;"></span></button>
+    <div style="display:flex;align-items:center;gap:2px;">
+      <button class="tb-icon" onclick="openSearch()"><i class="ti ti-search"></i></button>
+      <button class="tb-icon" style="position:relative;" onclick="openNotifications()"><i class="ti ti-bell"></i><span class="notif" id="notif-dot" style="display:none;"></span></button>
+    </div>
   </div>
   
   <div class="install-banner" id="install-banner" style="display:none;">
@@ -1954,11 +1963,18 @@ function removeBookingFB(fbKey){
   <div class="plist"><div class="pli" id="profile-spa-access" onclick="openSpaWithTierCheck()" style="display:none;"><i class="ti ti-sparkles pli-ico" style="color:var(--gold);"></i><div><div class="pli-name">Spa & Wellness</div><div class="pli-sub">Peaberries · Siringit · Book treatment</div></div><i class="ti ti-chevron-right pli-arr"></i></div><div class="pli" id="profile-gems-access" onclick="openGemsWithTierCheck()" style="display:none;"><i class="ti ti-diamond pli-ico" style="color:var(--ocean-soft);"></i><div><div class="pli-name">Hidden Gems</div><div class="pli-sub">Exclusive stays · Members only</div></div><i class="ti ti-chevron-right pli-arr"></i></div>
     <div class="pli" onclick="openMyBookings()"><i class="ti ti-file-invoice pli-ico"></i><div><div class="pli-name">My Bookings</div><div class="pli-sub">View confirmed and pending</div></div><i class="ti ti-chevron-right pli-arr"></i></div>
     <div class="pli" onclick="openPaymentDetails()"><i class="ti ti-credit-card pli-ico"></i><div><div class="pli-name">Payment Details</div><div class="pli-sub">Bank · Airtel Money · M-Pesa</div></div><i class="ti ti-chevron-right pli-arr"></i></div>
+    <div class="pli" onclick="showHowItWorks()"><i class="ti ti-help-circle pli-ico" style="color:var(--gold);"></i><div><div class="pli-name">How Barafu Luxe Works</div><div class="pli-sub">Booking, WhatsApp & confirmations explained</div></div><i class="ti ti-chevron-right pli-arr"></i></div>
     <div class="pli" onclick="openTrustPolicies()"><i class="ti ti-shield-check pli-ico" style="color:#7CB88A;"></i><div><div class="pli-name">Trust & Policies</div><div class="pli-sub">Response times · Cancellations · Privacy</div></div><i class="ti ti-chevron-right pli-arr"></i></div>
     <div class="pli" id="profile-install-item" onclick="showInstallGuide()" style="display:none;"><i class="ti ti-device-mobile-down pli-ico" style="color:var(--gold);"></i><div><div class="pli-name">Add to Home Screen</div><div class="pli-sub">Required for push notifications on iPhone</div></div><i class="ti ti-chevron-right pli-arr"></i></div>
     <div class="pli" style="cursor:default;"><i class="ti ti-bell-ringing pli-ico" style="color:var(--gold);"></i><div><div class="pli-name">Push Notifications</div><div class="pli-sub">Booking updates, tier changes & more</div></div>
       <label class="bl-switch">
         <input type="checkbox" id="push-notif-toggle" onchange="this.checked ? enablePushNotifications() : disablePushNotifications()">
+        <span class="bl-switch-track"></span>
+      </label>
+    </div>
+    <div class="pli" style="cursor:default;"><i class="ti ti-sun pli-ico" style="color:var(--gold);"></i><div><div class="pli-name">Outdoor Mode</div><div class="pli-sub">Boosts contrast for bright sunlight</div></div>
+      <label class="bl-switch">
+        <input type="checkbox" id="outdoor-mode-toggle" onchange="toggleOutdoorMode(this.checked)">
         <span class="bl-switch-track"></span>
       </label>
     </div>
@@ -3208,6 +3224,7 @@ function go(id){
   },100); }
   if(id==='s-profile' && currentUser){
     updateProfileForTier(currentUser);
+    if(typeof applyOutdoorModeFromStorage==='function') applyOutdoorModeFromStorage();
     var alreadyInstalledNow = window.navigator.standalone===true || (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
     var installItem = document.getElementById('profile-install-item');
     if(installItem) installItem.style.display = alreadyInstalledNow ? 'none' : 'flex';
@@ -3753,8 +3770,11 @@ function enterApp(user){
   }
   if(user.tier!=='admin'){
     setTimeout(function(){
+      if(typeof maybeShowHowItWorks==='function') maybeShowHowItWorks(user);
+    },5500);
+    setTimeout(function(){
       if(typeof maybeShowNotifPrimer==='function') maybeShowNotifPrimer(user);
-    },8000);
+    },9500);
   }
   // Apply tier styling to profile
   setTimeout(function(){
@@ -4502,6 +4522,145 @@ function dismissWelcomeBack(){
   }
 }
 
+// Shown once, ever, per member — explains the concierge model up front
+// since it's genuinely unusual: tapping "Book" doesn't confirm anything
+// in-app, it opens WhatsApp. Without this, a first-time member could
+// reasonably wonder if the tap even worked.
+function maybeShowHowItWorks(user){
+  if(!user || !user.email) return;
+  if(user.tier==='admin') return;
+  if(DB.get('how_it_works_shown_'+user.email)) return;
+
+  var modalBg = document.getElementById('modal-bg');
+  if(modalBg && modalBg.classList.contains('open')) return;
+
+  DB.set('how_it_works_shown_'+user.email, true);
+  showHowItWorks();
+}
+
+// ── GLOBAL SEARCH ──
+// Static index of every screen/category, plus dynamic results pulled live
+// from GEMS and DINING_VENUES so new properties/venues are searchable
+// automatically without needing to update this list by hand.
+var SEARCH_INDEX_STATIC = [
+  {title:'Transfers', sub:'Airport & hotel transfers · From $60', action:"go('s-transfers')", icon:'🚗'},
+  {title:'Helicopter', sub:'Scenic flights & transfers', action:"go('s-heli')", icon:'🚁'},
+  {title:'Yacht Charters', sub:'Zanzibar & Dar es Salaam', action:"go('s-yacht')", icon:'⛵'},
+  {title:'F1 Hospitality', sub:'Paddock access & private travel', action:"go('s-f1')", icon:'🏎️'},
+  {title:'Empty Legs', sub:'Discounted private flights', action:"go('s-emptylegs')", icon:'✈️'},
+  {title:'Events & Galas', sub:'Curated invitations', action:"go('s-events')", icon:'🎉'},
+  {title:'Flight Tracker', sub:'JRO · ARK · DAR · ZNZ · MYW', action:"go('s-flights')", icon:'📡'},
+  {title:'The Circle', sub:'Private members\' network', action:"go('s-circle')", icon:'👑'},
+  {title:'Spa & Wellness', sub:'Peaberries · Siringit', action:'openSpaWithTierCheck()', icon:'✨'},
+  {title:'Private Dining', sub:'ACL Grill · Gran Meliá', action:"go('s-dining')", icon:'🍽️'},
+  {title:'Equestrian', sub:'Guided safari rides', action:"go('s-equestrian')", icon:'🐎'},
+  {title:'Hidden Gems', sub:'Exclusive villas & stays', action:'openGemsWithTierCheck()', icon:'💎'},
+  {title:'Gemstone Sourcing', sub:'Tanzanite & rare stones', action:"go('s-gemstones')", icon:'💠'},
+  {title:'Real Estate', sub:'Off-market villas & introductions', action:"go('s-realestate')", icon:'🏛️'},
+  {title:'My Bookings', sub:'Track your requests', action:'openMyBookings()', icon:'📋'},
+  {title:'Trust & Policies', sub:'Response times, cancellations, privacy', action:'openTrustPolicies()', icon:'🛡️'},
+  {title:'How Barafu Luxe Works', sub:'Booking & WhatsApp explained', action:'showHowItWorks()', icon:'✦'},
+];
+
+function buildSearchIndex(){
+  var index = SEARCH_INDEX_STATIC.slice();
+  if(typeof GEMS !== 'undefined'){
+    GEMS.forEach(function(g){
+      index.push({title:g.name, sub:(g.location||'Hidden Gems')+' · Tap to view', action:'openGemsWithTierCheck()', icon:'💎'});
+    });
+  }
+  if(typeof DINING_VENUES !== 'undefined'){
+    DINING_VENUES.forEach(function(v){
+      index.push({title:v.name, sub:v.location||'Private Dining', action:"go('s-dining')", icon:'🍽️'});
+    });
+  }
+  return index;
+}
+
+// ── OUTDOOR MODE ── boosts contrast/brightness for legibility in direct
+// sunlight — genuinely relevant here given actual outdoor use (safari,
+// poolside, boats), not just a cosmetic option.
+function toggleOutdoorMode(enabled){
+  document.body.classList.toggle('outdoor-mode', enabled);
+  DB.set('outdoor_mode', enabled);
+}
+function applyOutdoorModeFromStorage(){
+  var enabled = !!DB.get('outdoor_mode');
+  document.body.classList.toggle('outdoor-mode', enabled);
+  var toggle = document.getElementById('outdoor-mode-toggle');
+  if(toggle) toggle.checked = enabled;
+}
+
+function openSearch(){
+  document.getElementById('modal-ttl').textContent = 'Search';
+  document.getElementById('modal-body').innerHTML =
+    '<div class="fwrap" style="padding-top:0;">'
+    +'<input class="finp" id="search-input" placeholder="Search villas, helicopter, dining..." autocomplete="off" style="margin-bottom:14px;" oninput="renderSearchResults(this.value)">'
+    +'<div id="search-results"></div>'
+    +'</div>';
+  document.getElementById('modal-bg').classList.add('open');
+  setTimeout(function(){
+    var input = document.getElementById('search-input');
+    if(input) input.focus();
+  }, 200);
+  renderSearchResults('');
+}
+
+function renderSearchResults(query){
+  var el = document.getElementById('search-results');
+  if(!el) return;
+  var q = (query||'').trim().toLowerCase();
+  var index = buildSearchIndex();
+  var results = !q ? [] : index.filter(function(item){
+    return item.title.toLowerCase().indexOf(q) !== -1 || item.sub.toLowerCase().indexOf(q) !== -1;
+  });
+
+  if(!q){
+    el.innerHTML = '<div style="text-align:center;padding:24px 0;font-size:11px;color:var(--mt);">Start typing to search across every service, villa and venue.</div>';
+    return;
+  }
+  if(!results.length){
+    el.innerHTML = '<div style="text-align:center;padding:24px 0;">'
+      +'<div style="font-size:28px;margin-bottom:8px;">🔍</div>'
+      +'<div style="font-size:11px;color:var(--mt);">No matches for "'+query+'". Try a different word, or ask your concierge directly.</div>'
+      +'</div>';
+    return;
+  }
+  var html = '';
+  results.slice(0,20).forEach(function(item){
+    html += '<div class="rc" style="cursor:pointer;padding:12px 4px;display:flex;align-items:center;gap:12px;" onclick="closeSearchAnd(\''+item.action.replace(/'/g,"\\'")+'\')">'
+      +'<span style="font-size:20px;flex-shrink:0;">'+item.icon+'</span>'
+      +'<div><div style="font-size:13px;color:var(--ow);font-family:Cormorant Garamond,serif;">'+item.title+'</div>'
+      +'<div style="font-size:10px;color:var(--mt);">'+item.sub+'</div></div>'
+      +'</div>';
+  });
+  el.innerHTML = html;
+}
+
+function closeSearchAnd(actionStr){
+  document.getElementById('modal-bg').classList.remove('open');
+  setTimeout(function(){
+    try{ eval(actionStr); }catch(e){ console.log('search navigate failed:', e); }
+  }, 250);
+}
+
+function showHowItWorks(){
+  document.getElementById('modal-ttl').textContent = 'How Barafu Luxe Works';
+  document.getElementById('modal-body').innerHTML =
+    '<div class="fwrap">'
+    +'<div style="text-align:center;margin-bottom:20px;">'
+    +'<div style="font-size:36px;margin-bottom:10px;">✦</div>'
+    +'<div style="font-family:Cormorant Garamond,serif;font-size:19px;color:var(--ow);">No forms. No queue. No call centre.</div>'
+    +'</div>'
+    +'<div class="ig-step"><div class="ig-num">1</div><div class="ig-txt">Browse anything — a villa, a helicopter, a table — and tap <b>Book</b> or <b>Enquire</b>.</div></div>'
+    +'<div class="ig-step"><div class="ig-num">2</div><div class="ig-txt">It opens <b>WhatsApp</b> with your request already written out. That\'s not a glitch — it\'s the whole point.</div></div>'
+    +'<div class="ig-step"><div class="ig-num">3</div><div class="ig-txt">A real person confirms it personally, usually within <b>2 hours</b>. No payment happens inside the app.</div></div>'
+    +'<div class="ig-step"><div class="ig-num">4</div><div class="ig-txt">Track everything under <b>My Bookings</b> in your Profile.</div></div>'
+    +'<button class="gbtn" style="margin-top:18px;" onclick="document.getElementById(\'modal-bg\').classList.remove(\'open\')">Got it</button>'
+    +'</div>';
+  document.getElementById('modal-bg').classList.add('open');
+}
+
 function maybeShowNotifPrimer(user){
   if(!user || !user.email) return;
   if(!isPushSupported()) return; // e.g. iOS not yet installed to Home Screen — nothing to prime yet
@@ -4688,6 +4847,7 @@ function sendBroadcastPush(title, body, url, tierFilter, callback){
 // for icons and install metadata. No injection needed here.
 
 document.addEventListener('DOMContentLoaded',function(){
+  if(typeof applyOutdoorModeFromStorage==='function') applyOutdoorModeFromStorage();
   // Dismiss splash after app initialises
   var splash = document.getElementById('bl-splash');
   if(splash){
