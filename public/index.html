@@ -1024,6 +1024,23 @@ window.FB = {
     }).catch(() => callback(null));
   },
 
+  // ── IN-APP NOTIFICATIONS — persisted per member, so the bell reflects
+  // what was actually pushed, even if the app was closed when it happened ──
+  saveNotificationForUser: (email, notif) => {
+    const safe = email.replace(/\./g,'_').replace(/@/g,'_at_');
+    return push(ref(db, 'notifications/' + safe), notif);
+  },
+  getNotificationsForUser: (email, callback) => {
+    const safe = email.replace(/\./g,'_').replace(/@/g,'_at_');
+    get(ref(db, 'notifications/' + safe)).then(snap => {
+      if (!snap.exists()) { callback([]); return; }
+      const data = snap.val();
+      const list = Object.keys(data).map(k => Object.assign({}, data[k], {fbKey: k}));
+      list.sort((a, b) => (b.createdAt||0) - (a.createdAt||0));
+      callback(list);
+    }).catch(() => callback([]));
+  },
+
   // ── PROFILE PICTURE — synced across devices, not just this browser ──
   saveProfilePic: (email, dataUrl) => {
     const safe = email.replace(/\./g,'_').replace(/@/g,'_at_');
@@ -3778,6 +3795,7 @@ function enterApp(user){
   // requiring a specific tap on the bell icon.
   if('clearAppBadge' in navigator) navigator.clearAppBadge().catch(function(){});
   if(typeof resetServiceWorkerBadge==='function') resetServiceWorkerBadge();
+  if(typeof loadNotificationsFromFirebase==='function') loadNotificationsFromFirebase(user);
   setTimeout(function(){
     if(typeof maybeShowWelcomeBack==='function') maybeShowWelcomeBack(user);
   },2300);
@@ -4830,6 +4848,29 @@ function sendPushToMember(email, title, body, url, callback){
     }).then(function(res){ return res.json(); })
       .then(function(result){
         if(result && result.ok){
+          // Mirror this into the recipient's in-app notification history too
+          // — otherwise the bell and real push notifications tell two
+          // different stories, which is confusing regardless of which one
+          // is "more correct."
+          if(window.FB && typeof window.FB.saveNotificationForUser==='function'){
+            // Extract the target screen from the URL (e.g. "/?screen=s-yacht")
+            // so tapping this notification later can navigate directly,
+            // same deep-link format already used by push notification taps.
+            var targetScreen = null;
+            try{
+              var qIdx = (url||'').indexOf('screen=');
+              if(qIdx !== -1) targetScreen = decodeURIComponent((url||'').slice(qIdx+7).split('&')[0]);
+            }catch(e){}
+
+            window.FB.saveNotificationForUser(email, {
+              type: 'info',
+              title: title,
+              body: body,
+              action: targetScreen ? ("go('"+targetScreen+"')") : null,
+              createdAt: Date.now(),
+              read: false
+            }).catch(function(err){ console.log('saveNotificationForUser failed:', err); });
+          }
           callback('sent');
         } else if(result && result.expired){
           callback('expired');
@@ -7424,6 +7465,45 @@ function closeNotifAndGo(actionStr){
   setTimeout(function(){
     try{ eval(actionStr); }catch(e){ console.log('notification navigate failed:', e); }
   }, 250);
+}
+
+// Pulls real notification history from Firebase into the in-app bell.
+// This is the actual fix for pushes arriving with nothing showing in the
+// bell — the two systems were completely disconnected before: a real push
+// went straight to the phone's OS notification tray via the service
+// worker, and never touched the in-app NOTIFICATIONS array at all. Now
+// every push that actually sends also gets written here (see
+// sendPushToMember), and this pulls that same history in on app open —
+// including anything that arrived while the app was closed.
+function loadNotificationsFromFirebase(user){
+  if(!user || !user.email) return;
+  if(!window.FB || typeof window.FB.getNotificationsForUser !== 'function') return;
+  window.FB.getNotificationsForUser(user.email, function(list){
+    if(!list || !list.length) return;
+    // Only load what isn't already in the in-memory list (avoids
+    // duplicating anything a live listener already added this session).
+    var existingKeys = {};
+    NOTIFICATIONS.forEach(function(n){ if(n.fbKey) existingKeys[n.fbKey] = true; });
+    var added = false;
+    list.forEach(function(n){
+      if(n.fbKey && existingKeys[n.fbKey]) return;
+      NOTIFICATIONS.push({
+        id: n.fbKey || ('n'+n.createdAt),
+        fbKey: n.fbKey,
+        type: n.type || 'info',
+        title: n.title,
+        body: n.body,
+        action: n.action || null,
+        time: n.createdAt ? new Date(n.createdAt).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}) : '',
+        read: !!n.read
+      });
+      added = true;
+    });
+    if(added){
+      NOTIFICATIONS.sort(function(a,b){ return (b.id > a.id) ? 1 : -1; });
+      updateNotifBadge();
+    }
+  });
 }
 
 function openNotifications(){
