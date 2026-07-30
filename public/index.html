@@ -7508,6 +7508,31 @@ function changeProfilePic(){
           return;
         }
 
+        // .decode() specifically guarantees the image is FULLY decoded
+        // before we touch it — unlike onload, which some browsers can fire
+        // slightly early for formats like HEIC, leaving drawImage working
+        // from incomplete pixel data and producing a corrupted result.
+        // This directly targets that race rather than just detecting it
+        // after the fact. Falls back to proceeding immediately if decode()
+        // isn't supported at all.
+        if(typeof img.decode === 'function'){
+          img.decode().then(function(){ resizeAndSaveProfilePic(img); }).catch(function(){
+            resizeAndSaveProfilePic(img); // fall back and let the later checks catch a genuine failure
+          });
+        } else {
+          resizeAndSaveProfilePic(img);
+        }
+      };
+      img.onerror = function(){ showToast('⚠ Could not read that image — try a different file'); };
+      img.src = ev.target.result;
+    };
+    reader.onerror = function(){ showToast('⚠ Could not read that file'); };
+    reader.readAsDataURL(file);
+  };
+  input.click();
+}
+
+function resizeAndSaveProfilePic(img){
         // Resize before storing — a raw phone-camera photo can be several
         // MB, and localStorage's total quota (shared with everything else
         // the app stores there) is small enough that a single full-size
@@ -7530,64 +7555,65 @@ function changeProfilePic(){
 
         // Second safety net: a genuinely blank/failed canvas export is
         // suspiciously tiny (a couple hundred bytes) compared to a real
-        // 320x320 photo (which should be several KB at minimum). Catches
-        // any other path that could produce an empty image, not just the
-        // zero-dimension case already checked above.
+        // 320x320 photo (which should be several KB at minimum).
         if(resizedDataUrl.length < 1000){
           showToast('⚠ That photo didn\'t process correctly — try a different one');
           return;
         }
 
-        var key = 'profile_pic_'+(currentUser?currentUser.email:'guest');
-        var saved = false;
-        try{
-          localStorage.setItem('bl_'+key, JSON.stringify(resizedDataUrl));
-          saved = true;
-        }catch(err){
-          console.log('Profile picture save failed:', err);
-        }
+        // Prove the output actually decodes before trusting it with
+        // anything. This matters specifically for HEIC-sourced photos
+        // (the iPhone default): WebKit can sometimes fire the source
+        // image's onload slightly before it's genuinely fully decoded,
+        // so the canvas draws from incomplete pixel data and produces a
+        // technically-non-empty but corrupted JPEG — one that passes
+        // every check above, sets as a valid-looking data URL, and then
+        // fails only when the browser actually tries to render it. Catch
+        // that here, before it ever reaches storage or the screen.
+        var verifyImg = new Image();
+        verifyImg.onload = function(){
+          finishProfilePicSave(resizedDataUrl);
+        };
+        verifyImg.onerror = function(){
+          showToast('⚠ That photo didn\'t convert correctly on this device — try a different photo, or take a new one instead of using one from your camera roll');
+        };
+        verifyImg.src = resizedDataUrl;
+}
 
-        if(saved){
-          var imgEl = document.getElementById('profile-av-img');
-          var txt = document.getElementById('profile-av-text');
-          if(imgEl){
-            imgEl.onerror = function(){
-              console.log('Displayed img element failed to render the saved photo data');
-              imgEl.style.display='none';
-              if(txt) txt.style.display='flex';
-              showToast('⚠ Photo saved but couldn\'t display — please try again or use a different photo');
-            };
-            imgEl.onload = function(){
-              console.log('Profile photo rendered successfully, size:', resizedDataUrl.length, 'chars');
-            };
-            imgEl.src=resizedDataUrl;
-            imgEl.style.display='block';
-          }
-          if(txt) txt.style.display='none';
+function finishProfilePicSave(resizedDataUrl){
+  var key = 'profile_pic_'+(currentUser?currentUser.email:'guest');
+  var saved = false;
+  try{
+    localStorage.setItem('bl_'+key, JSON.stringify(resizedDataUrl));
+    saved = true;
+  }catch(err){
+    console.log('Profile picture save failed:', err);
+  }
 
-          // Local save is instant, but the point of syncing is that it
-          // follows the member elsewhere — push to Firebase too.
-          if(currentUser && currentUser.email && window.FB && typeof window.FB.saveProfilePic==='function'){
-            window.FB.saveProfilePic(currentUser.email, resizedDataUrl).then(function(){
-              showToast('Profile photo updated ✓');
-            }).catch(function(err){
-              console.log('Profile picture sync failed:', err);
-              showToast('Saved on this device — but couldn\'t sync to your other devices');
-            });
-          } else {
-            showToast('Profile photo updated ✓');
-          }
-        } else {
-          showToast('⚠ Could not save photo — try a smaller image or clear some space');
-        }
-      };
-      img.onerror = function(){ showToast('⚠ Could not read that image — try a different file'); };
-      img.src = ev.target.result;
-    };
-    reader.onerror = function(){ showToast('⚠ Could not read that file'); };
-    reader.readAsDataURL(file);
-  };
-  input.click();
+  if(saved){
+    var imgEl = document.getElementById('profile-av-img');
+    var txt = document.getElementById('profile-av-text');
+    if(imgEl){
+      imgEl.src=resizedDataUrl;
+      imgEl.style.display='block';
+    }
+    if(txt) txt.style.display='none';
+
+    // Local save is instant, but the point of syncing is that it
+    // follows the member elsewhere — push to Firebase too.
+    if(currentUser && currentUser.email && window.FB && typeof window.FB.saveProfilePic==='function'){
+      window.FB.saveProfilePic(currentUser.email, resizedDataUrl).then(function(){
+        showToast('Profile photo updated ✓');
+      }).catch(function(err){
+        console.log('Profile picture sync failed:', err);
+        showToast('Saved on this device — but couldn\'t sync to your other devices');
+      });
+    } else {
+      showToast('Profile photo updated ✓');
+    }
+  } else {
+    showToast('⚠ Could not save photo — try a smaller image or clear some space');
+  }
 }
 
 function loadProfilePic(user){
