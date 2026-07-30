@@ -7496,6 +7496,17 @@ function changeProfilePic(){
     reader.onload = function(ev){
       var img = new Image();
       img.onload = function(){
+        // A known failure mode, especially with iPhone photos (often HEIC
+        // format): the image can "load" but decode with zero width/height
+        // in some browsers. If that happens, drawImage draws nothing, the
+        // canvas exports as a blank image, and it would otherwise "save
+        // successfully" — just with nothing actually in it. Catch that
+        // here instead of showing a false success.
+        if(!img.width || !img.height){
+          showToast('⚠ Could not read that photo — try a JPG or PNG instead');
+          return;
+        }
+
         // Resize before storing — a raw phone-camera photo can be several
         // MB, and localStorage's total quota (shared with everything else
         // the app stores there) is small enough that a single full-size
@@ -7515,6 +7526,16 @@ function changeProfilePic(){
         ctx.drawImage(img, srcX, srcY, srcSize, srcSize, 0, 0, size, size);
 
         var resizedDataUrl = canvas.toDataURL('image/jpeg', 0.82);
+
+        // Second safety net: a genuinely blank/failed canvas export is
+        // suspiciously tiny (a couple hundred bytes) compared to a real
+        // 320x320 photo (which should be several KB at minimum). Catches
+        // any other path that could produce an empty image, not just the
+        // zero-dimension case already checked above.
+        if(resizedDataUrl.length < 1000){
+          showToast('⚠ That photo didn\'t process correctly — try a different one');
+          return;
+        }
 
         var key = 'profile_pic_'+(currentUser?currentUser.email:'guest');
         var saved = false;
