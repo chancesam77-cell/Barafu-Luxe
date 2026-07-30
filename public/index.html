@@ -466,6 +466,9 @@ body.outdoor-mode{
   --bd:rgba(184,137,42,0.4);
   filter:contrast(1.18) brightness(1.08);
 }
+body.outdoor-mode .tb-logo{
+  filter:contrast(1.35) brightness(1.15) saturate(1.1);
+}
 
 html,body{height:100%;background:var(--black);color:var(--ow);font-family:'Montserrat',sans-serif;font-weight:300;overflow:hidden;-webkit-tap-highlight-color:transparent;}
 
@@ -1017,6 +1020,19 @@ window.FB = {
     get(ref(db, 'pushSubscriptions/' + safe)).then(snap => {
       callback(snap.exists() ? snap.val() : null);
     }).catch(() => callback(null));
+  },
+
+  // ── FLIGHT TRACKING — "notify me when my guest's flight lands" ──
+  saveTrackedFlight: (flightKey, data) => {
+    return set(ref(db, 'trackedFlights/' + flightKey), data);
+  },
+  getTrackedFlights: (callback) => {
+    get(ref(db, 'trackedFlights')).then(snap => {
+      callback(snap.exists() ? snap.val() : {});
+    }).catch(() => callback({}));
+  },
+  removeTrackedFlight: (flightKey) => {
+    return remove(ref(db, 'trackedFlights/' + flightKey));
   },
 
   removeMember: (email) => {
@@ -3202,6 +3218,7 @@ function go(id){
   // Screen-specific init
   if(id==='s-flights'){
     setTimeout(function(){ try{renderFlights();}catch(e){} setTimeout(function(){ try{fetchLiveFlights();}catch(e){}},500); },100);
+    setTimeout(function(){ try{checkTrackedFlights();}catch(e){console.log('checkTrackedFlights err:',e);} },1200);
   }
   if(id==='s-events'){ try{renderCalendar();}catch(e){} try{renderEvents();}catch(e){} setTimeout(function(){try{fetchLiveEvents();}catch(e){}},300); }
   if(id==='s-emptylegs'){ setTimeout(function(){ try{fetchLiveEmptyLegs();}catch(e){}; },100); }
@@ -4585,7 +4602,10 @@ function toggleOutdoorMode(enabled){
   DB.set('outdoor_mode', enabled);
 }
 function applyOutdoorModeFromStorage(){
-  var enabled = !!DB.get('outdoor_mode');
+  var stored = DB.get('outdoor_mode');
+  // Default ON for anyone who's never touched this setting. Only an
+  // explicit false (someone deliberately switched it off) stays off.
+  var enabled = stored === null ? true : !!stored;
   document.body.classList.toggle('outdoor-mode', enabled);
   var toggle = document.getElementById('outdoor-mode-toggle');
   if(toggle) toggle.checked = enabled;
@@ -9224,7 +9244,101 @@ function _renderFlightDetail(f, el){
     +'</div>'
     +'</div>'
     +'<button class="gbtn" onclick="openTransferBook(\'Airport Transfer\',100,\'250,000\')" style="margin-top:4px;">Book transfer for this flight</button>'
+    +(status!=='LANDED'&&status!=='CANCELLED' ? '<button class="gghst" id="notify-flight-btn" style="margin-top:8px;" onclick="trackFlightForNotification(\''+fn+'\',\''+status+'\')"><i class="ti ti-bell-ringing"></i> Notify me when it lands</button>' : '')
     +'</div>';
+}
+
+// ── FLIGHT TRACKING — "notify me when my guest's flight lands" ──
+// Real limitation, stated plainly rather than oversold: this is a
+// best-effort, client-triggered check, not a guaranteed background job.
+// It rechecks every tracked flight each time ANYONE opens Flight Tracker
+// (admin or any member) — there's no dedicated server process watching
+// flights 24/7 independent of someone having the app open. For a small
+// concierge operation where the admin dashboard gets opened regularly,
+// this covers the real case well; it's not the same guarantee a true
+// server-side cron job would give.
+function trackFlightForNotification(flightNumber, currentStatus){
+  if(!currentUser || !currentUser.email){
+    showToast('Please sign in to track a flight');
+    return;
+  }
+  var flightKey = flightNumber.replace(/[^A-Z0-9]/gi, '');
+  var data = {
+    flightNumber: flightNumber,
+    watcherEmail: currentUser.email,
+    watcherName: currentUser.name || 'Guest',
+    lastKnownStatus: currentStatus,
+    trackedAt: Date.now()
+  };
+  if(window.FB && typeof window.FB.saveTrackedFlight === 'function'){
+    window.FB.saveTrackedFlight(flightKey, data).then(function(){
+      showToast('Tracking '+flightNumber+' — you\'ll be notified when it lands ✓');
+      var btn = document.getElementById('notify-flight-btn');
+      if(btn){
+        btn.innerHTML = '<i class="ti ti-check"></i> Tracking this flight';
+        btn.onclick = null;
+        btn.style.opacity = '0.6';
+      }
+    }).catch(function(err){
+      console.log('trackFlightForNotification failed:', err);
+      showToast('⚠ Could not save — check connection and try again');
+    });
+  }
+}
+
+function checkTrackedFlights(){
+  if(!window.FB || typeof window.FB.getTrackedFlights !== 'function') return;
+  window.FB.getTrackedFlights(function(tracked){
+    var keys = Object.keys(tracked || {});
+    keys.forEach(function(key){
+      var entry = tracked[key];
+      if(!entry || !entry.flightNumber) return;
+      fetch('/api/aviation?flight=' + encodeURIComponent(entry.flightNumber))
+        .then(function(r){ return r.json(); })
+        .then(function(data){
+          if(!data || !data.data || !data.data.length) return;
+          var f = data.data[0];
+          var newStatus = (f.flight_status || 'unknown').toUpperCase();
+          if(newStatus === entry.lastKnownStatus) return; // no change, nothing to do
+
+          if(newStatus === 'LANDED'){
+            var arr = f.arrival || {};
+            var arrivalAirport = arr.iata || 'destination';
+            sendPushToMember(
+              entry.watcherEmail,
+              '✈ Flight Landed',
+              entry.flightNumber + ' has landed at ' + arrivalAirport + '.',
+              '/?screen=s-flights',
+              function(){}
+            );
+            // Landing is the terminal event this feature cares about — stop
+            // tracking so the watcher isn't notified again on every future check.
+            if(window.FB && typeof window.FB.removeTrackedFlight === 'function'){
+              window.FB.removeTrackedFlight(key);
+            }
+          } else if(newStatus === 'CANCELLED'){
+            sendPushToMember(
+              entry.watcherEmail,
+              '⚠ Flight Cancelled',
+              entry.flightNumber + ' has been cancelled.',
+              '/?screen=s-flights',
+              function(){}
+            );
+            if(window.FB && typeof window.FB.removeTrackedFlight === 'function'){
+              window.FB.removeTrackedFlight(key);
+            }
+          } else {
+            // Status changed but isn't a terminal event yet (e.g. scheduled
+            // -> active) — just update what we're comparing against next time.
+            if(window.FB && typeof window.FB.saveTrackedFlight === 'function'){
+              entry.lastKnownStatus = newStatus;
+              window.FB.saveTrackedFlight(key, entry);
+            }
+          }
+        })
+        .catch(function(err){ console.log('checkTrackedFlights fetch failed for', entry.flightNumber, err); });
+    });
+  });
 }
 
 </script>
