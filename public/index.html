@@ -7673,6 +7673,21 @@ function finishProfilePicSave(resizedDataUrl){
     if(imgEl){
       imgEl.src=resizedDataUrl;
       imgEl.style.display='block';
+      // Verify the update actually took, rather than assuming it did —
+      // if this doesn't match, something is resetting it immediately
+      // after, which is different from the image data itself being bad.
+      setTimeout(function(){
+        var actualDisplay = window.getComputedStyle(imgEl).display;
+        var actualSrcLen = imgEl.src ? imgEl.src.length : 0;
+        console.log('Profile avatar check — computed display:', actualDisplay, '| src length:', actualSrcLen, '| naturalWidth:', imgEl.naturalWidth);
+        if(actualDisplay === 'none' || actualSrcLen < 100){
+          showToast('⚠ Diagnostic: photo saved but something reset the display (display='+actualDisplay+')');
+        } else if(imgEl.naturalWidth === 0){
+          showToast('⚠ Diagnostic: image element updated but rendered at 0 width');
+        }
+      }, 500);
+    } else {
+      showToast('⚠ Diagnostic: could not find the avatar image element at all');
     }
     if(txt) txt.style.display='none';
 
