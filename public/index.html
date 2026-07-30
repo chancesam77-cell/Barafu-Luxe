@@ -4228,7 +4228,7 @@ function setMemberTier(email, newTier, silent){
       // Only push once the write is actually confirmed saved.
       if(typeof sendPushToMember==='function'){
         var tierLabel = newTier.charAt(0).toUpperCase()+newTier.slice(1);
-        sendPushToMember(email, 'Membership Updated', 'You are now a '+tierLabel+' member.', '/', function(status, detail){
+        sendPushToMember(email, 'Membership Updated', 'You are now a '+tierLabel+' member.', '/?screen=s-profile', function(status, detail){
           if(silent) return; // bulk operations show their own combined summary
           if(status==='sent'){
             showToast('Notification sent ✓');
@@ -4869,7 +4869,19 @@ function sendPushToMember(email, title, body, url, callback){
               action: targetScreen ? ("go('"+targetScreen+"')") : null,
               createdAt: Date.now(),
               read: false
-            }).catch(function(err){ console.log('saveNotificationForUser failed:', err); });
+            }).then(function(){
+              console.log('Notification history saved for', email);
+            }).catch(function(err){
+              // This was previously console-only — completely invisible.
+              // If Firebase security rules are blocking this specific write
+              // (a very common real cause when one path works and a sibling
+              // path doesn't), this is the only way anyone would ever find
+              // out, since the push itself still sends successfully either way.
+              console.log('saveNotificationForUser failed:', err);
+              if(typeof showToast==='function'){
+                showToast('⚠ Push sent, but could not save to their notification history: ' + (err && err.message ? err.message : 'unknown error'));
+              }
+            });
           }
           callback('sent');
         } else if(result && result.expired){
