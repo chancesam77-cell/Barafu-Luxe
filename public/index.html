@@ -520,8 +520,17 @@ html,body{height:100%;background:var(--black);color:var(--ow);font-family:'Monts
 .sec{padding:16px 14px;}
 
 /* ── QUICK GRID ── */
-.qgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 14px 14px;}
-.qc{background:var(--card);border:0.5px solid var(--bd);padding:14px;cursor:pointer;transition:border-color 0.15s,transform .15s cubic-bezier(0.34,1.56,0.64,1);border-radius:2px;}
+.qgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 14px 14px;perspective:700px;}
+@keyframes pageOpenJelly{
+  0%{transform:perspective(700px) rotateY(0deg) scale(1);}
+  25%{transform:perspective(700px) rotateY(-16deg) scale(0.93) skewY(-1deg);}
+  50%{transform:perspective(700px) rotateY(9deg) scale(1.04) skewY(0.5deg);}
+  72%{transform:perspective(700px) rotateY(-5deg) scale(0.98);}
+  88%{transform:perspective(700px) rotateY(2deg) scale(1.01);}
+  100%{transform:perspective(700px) rotateY(0deg) scale(1);}
+}
+.qc.page-opening{animation:pageOpenJelly 0.5s cubic-bezier(0.34,1.56,0.64,1);box-shadow:-6px 4px 18px rgba(0,0,0,0.35);}
+.qc{background:var(--card);border:0.5px solid var(--bd);padding:14px;cursor:pointer;transition:border-color 0.15s,transform .15s cubic-bezier(0.34,1.56,0.64,1);border-radius:2px;transform-style:preserve-3d;transform-origin:left center;}
 .qc:active{background:var(--card2);transform:scale(0.9);}
 .discover-card{flex-shrink:0;width:200px;background:var(--card);border:0.5px solid var(--bd);border-radius:2px;padding:16px;cursor:pointer;position:relative;overflow:hidden;transition:transform .15s cubic-bezier(0.34,1.56,0.64,1),border-color .15s;}
 .discover-card:active{transform:scale(0.92);border-color:rgba(184,137,42,0.35);}
@@ -1639,27 +1648,27 @@ function removeBookingFB(fbKey){
   </div>
   <div class="sec"><div class="slbl">Quick request</div></div>
   <div class="qgrid">
-    <div class="qc" onclick="go('s-transfers')"><span class="qc-ico" style="color:var(--gold)"><i class="ti ti-car"></i></span><div class="qc-name">Transfer</div><div class="qc-sub">From $60</div></div>
-    <div class="qc" onclick="go('s-heli')"><span class="qc-ico" style="color:var(--gold)"><i class="ti ti-helicopter"></i></span><div class="qc-name">Helicopter</div><div class="qc-sub">From $8,930</div></div>
-    <div class="qc" onclick="go('s-yacht')"><span class="qc-ico" style="color:var(--ocean-soft)"><i class="ti ti-sailboat"></i></span><div class="qc-name">Yacht</div><div class="qc-sub">From $2,000</div></div>
-    <div class="qc" onclick="go('s-f1')"><span class="qc-ico" style="color:var(--red)"><i class="ti ti-steering-wheel"></i></span><div class="qc-name">F1 Hospitality</div><div class="qc-sub">14 races</div></div>
-    <div class="qc" onclick="go('s-events')"><span class="qc-ico" style="color:#9C27B0"><i class="ti ti-calendar-event"></i></span><div class="qc-name">Events</div><div class="qc-sub">Galas & more</div></div>
+    <div class="qc" onclick="openWithPageFlip(this,'go(\'s-transfers\')')"><span class="qc-ico" style="color:var(--gold)"><i class="ti ti-car"></i></span><div class="qc-name">Transfer</div><div class="qc-sub">From $60</div></div>
+    <div class="qc" onclick="openWithPageFlip(this,'go(\'s-heli\')')"><span class="qc-ico" style="color:var(--gold)"><i class="ti ti-helicopter"></i></span><div class="qc-name">Helicopter</div><div class="qc-sub">From $8,930</div></div>
+    <div class="qc" onclick="openWithPageFlip(this,'go(\'s-yacht\')')"><span class="qc-ico" style="color:var(--ocean-soft)"><i class="ti ti-sailboat"></i></span><div class="qc-name">Yacht</div><div class="qc-sub">From $2,000</div></div>
+    <div class="qc" onclick="openWithPageFlip(this,'go(\'s-f1\')')"><span class="qc-ico" style="color:var(--red)"><i class="ti ti-steering-wheel"></i></span><div class="qc-name">F1 Hospitality</div><div class="qc-sub">14 races</div></div>
+    <div class="qc" onclick="openWithPageFlip(this,'go(\'s-events\')')"><span class="qc-ico" style="color:#9C27B0"><i class="ti ti-calendar-event"></i></span><div class="qc-name">Events</div><div class="qc-sub">Galas & more</div></div>
 
-    <div class="qc" onclick="go('s-emptylegs')"><span class="qc-ico" style="color:var(--gold)"><i class="ti ti-plane-tilt"></i></span><div class="qc-name">Empty Legs</div><div class="qc-sub">Up to 75% off</div></div>
-    <div class="qc" onclick="go('s-flights')"><span class="qc-ico" style="color:var(--mt)"><i class="ti ti-radar"></i></span><div class="qc-name">Flight Tracker</div><div class="qc-sub">JRO · ARK · DAR</div></div>
-    <div class="qc" onclick="go('s-circle')"><span class="qc-ico" style="color:#D4AF37"><i class="ti ti-crown"></i></span><div class="qc-name">The Circle</div><div class="qc-sub" id="circle-member-count">Private network</div></div>
+    <div class="qc" onclick="openWithPageFlip(this,'go(\'s-emptylegs\')')"><span class="qc-ico" style="color:var(--gold)"><i class="ti ti-plane-tilt"></i></span><div class="qc-name">Empty Legs</div><div class="qc-sub">Up to 75% off</div></div>
+    <div class="qc" onclick="openWithPageFlip(this,'go(\'s-flights\')')"><span class="qc-ico" style="color:var(--mt)"><i class="ti ti-radar"></i></span><div class="qc-name">Flight Tracker</div><div class="qc-sub">JRO · ARK · DAR</div></div>
+    <div class="qc" onclick="openWithPageFlip(this,'go(\'s-circle\')')"><span class="qc-ico" style="color:#D4AF37"><i class="ti ti-crown"></i></span><div class="qc-name">The Circle</div><div class="qc-sub" id="circle-member-count">Private network</div></div>
   </div>
   <div class="divider"></div>
   <div class="sec"><div class="slbl">Discover</div></div>
   <div style="display:flex;gap:10px;padding:0 14px 14px;overflow-x:auto;-webkit-overflow-scrolling:touch;" id="discover-feed"></div>
   <div class="sec" style="padding-top:4px;"><div class="slbl">More services</div></div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 14px 14px;">
-    <div class="qc" onclick="openSpaWithTierCheck()"><span class="qc-ico" style="color:var(--gold)"><i class="ti ti-sparkles"></i></span><div class="qc-name">Spa & Wellness</div><div class="qc-sub">Peaberries · Siringit</div></div>
-    <div class="qc" onclick="go('s-dining')"><span class="qc-ico">🍽️</span><div class="qc-name">Private Dining</div><div class="qc-sub">ACL Grill · Gran Meliá</div></div>
-    <div class="qc" onclick="go('s-equestrian')"><span class="qc-ico">🐎</span><div class="qc-name">Equestrian</div><div class="qc-sub">Safari rides</div></div>
-    <div class="qc" onclick="openGemsWithTierCheck()"><span class="qc-ico" style="color:var(--ocean-soft)"><i class="ti ti-diamond"></i></span><div class="qc-name">Hidden Gems</div><div class="qc-sub">Exclusive stays</div></div>
-    <div class="qc" onclick="go('s-gemstones')"><span class="qc-ico" style="color:#7C4DFF"><i class="ti ti-diamond"></i></span><div class="qc-name">Gemstone Sourcing</div><div class="qc-sub">Tanzanite & more</div></div>
-    <div class="qc" onclick="go('s-realestate')"><span class="qc-ico" style="color:var(--gold)"><i class="ti ti-building-estate"></i></span><div class="qc-name">Off-Market Villas</div><div class="qc-sub">Real estate concierge</div></div>
+    <div class="qc" onclick="openWithPageFlip(this,'openSpaWithTierCheck()')"><span class="qc-ico" style="color:var(--gold)"><i class="ti ti-sparkles"></i></span><div class="qc-name">Spa & Wellness</div><div class="qc-sub">Peaberries · Siringit</div></div>
+    <div class="qc" onclick="openWithPageFlip(this,'go(\'s-dining\')')"><span class="qc-ico">🍽️</span><div class="qc-name">Private Dining</div><div class="qc-sub">ACL Grill · Gran Meliá</div></div>
+    <div class="qc" onclick="openWithPageFlip(this,'go(\'s-equestrian\')')"><span class="qc-ico">🐎</span><div class="qc-name">Equestrian</div><div class="qc-sub">Safari rides</div></div>
+    <div class="qc" onclick="openWithPageFlip(this,'openGemsWithTierCheck()')"><span class="qc-ico" style="color:var(--ocean-soft)"><i class="ti ti-diamond"></i></span><div class="qc-name">Hidden Gems</div><div class="qc-sub">Exclusive stays</div></div>
+    <div class="qc" onclick="openWithPageFlip(this,'go(\'s-gemstones\')')"><span class="qc-ico" style="color:#7C4DFF"><i class="ti ti-diamond"></i></span><div class="qc-name">Gemstone Sourcing</div><div class="qc-sub">Tanzanite & more</div></div>
+    <div class="qc" onclick="openWithPageFlip(this,'go(\'s-realestate\')')"><span class="qc-ico" style="color:var(--gold)"><i class="ti ti-building-estate"></i></span><div class="qc-name">Off-Market Villas</div><div class="qc-sub">Real estate concierge</div></div>
   </div>
 </div>
 
@@ -3784,7 +3793,14 @@ function enterApp(user){
   var tmap={admin:'✦ Admin · Barafu Luxe',gold:'✦ Gold Member',obsidian:'✦ Obsidian Member',silver:'Silver Member'};
   if(pt) pt.textContent=tmap[user.tier]||'Barafu Luxe Member';
   var av=user.initials||user.name.split(' ').map(function(n){return n[0];}).join('').slice(0,2).toUpperCase();
-  if(pa) pa.textContent=av;
+  // Sets initials on the nested span specifically, never wipes the whole
+  // wrapper — pa.textContent would destroy the <img>/<span> structure the
+  // avatar system depends on (found while auditing the profile picture fix).
+  if(pa){
+    var initialsSpan = document.getElementById('profile-av-text');
+    if(initialsSpan) initialsSpan.textContent = av;
+    else pa.textContent = av; // first-ever render, nothing nested yet — safe to set directly
+  }
   if(user.tier==='admin'){
     var item=document.getElementById('admin-menu-item');
     if(item) item.style.display='flex';
@@ -4687,6 +4703,19 @@ function renderSearchResults(query){
       +'</div>';
   });
   el.innerHTML = html;
+}
+
+// Plays the page-flip animation on a category card before navigating,
+// rather than navigating instantly (which would swap screens immediately
+// and cut the animation off before it's even visible).
+function openWithPageFlip(el, actionStr){
+  if(el){
+    el.classList.add('page-opening');
+  }
+  setTimeout(function(){
+    if(el) el.classList.remove('page-opening');
+    try{ eval(actionStr); }catch(e){ console.log('page-flip navigate failed:', e); }
+  }, 380);
 }
 
 function closeSearchAnd(actionStr){
@@ -7668,24 +7697,22 @@ function finishProfilePicSave(resizedDataUrl){
   }
 
   if(saved){
-    // Retry finding the element a few times with short delays, rather than
-    // giving up on the very first attempt — if something transient about
-    // the page's render cycle is the cause, this works around it without
-    // needing to know exactly what that cause is.
+    // Rather than searching for and mutating a specific pre-existing child
+    // element (which has proven unreliable — the element demonstrably
+    // exists at tap-time, since tapping it is what starts this whole
+    // flow, yet can't be found again a few seconds later once photo
+    // processing finishes), rebuild the entire avatar container fresh via
+    // the same shared helper used elsewhere in the app.
     var attempts = 0;
     var tryUpdateAvatar = function(){
       attempts++;
-      var imgEl = document.getElementById('profile-av-img');
-      var txt = document.getElementById('profile-av-text');
-      if(imgEl){
-        imgEl.src=resizedDataUrl;
-        imgEl.style.display='block';
-        if(txt) txt.style.display='none';
-      } else if(attempts < 5){
+      var ok = (typeof setAvatarImage==='function') && setAvatarImage(resizedDataUrl);
+      if(!ok && attempts < 5){
         setTimeout(tryUpdateAvatar, 150);
-      } else {
-        console.log('profile-av-img not found after 5 attempts');
-        showToast('⚠ Diagnostic: avatar element genuinely not in the page — please screenshot this and send it');
+        return;
+      } else if(!ok){
+        console.log('profile-av wrapper not found after 5 attempts');
+        showToast('⚠ Diagnostic: avatar container genuinely not in the page — please screenshot this and send it');
       }
       // Also route through the same logic that already reliably loads and
       // displays a saved photo elsewhere in the app, as a second path.
@@ -7710,25 +7737,33 @@ function finishProfilePicSave(resizedDataUrl){
   }
 }
 
+// Shared, robust way to actually paint the avatar — rebuilds the stable
+// outer wrapper's contents fresh rather than depending on a specific
+// pre-existing child element, since that child has proven to sometimes
+// not be findable by the time async work (photo processing, Firebase
+// reads) completes, for reasons that resisted diagnosis through code
+// alone. Used by both the upload flow and the normal load-on-open flow.
+function setAvatarImage(dataUrl){
+  var wrapper = document.getElementById('profile-av');
+  if(!wrapper) return false;
+  wrapper.innerHTML = '<img id="profile-av-img" src="'+dataUrl+'" style="display:block;width:100%;height:100%;object-fit:cover;border-radius:50%;">'
+    + '<span id="profile-av-text" style="display:none;">'+((currentUser&&currentUser.initials)||'BL')+'</span>';
+  return true;
+}
+
 function loadProfilePic(user){
   if(!user) return;
-  var img = document.getElementById('profile-av-img');
-  var txt = document.getElementById('profile-av-text');
 
   // Paint instantly from whatever's cached on this device, then confirm
   // against Firebase — the real source of truth if this is a different
   // device than where the photo was last uploaded.
   var cached = DB.get('profile_pic_'+user.email);
-  if(cached){
-    if(img){ img.src=cached; img.style.display='block'; }
-    if(txt) txt.style.display='none';
-  }
+  if(cached) setAvatarImage(cached);
 
   if(window.FB && typeof window.FB.getProfilePic==='function'){
     window.FB.getProfilePic(user.email, function(remote){
       if(remote && remote !== cached){
-        if(img){ img.src=remote; img.style.display='block'; }
-        if(txt) txt.style.display='none';
+        setAvatarImage(remote);
         try{ localStorage.setItem('bl_profile_pic_'+user.email, JSON.stringify(remote)); }catch(e){}
       }
     });
