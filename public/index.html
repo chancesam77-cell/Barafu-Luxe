@@ -699,7 +699,8 @@ html,body{height:100%;background:var(--black);color:var(--ow);font-family:'Monts
 .bl-switch input:checked + .bl-switch-track::before{transform:translateX(16px);background:var(--gold);}
 .tier-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 14px 14px;}
 .tier-c{border:0.5px solid var(--bd);padding:12px;text-align:center;border-radius:2px;}
-.tier-c.active-tier{border-color:rgba(184,137,42,0.45);}
+.tier-c.active-tier{border-color:rgba(184,137,42,0.6);background:rgba(184,137,42,0.12);}
+body.outdoor-mode .tier-c.active-tier{border-color:rgba(184,137,42,0.85);background:rgba(184,137,42,0.22);}
 .tier-n{font-size:9px;letter-spacing:0.16em;color:var(--mt);text-transform:uppercase;margin-bottom:5px;}
 .tier-name{font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--ow);margin-bottom:6px;}
 .tier-f{font-size:9px;color:var(--mt);line-height:1.6;}
