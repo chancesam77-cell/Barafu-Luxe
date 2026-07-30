@@ -438,6 +438,9 @@
 .gem-prop-per{font-size:9px;color:var(--mt);margin-top:4px;letter-spacing:0.04em;}
 .gem-enquire-btn{background:transparent;border:0.5px solid rgba(184,137,42,0.4);color:var(--gold);padding:10px 20px;border-radius:2px;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;font-family:Montserrat,Georgia,sans-serif;cursor:pointer;white-space:nowrap;}
 
+.water-ripple{position:fixed;border-radius:50%;pointer-events:none;border:1px solid rgba(184,137,42,0.45);background:radial-gradient(circle,rgba(74,158,191,0.14) 0%,rgba(184,137,42,0.06) 45%,transparent 72%);transform:translate(-50%,-50%) scale(0);z-index:9999;animation:waterRippleExpand 0.7s cubic-bezier(0.22,0.61,0.36,1) forwards;}
+@keyframes waterRippleExpand{0%{transform:translate(-50%,-50%) scale(0);opacity:0.85;}60%{opacity:0.4;}100%{transform:translate(-50%,-50%) scale(1);opacity:0;}}
+
 </style>
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="theme-color" content="#080808">
@@ -1046,6 +1049,39 @@ window.FB = {
       const data = snap.val();
       const list = Object.keys(data).map(k => Object.assign({}, data[k], {fbKey: k}));
       list.sort((a, b) => (b.createdAt||0) - (a.createdAt||0));
+      callback(list);
+    }).catch(() => callback([]));
+  },
+
+  // ── CARATS — the loyalty/rewards balance. Stored as a running total plus
+  // a transparent history log, so a member can always see exactly why
+  // their balance is what it is, not just a bare number. ──
+  awardCarats: (email, amount, reason) => {
+    const safe = email.replace(/\./g,'_').replace(/@/g,'_at_');
+    const balRef = ref(db, 'carats/' + safe + '/balance');
+    return get(balRef).then(snap => {
+      const current = snap.exists() ? snap.val() : 0;
+      const next = current + amount;
+      return set(balRef, next).then(() => {
+        return push(ref(db, 'carats/' + safe + '/history'), {
+          amount, reason, balance: next, at: Date.now()
+        });
+      }).then(() => next);
+    });
+  },
+  getCaratBalance: (email, callback) => {
+    const safe = email.replace(/\./g,'_').replace(/@/g,'_at_');
+    get(ref(db, 'carats/' + safe + '/balance')).then(snap => {
+      callback(snap.exists() ? snap.val() : 0);
+    }).catch(() => callback(0));
+  },
+  getCaratHistory: (email, callback) => {
+    const safe = email.replace(/\./g,'_').replace(/@/g,'_at_');
+    get(ref(db, 'carats/' + safe + '/history')).then(snap => {
+      if (!snap.exists()) { callback([]); return; }
+      const data = snap.val();
+      const list = Object.keys(data).map(k => data[k]);
+      list.sort((a, b) => (b.at||0) - (a.at||0));
       callback(list);
     }).catch(() => callback([]));
   },
@@ -2019,6 +2055,7 @@ function removeBookingFB(fbKey){
   <div class="plist"><div class="pli" id="profile-spa-access" onclick="openSpaWithTierCheck()" style="display:none;"><i class="ti ti-sparkles pli-ico" style="color:var(--gold);"></i><div><div class="pli-name">Spa & Wellness</div><div class="pli-sub">Peaberries · Siringit · Book treatment</div></div><i class="ti ti-chevron-right pli-arr"></i></div><div class="pli" id="profile-gems-access" onclick="openGemsWithTierCheck()" style="display:none;"><i class="ti ti-diamond pli-ico" style="color:var(--ocean-soft);"></i><div><div class="pli-name">Hidden Gems</div><div class="pli-sub">Exclusive stays · Members only</div></div><i class="ti ti-chevron-right pli-arr"></i></div>
     <div class="pli" onclick="openMyBookings()"><i class="ti ti-file-invoice pli-ico"></i><div><div class="pli-name">My Bookings</div><div class="pli-sub">View confirmed and pending</div></div><i class="ti ti-chevron-right pli-arr"></i></div>
     <div class="pli" onclick="openPaymentDetails()"><i class="ti ti-credit-card pli-ico"></i><div><div class="pli-name">Payment Details</div><div class="pli-sub">Bank · Airtel Money · M-Pesa</div></div><i class="ti ti-chevron-right pli-arr"></i></div>
+    <div class="pli" onclick="go('s-rewards')"><i class="ti ti-diamond pli-ico" style="color:var(--gl);"></i><div><div class="pli-name">Rewards</div><div class="pli-sub">Your Carats & what to redeem them for</div></div><i class="ti ti-chevron-right pli-arr"></i></div>
     <div class="pli" onclick="showHowItWorks()"><i class="ti ti-help-circle pli-ico" style="color:var(--gold);"></i><div><div class="pli-name">How Barafu Luxe Works</div><div class="pli-sub">Booking, WhatsApp & confirmations explained</div></div><i class="ti ti-chevron-right pli-arr"></i></div>
     <div class="pli" onclick="openTrustPolicies()"><i class="ti ti-shield-check pli-ico" style="color:#7CB88A;"></i><div><div class="pli-name">Trust & Policies</div><div class="pli-sub">Response times · Cancellations · Privacy</div></div><i class="ti ti-chevron-right pli-arr"></i></div>
     <div class="pli" id="profile-install-item" onclick="showInstallGuide()" style="display:none;"><i class="ti ti-device-mobile-down pli-ico" style="color:var(--gold);"></i><div><div class="pli-name">Add to Home Screen</div><div class="pli-sub">Required for push notifications on iPhone</div></div><i class="ti ti-chevron-right pli-arr"></i></div>
@@ -2122,6 +2159,31 @@ function removeBookingFB(fbKey){
     </div>
   </div>
   <div id="ft-flights-board" style="padding:0 14px 14px;display:grid;gap:6px;margin-top:10px;"></div>
+  <div class="spacer"></div>
+</div>
+
+<!-- ════════════════════ REWARDS / CARATS ════════════════════ -->
+<div class="screen" id="s-rewards">
+  <div class="topbar">
+    <button class="tb-back" onclick="go('s-profile')"><i class="ti ti-arrow-left"></i></button>
+    <span class="tb-title">Rewards</span>
+    <div style="width:32px"></div>
+  </div>
+
+  <div style="text-align:center;padding:28px 24px 8px;">
+    <div style="font-size:9px;letter-spacing:0.28em;color:var(--gold);text-transform:uppercase;margin-bottom:10px;">Your Balance</div>
+    <div style="font-family:Cormorant Garamond,serif;font-style:italic;font-size:52px;color:var(--gl);line-height:1;" id="carat-balance-display">—</div>
+    <div style="font-size:10px;color:var(--mt);letter-spacing:0.1em;text-transform:uppercase;margin-top:8px;">Carats</div>
+  </div>
+
+  <div class="info-box" style="margin:18px 14px;">Earned through confirmed bookings and personal invitation. Redeem toward the experiences below — your concierge confirms every redemption personally.</div>
+
+  <div class="sec"><div class="slbl">Redeem</div></div>
+  <div id="carat-rewards-list" style="padding:0 14px 14px;display:grid;gap:10px;"></div>
+
+  <div class="sec"><div class="slbl">Recent Activity</div></div>
+  <div id="carat-history-list" style="padding:0 14px 24px;"></div>
+
   <div class="spacer"></div>
 </div>
 
@@ -3260,6 +3322,7 @@ function go(id){
     setTimeout(function(){ try{renderFlights();}catch(e){} setTimeout(function(){ try{fetchLiveFlights();}catch(e){}},500); },100);
     setTimeout(function(){ try{checkTrackedFlights();}catch(e){console.log('checkTrackedFlights err:',e);} },1200);
   }
+  if(id==='s-rewards'){ setTimeout(function(){ try{renderRewardsScreen();}catch(e){console.log('renderRewardsScreen err:',e);} },100); }
   if(id==='s-events'){ try{renderCalendar();}catch(e){} try{renderEvents();}catch(e){} setTimeout(function(){try{fetchLiveEvents();}catch(e){}},300); }
   if(id==='s-emptylegs'){ setTimeout(function(){ try{fetchLiveEmptyLegs();}catch(e){}; },100); }
   if(id==='s-transfers'){ setTimeout(function(){ try{buildRoutes();}catch(e){} },100); }
@@ -3305,6 +3368,21 @@ function go(id){
 }
 // Same selector list as the CSS squish rule — kept as one shared constant so
 // the visual squish and the audio tone always stay in sync with each other.
+// ── WATER RIPPLE — fires on every tap anywhere on screen, not just
+// interactive elements. Kept to a single soft expanding ring rather than
+// multiple concentric circles, to stay understated rather than busy. ──
+document.addEventListener('click', function(e){
+  var ripple = document.createElement('div');
+  ripple.className = 'water-ripple';
+  var size = 90;
+  ripple.style.width = size+'px';
+  ripple.style.height = size+'px';
+  ripple.style.left = e.clientX+'px';
+  ripple.style.top = e.clientY+'px';
+  document.body.appendChild(ripple);
+  setTimeout(function(){ if(ripple.parentNode) ripple.parentNode.removeChild(ripple); }, 750);
+}, true);
+
 var JELLYBEAN_SELECTOR = '.ni,.qc,.luxury-tab,.discover-card,.ab-btn,.admin-close,'
   +'.admin-submit,.apt-tab,.chat-room-send,.chat-send,.circle-tab,.cmsg-rx,.comm-card,'
   +'.el-book-btn,.el-card,.el-filter,.ev-book-btn,.ev-card,.ev-day,.ev-filter,.ev-nav-btn,'
@@ -4051,7 +4129,16 @@ function renderAdminBookings(){
 function confirmBooking(id){
   var bk=DB.get('bookings')||DEFAULT_BOOKINGS;
   var b=(bk.filter(function(x){return x.id===id;})||[null])[0];
-  if(b){b.status='confirmed';DB.set('bookings',bk);renderAdminBookings();renderAdminStats();}
+  if(b){
+    b.status='confirmed';DB.set('bookings',bk);renderAdminBookings();renderAdminStats();
+    // Award Carats for a genuinely confirmed booking — modest, automatic,
+    // tied to a real event rather than something that can be gamed.
+    if(b.email && window.FB && typeof window.FB.awardCarats==='function'){
+      window.FB.awardCarats(b.email, 10, 'Booking confirmed: '+b.service).catch(function(err){
+        console.log('awardCarats failed:', err);
+      });
+    }
+  }
 }
 function deleteBooking(id){
   DB.set('bookings',(DB.get('bookings')||DEFAULT_BOOKINGS).filter(function(x){return x.id!==id;}));
@@ -4140,8 +4227,29 @@ function renderAdminMembers(){
       setMemberTier(u.email, tierSel.value);
     };
 
+    var caratsBtn=document.createElement('button');
+    caratsBtn.className='ab-btn';
+    caratsBtn.style.cssText='color:var(--gl);border-color:rgba(184,137,42,0.3);';
+    caratsBtn.textContent='+Carats';
+    caratsBtn.onclick=function(){
+      var amount = prompt('Award how many Carats to '+u.name+'? (use a negative number to deduct)');
+      if(amount===null || amount==='') return;
+      var num = parseInt(amount, 10);
+      if(isNaN(num)) { alert('Please enter a number.'); return; }
+      var reason = prompt('Reason (shown in their Carats history):', num>0?'Bonus award':'Adjustment') || 'Manual adjustment';
+      if(window.FB && typeof window.FB.awardCarats==='function'){
+        window.FB.awardCarats(u.email, num, reason).then(function(newBalance){
+          showToast(u.name+' now has '+newBalance+' Carats ✓');
+        }).catch(function(err){
+          console.log('awardCarats failed:', err);
+          showToast('⚠ Could not award Carats — check connection');
+        });
+      }
+    };
+
     var btnRow=rightWrap.querySelector('.am-btns');
     btnRow.appendChild(msgBtn);
+    btnRow.appendChild(caratsBtn);
     btnRow.appendChild(removeBtn);
     el.appendChild(row);
   });
@@ -4392,7 +4500,7 @@ function submitForm(service){
 
   // Local admin-device cache (instant paint, same as before)
   var bk=DB.get('bookings')||DEFAULT_BOOKINGS;
-  bk.unshift({id:'b'+Date.now(),service,client:clientName,detail:'App enquiry',price:'—',status:'pending',time:t});
+  bk.unshift({id:'b'+Date.now(),service,client:clientName,email:clientEmail,detail:'App enquiry',price:'—',status:'pending',time:t});
   DB.set('bookings',bk);
 
   // Local per-user cache too, so My Bookings shows something instantly even
@@ -8345,6 +8453,79 @@ function openProfileSettings(){
 
   el.appendChild(f);
   document.getElementById('modal-bg').classList.add('open');
+}
+
+// ── CARATS REWARDS ──
+var CARAT_REWARDS = [
+  {threshold: 50,  icon: '🚗', name: 'Complimentary Airport Transfer', desc: 'One-way, anywhere in Arusha'},
+  {threshold: 120, icon: '🍽️', name: 'Lunch, On Us', desc: 'At any of our dining partners'},
+  {threshold: 250, icon: '✨', name: 'An Afternoon at the Spa', desc: 'Full treatment · Peaberries or Siringit'},
+  {threshold: 500, icon: '🚁', name: 'Sundowner Above the Clouds', desc: 'A complimentary helicopter sundowner'}
+];
+
+function renderRewardsScreen(){
+  if(!currentUser || !currentUser.email) return;
+  var balanceEl = document.getElementById('carat-balance-display');
+  var rewardsEl = document.getElementById('carat-rewards-list');
+  var historyEl = document.getElementById('carat-history-list');
+  if(!balanceEl) return;
+
+  if(!window.FB || typeof window.FB.getCaratBalance !== 'function') return;
+
+  window.FB.getCaratBalance(currentUser.email, function(balance){
+    balanceEl.textContent = balance.toLocaleString();
+
+    var html = '';
+    CARAT_REWARDS.forEach(function(r){
+      var unlocked = balance >= r.threshold;
+      var pct = Math.min(100, Math.round((balance / r.threshold) * 100));
+      html += '<div class="rc" style="padding:14px;">'
+        +'<div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">'
+        +'<span style="font-size:24px;flex-shrink:0;opacity:'+(unlocked?'1':'0.5')+';">'+r.icon+'</span>'
+        +'<div style="flex:1;">'
+        +'<div style="font-size:13px;color:var(--ow);font-family:Cormorant Garamond,serif;">'+r.name+'</div>'
+        +'<div style="font-size:10px;color:var(--mt);">'+r.desc+'</div>'
+        +'</div>'
+        +'<div style="font-size:11px;color:var(--gold);white-space:nowrap;">'+r.threshold+'</div>'
+        +'</div>'
+        +'<div style="height:3px;background:var(--soft);border-radius:2px;overflow:hidden;margin-bottom:'+(unlocked?'10':'4')+'px;">'
+        +'<div style="height:100%;width:'+pct+'%;background:linear-gradient(90deg,var(--gold),var(--gl));"></div>'
+        +'</div>'
+        +(unlocked
+          ? '<button class="gbtn" style="padding:9px;" onclick="redeemCaratReward('+r.threshold+',\''+r.name.replace(/'/g,"\\'")+'\')">Redeem</button>'
+          : '<div style="font-size:9px;color:var(--mt);text-align:right;">'+(r.threshold-balance)+' more to unlock</div>')
+        +'</div>';
+    });
+    rewardsEl.innerHTML = html;
+
+    if(window.FB && typeof window.FB.getCaratHistory === 'function'){
+      window.FB.getCaratHistory(currentUser.email, function(history){
+        if(!history.length){
+          historyEl.innerHTML = '<div style="font-size:10px;color:var(--mt);text-align:center;padding:10px 0;">Nothing yet — Carats appear here as you earn them.</div>';
+          return;
+        }
+        var hHtml = '';
+        history.slice(0,10).forEach(function(h){
+          var sign = h.amount >= 0 ? '+' : '';
+          var color = h.amount >= 0 ? '#4CAF50' : 'var(--mt)';
+          hHtml += '<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:0.5px solid var(--bd);">'
+            +'<div style="font-size:11px;color:var(--ow);">'+(h.reason||'Carats update')+'</div>'
+            +'<div style="font-size:11px;color:'+color+';">'+sign+h.amount+'</div>'
+            +'</div>';
+        });
+        historyEl.innerHTML = hHtml;
+      });
+    }
+  });
+}
+
+function redeemCaratReward(threshold, name){
+  if(!confirm('Redeem '+threshold+' Carats for "'+name+'"? Your concierge will confirm by WhatsApp.')) return;
+  var msg = 'I would like to redeem '+threshold+' Carats for: '+name;
+  window.open('https://wa.me/255692312366?text='+encodeURIComponent(msg), '_blank');
+  // Deduct is handled by admin once the redemption is actually confirmed and
+  // fulfilled — not automatically here, since "redeem" is a request, not a
+  // guarantee, same as every other booking in this app.
 }
 
 function openTrustPolicies(){
