@@ -9268,6 +9268,7 @@ function trackFlightForNotification(flightNumber, currentStatus){
     watcherEmail: currentUser.email,
     watcherName: currentUser.name || 'Guest',
     lastKnownStatus: currentStatus,
+    lastCheckedAt: Date.now(), // the search that found this flight just fetched fresh data — no need to re-check immediately
     trackedAt: Date.now()
   };
   if(window.FB && typeof window.FB.saveTrackedFlight === 'function'){
@@ -9286,6 +9287,15 @@ function trackFlightForNotification(flightNumber, currentStatus){
   }
 }
 
+// Real limit: only actually call the API for a given tracked flight once
+// per this window, no matter how many times anyone opens the screen in
+// between. The free AviationStack tier has a small monthly call budget —
+// checking every tracked flight on every single screen open burns through
+// that fast, especially with several flights tracked at once. A flight's
+// status doesn't need second-by-second precision for "notify me when it
+// lands" to still be useful.
+var TRACKED_FLIGHT_CHECK_INTERVAL_MS = 30*60*1000; // 30 minutes
+
 function checkTrackedFlights(){
   if(!window.FB || typeof window.FB.getTrackedFlights !== 'function') return;
   window.FB.getTrackedFlights(function(tracked){
@@ -9293,13 +9303,24 @@ function checkTrackedFlights(){
     keys.forEach(function(key){
       var entry = tracked[key];
       if(!entry || !entry.flightNumber) return;
+
+      var lastChecked = entry.lastCheckedAt || 0;
+      if(Date.now() - lastChecked < TRACKED_FLIGHT_CHECK_INTERVAL_MS) return; // too soon, skip the API call entirely
+
       fetch('/api/aviation?flight=' + encodeURIComponent(entry.flightNumber))
         .then(function(r){ return r.json(); })
         .then(function(data){
-          if(!data || !data.data || !data.data.length) return;
+          entry.lastCheckedAt = Date.now();
+          if(!data || !data.data || !data.data.length){
+            if(window.FB && typeof window.FB.saveTrackedFlight === 'function') window.FB.saveTrackedFlight(key, entry);
+            return;
+          }
           var f = data.data[0];
           var newStatus = (f.flight_status || 'unknown').toUpperCase();
-          if(newStatus === entry.lastKnownStatus) return; // no change, nothing to do
+          if(newStatus === entry.lastKnownStatus){
+            if(window.FB && typeof window.FB.saveTrackedFlight === 'function') window.FB.saveTrackedFlight(key, entry);
+            return; // no change, nothing to do — but still record that we checked
+          }
 
           if(newStatus === 'LANDED'){
             var arr = f.arrival || {};
