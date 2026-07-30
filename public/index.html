@@ -1023,6 +1023,18 @@ window.FB = {
     }).catch(() => callback(null));
   },
 
+  // ── PROFILE PICTURE — synced across devices, not just this browser ──
+  saveProfilePic: (email, dataUrl) => {
+    const safe = email.replace(/\./g,'_').replace(/@/g,'_at_');
+    return set(ref(db, 'profilePics/' + safe), dataUrl);
+  },
+  getProfilePic: (email, callback) => {
+    const safe = email.replace(/\./g,'_').replace(/@/g,'_at_');
+    get(ref(db, 'profilePics/' + safe)).then(snap => {
+      callback(snap.exists() ? snap.val() : null);
+    }).catch(() => callback(null));
+  },
+
   // ── FLIGHT TRACKING — "notify me when my guest's flight lands" ──
   saveTrackedFlight: (flightKey, data) => {
     return set(ref(db, 'trackedFlights/' + flightKey), data);
@@ -7474,17 +7486,71 @@ function changeProfilePic(){
   input.onchange = function(e){
     var file = e.target.files[0];
     if(!file) return;
+
+    if(!file.type || file.type.indexOf('image/') !== 0){
+      showToast('⚠ Please choose an image file');
+      return;
+    }
+
     var reader = new FileReader();
     reader.onload = function(ev){
-      var dataUrl = ev.target.result;
-      // Save to localStorage
-      DB.set('profile_pic_'+(currentUser?currentUser.email:'guest'), dataUrl);
-      // Update UI
-      var img = document.getElementById('profile-av-img');
-      var txt = document.getElementById('profile-av-text');
-      if(img){ img.src=dataUrl; img.style.display='block'; }
-      if(txt) txt.style.display='none';
+      var img = new Image();
+      img.onload = function(){
+        // Resize before storing — a raw phone-camera photo can be several
+        // MB, and localStorage's total quota (shared with everything else
+        // the app stores there) is small enough that a single full-size
+        // photo can silently fail to save. A small square avatar doesn't
+        // need more than a couple hundred pixels anyway.
+        var size = 320;
+        var canvas = document.createElement('canvas');
+        canvas.width = size;
+        canvas.height = size;
+        var ctx = canvas.getContext('2d');
+
+        // Crop to a centered square before scaling down, so the avatar
+        // isn't squished for non-square source photos.
+        var srcSize = Math.min(img.width, img.height);
+        var srcX = (img.width - srcSize) / 2;
+        var srcY = (img.height - srcSize) / 2;
+        ctx.drawImage(img, srcX, srcY, srcSize, srcSize, 0, 0, size, size);
+
+        var resizedDataUrl = canvas.toDataURL('image/jpeg', 0.82);
+
+        var key = 'profile_pic_'+(currentUser?currentUser.email:'guest');
+        var saved = false;
+        try{
+          localStorage.setItem('bl_'+key, JSON.stringify(resizedDataUrl));
+          saved = true;
+        }catch(err){
+          console.log('Profile picture save failed:', err);
+        }
+
+        if(saved){
+          var imgEl = document.getElementById('profile-av-img');
+          var txt = document.getElementById('profile-av-text');
+          if(imgEl){ imgEl.src=resizedDataUrl; imgEl.style.display='block'; }
+          if(txt) txt.style.display='none';
+
+          // Local save is instant, but the point of syncing is that it
+          // follows the member elsewhere — push to Firebase too.
+          if(currentUser && currentUser.email && window.FB && typeof window.FB.saveProfilePic==='function'){
+            window.FB.saveProfilePic(currentUser.email, resizedDataUrl).then(function(){
+              showToast('Profile photo updated ✓');
+            }).catch(function(err){
+              console.log('Profile picture sync failed:', err);
+              showToast('Saved on this device — but couldn\'t sync to your other devices');
+            });
+          } else {
+            showToast('Profile photo updated ✓');
+          }
+        } else {
+          showToast('⚠ Could not save photo — try a smaller image or clear some space');
+        }
+      };
+      img.onerror = function(){ showToast('⚠ Could not read that image — try a different file'); };
+      img.src = ev.target.result;
     };
+    reader.onerror = function(){ showToast('⚠ Could not read that file'); };
     reader.readAsDataURL(file);
   };
   input.click();
@@ -7492,12 +7558,26 @@ function changeProfilePic(){
 
 function loadProfilePic(user){
   if(!user) return;
-  var saved = DB.get('profile_pic_'+user.email);
-  if(saved){
-    var img = document.getElementById('profile-av-img');
-    var txt = document.getElementById('profile-av-text');
-    if(img){ img.src=saved; img.style.display='block'; }
+  var img = document.getElementById('profile-av-img');
+  var txt = document.getElementById('profile-av-text');
+
+  // Paint instantly from whatever's cached on this device, then confirm
+  // against Firebase — the real source of truth if this is a different
+  // device than where the photo was last uploaded.
+  var cached = DB.get('profile_pic_'+user.email);
+  if(cached){
+    if(img){ img.src=cached; img.style.display='block'; }
     if(txt) txt.style.display='none';
+  }
+
+  if(window.FB && typeof window.FB.getProfilePic==='function'){
+    window.FB.getProfilePic(user.email, function(remote){
+      if(remote && remote !== cached){
+        if(img){ img.src=remote; img.style.display='block'; }
+        if(txt) txt.style.display='none';
+        try{ localStorage.setItem('bl_profile_pic_'+user.email, JSON.stringify(remote)); }catch(e){}
+      }
+    });
   }
 }
 
