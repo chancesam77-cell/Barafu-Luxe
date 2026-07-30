@@ -6722,8 +6722,9 @@ function updateProfileForTier(user) {
   }
   // Load profile picture
   setTimeout(function(){ try{loadProfilePic(user);}catch(e){}; }, 200);
-  // Init notifications
-  setTimeout(function(){ try{initNotifications();}catch(e){}; }, 1000);
+  // Notifications now only appear from real events (tier changes, live
+  // pushes, etc.) — no longer seeded with synthetic "here's what's
+  // currently available" examples on every open.
 }
 
 // ════ COMMUNITY REBUILD with tier badges + leave button ════
@@ -7418,6 +7419,13 @@ function updateNotifBadge(){
   }
 }
 
+function closeNotifAndGo(actionStr){
+  document.getElementById('modal-bg').classList.remove('open');
+  setTimeout(function(){
+    try{ eval(actionStr); }catch(e){ console.log('notification navigate failed:', e); }
+  }, 250);
+}
+
 function openNotifications(){
   var unread = NOTIFICATIONS.filter(function(n){return !n.read;}).length;
   // Mark all as read
@@ -7437,7 +7445,8 @@ function openNotifications(){
   } else {
     NOTIFICATIONS.slice(0,20).forEach(function(n){
       var icons = {booking:'📋',event:'📅',emptylegs:'✈️',community:'💬',flight:'🛫',info:'✦'};
-      html += '<div style="padding:12px 0;border-bottom:0.5px solid var(--bd);cursor:pointer;" onclick="'+( n.action||'')+'">'
+      var hasAction = !!n.action;
+      html += '<div style="padding:12px 0;border-bottom:0.5px solid var(--bd);'+(hasAction?'cursor:pointer;':'')+'" '+(hasAction?'onclick="closeNotifAndGo(\''+n.action.replace(/'/g,"\\'")+'\')"':'')+'>'
         +'<div style="display:flex;align-items:flex-start;gap:10px;">'
         +'<span style="font-size:20px;flex-shrink:0;">'+(icons[n.type]||'✦')+'</span>'
         +'<div style="flex:1;">'
@@ -7453,31 +7462,7 @@ function openNotifications(){
 }
 
 // Auto-generate notifications from app activity
-function initNotifications(){
-  // Was previously called every time Profile opened (via updateProfileForTier),
-  // silently re-adding these same 3 notifications each visit — with a numbered
-  // badge, that bug would show an ever-growing, meaningless count. Gate to
-  // once per app session.
-  if(window._notificationsInitialized) return;
-  window._notificationsInitialized = true;
 
-  // Welcome notification
-  if(currentUser){
-    addNotification('info','Welcome back, '+currentUser.name.split(' ')[0]+'.','Your concierge is ready. Tap here to send a request.','go("s-concierge")');
-  }
-  // Check for new empty legs
-  var avail = EMPTY_LEGS.filter(function(e){return e.avail;});
-  if(avail.length>0){
-    addNotification('emptylegs','Empty Leg Available',avail[0].from+' → '+avail[0].to+' · Save '+avail[0].saving+'%','go("s-emptylegs")');
-  }
-  // Check for upcoming events
-  var upcoming = EVENTS_DATA.filter(function(e){
-    var d=new Date(e.date); return d>new Date();
-  }).sort(function(a,b){return new Date(a.date)-new Date(b.date);});
-  if(upcoming.length>0){
-    addNotification('event','Upcoming Event',upcoming[0].name+' · '+upcoming[0].venue,'go("s-events")');
-  }
-}
 
 // ════ PROFILE PICTURE ════
 function changeProfilePic(){
