@@ -7668,28 +7668,30 @@ function finishProfilePicSave(resizedDataUrl){
   }
 
   if(saved){
-    var imgEl = document.getElementById('profile-av-img');
-    var txt = document.getElementById('profile-av-text');
-    if(imgEl){
-      imgEl.src=resizedDataUrl;
-      imgEl.style.display='block';
-      // Verify the update actually took, rather than assuming it did —
-      // if this doesn't match, something is resetting it immediately
-      // after, which is different from the image data itself being bad.
-      setTimeout(function(){
-        var actualDisplay = window.getComputedStyle(imgEl).display;
-        var actualSrcLen = imgEl.src ? imgEl.src.length : 0;
-        console.log('Profile avatar check — computed display:', actualDisplay, '| src length:', actualSrcLen, '| naturalWidth:', imgEl.naturalWidth);
-        if(actualDisplay === 'none' || actualSrcLen < 100){
-          showToast('⚠ Diagnostic: photo saved but something reset the display (display='+actualDisplay+')');
-        } else if(imgEl.naturalWidth === 0){
-          showToast('⚠ Diagnostic: image element updated but rendered at 0 width');
-        }
-      }, 500);
-    } else {
-      showToast('⚠ Diagnostic: could not find the avatar image element at all');
-    }
-    if(txt) txt.style.display='none';
+    // Retry finding the element a few times with short delays, rather than
+    // giving up on the very first attempt — if something transient about
+    // the page's render cycle is the cause, this works around it without
+    // needing to know exactly what that cause is.
+    var attempts = 0;
+    var tryUpdateAvatar = function(){
+      attempts++;
+      var imgEl = document.getElementById('profile-av-img');
+      var txt = document.getElementById('profile-av-text');
+      if(imgEl){
+        imgEl.src=resizedDataUrl;
+        imgEl.style.display='block';
+        if(txt) txt.style.display='none';
+      } else if(attempts < 5){
+        setTimeout(tryUpdateAvatar, 150);
+      } else {
+        console.log('profile-av-img not found after 5 attempts');
+        showToast('⚠ Diagnostic: avatar element genuinely not in the page — please screenshot this and send it');
+      }
+      // Also route through the same logic that already reliably loads and
+      // displays a saved photo elsewhere in the app, as a second path.
+      if(typeof loadProfilePic === 'function' && currentUser) loadProfilePic(currentUser);
+    };
+    tryUpdateAvatar();
 
     // Local save is instant, but the point of syncing is that it
     // follows the member elsewhere — push to Firebase too.
