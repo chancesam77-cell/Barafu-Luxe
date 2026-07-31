@@ -441,6 +441,11 @@
 .water-ripple{position:fixed;border-radius:50%;pointer-events:none;border:1px solid rgba(184,137,42,0.45);background:radial-gradient(circle,rgba(74,158,191,0.14) 0%,rgba(184,137,42,0.06) 45%,transparent 72%);transform:translate(-50%,-50%) scale(0);z-index:9999;animation:waterRippleExpand 0.7s cubic-bezier(0.22,0.61,0.36,1) forwards;}
 @keyframes waterRippleExpand{0%{transform:translate(-50%,-50%) scale(0);opacity:0.85;}60%{opacity:0.4;}100%{transform:translate(-50%,-50%) scale(1);opacity:0;}}
 
+.offline-banner{position:fixed;top:0;left:50%;transform:translateX(-50%) translateY(-100%);width:100%;max-width:430px;background:var(--soft);border-bottom:0.5px solid rgba(184,137,42,0.3);padding:9px 16px;padding-top:calc(9px + env(safe-area-inset-top, 0px));display:flex;align-items:center;justify-content:center;gap:8px;z-index:3000;transition:transform 0.35s cubic-bezier(0.22,0.61,0.36,1);}
+.offline-banner.show{transform:translateX(-50%) translateY(0);}
+.offline-banner-dot{width:6px;height:6px;border-radius:50%;background:var(--gl);flex-shrink:0;animation:offlinePulse 1.6s ease-in-out infinite;}
+@keyframes offlinePulse{0%,100%{opacity:0.4;}50%{opacity:1;}}
+
 </style>
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="theme-color" content="#080808">
@@ -1445,6 +1450,11 @@ function removeBookingFB(fbKey){
 </style>
 
 
+<div class="offline-banner" id="offline-banner">
+  <span class="offline-banner-dot"></span>
+  <span style="font-size:10px;letter-spacing:0.04em;color:var(--mt);">You're offline — showing what's already saved</span>
+</div>
+
 <div class="welcome-back" id="welcome-back" onclick="dismissWelcomeBack()">
   <div class="welcome-back-rule"></div>
   <div class="welcome-back-label" id="welcome-back-label">Welcome Back</div>
@@ -1685,25 +1695,25 @@ function removeBookingFB(fbKey){
   <div class="sec"><div class="slbl">Quick request</div></div>
   <div class="qgrid">
     <div class="qc" onclick="openWithPageFlip(this,'go(\'s-transfers\')')"><span class="qc-ico" style="color:var(--gold)"><i class="ti ti-car"></i></span><div class="qc-name">Transfer</div><div class="qc-sub">From $60</div></div>
-    <div class="qc" onclick="openWithPageFlip(this,'go(\'s-heli\')')"><span class="qc-ico" style="color:var(--gold)"><i class="ti ti-helicopter"></i></span><div class="qc-name">Helicopter</div><div class="qc-sub">From $8,930</div></div>
     <div class="qc" onclick="openWithPageFlip(this,'go(\'s-yacht\')')"><span class="qc-ico" style="color:var(--ocean-soft)"><i class="ti ti-sailboat"></i></span><div class="qc-name">Yacht</div><div class="qc-sub">From $2,000</div></div>
-    <div class="qc" onclick="openWithPageFlip(this,'go(\'s-f1\')')"><span class="qc-ico" style="color:var(--red)"><i class="ti ti-steering-wheel"></i></span><div class="qc-name">F1 Hospitality</div><div class="qc-sub">14 races</div></div>
-    <div class="qc" onclick="openWithPageFlip(this,'go(\'s-events\')')"><span class="qc-ico" style="color:#9C27B0"><i class="ti ti-calendar-event"></i></span><div class="qc-name">Events</div><div class="qc-sub">Galas & more</div></div>
-
+    <div class="qc" onclick="openWithPageFlip(this,'go(\'s-dining\')')"><span class="qc-ico">🍽️</span><div class="qc-name">Private Dining</div><div class="qc-sub">ACL Grill · Gran Meliá</div></div>
     <div class="qc" onclick="openWithPageFlip(this,'go(\'s-emptylegs\')')"><span class="qc-ico" style="color:var(--gold)"><i class="ti ti-plane-tilt"></i></span><div class="qc-name">Empty Legs</div><div class="qc-sub">Up to 75% off</div></div>
+
+    <div class="qc" onclick="openWithPageFlip(this,'go(\'s-events\')')"><span class="qc-ico" style="color:#9C27B0"><i class="ti ti-calendar-event"></i></span><div class="qc-name">Events</div><div class="qc-sub">Galas & more</div></div>
+    <div class="qc" onclick="openWithPageFlip(this,'go(\'s-equestrian\')')"><span class="qc-ico">🐎</span><div class="qc-name">Equestrian</div><div class="qc-sub">Safari rides</div></div>
     <div class="qc" onclick="openWithPageFlip(this,'go(\'s-flights\')')"><span class="qc-ico" style="color:var(--mt)"><i class="ti ti-radar"></i></span><div class="qc-name">Flight Tracker</div><div class="qc-sub">JRO · ARK · DAR</div></div>
     <div class="qc" onclick="openWithPageFlip(this,'go(\'s-circle\')')"><span class="qc-ico" style="color:#D4AF37"><i class="ti ti-crown"></i></span><div class="qc-name">The Circle</div><div class="qc-sub" id="circle-member-count">Private network</div></div>
   </div>
   <div class="divider"></div>
   <div class="sec"><div class="slbl">Discover</div></div>
   <div style="display:flex;gap:10px;padding:0 14px 14px;overflow-x:auto;-webkit-overflow-scrolling:touch;" id="discover-feed"></div>
-  <div class="sec" style="padding-top:4px;"><div class="slbl">More services</div></div>
+  <div class="sec" style="padding-top:4px;"><div class="slbl">Exclusive Access</div></div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 14px 14px;">
-    <div class="qc" onclick="openWithPageFlip(this,'openSpaWithTierCheck()')"><span class="qc-ico" style="color:var(--gold)"><i class="ti ti-sparkles"></i></span><div class="qc-name">Spa & Wellness</div><div class="qc-sub">Peaberries · Siringit</div></div>
-    <div class="qc" onclick="openWithPageFlip(this,'go(\'s-dining\')')"><span class="qc-ico">🍽️</span><div class="qc-name">Private Dining</div><div class="qc-sub">ACL Grill · Gran Meliá</div></div>
-    <div class="qc" onclick="openWithPageFlip(this,'go(\'s-equestrian\')')"><span class="qc-ico">🐎</span><div class="qc-name">Equestrian</div><div class="qc-sub">Safari rides</div></div>
-    <div class="qc" onclick="openWithPageFlip(this,'openGemsWithTierCheck()')"><span class="qc-ico" style="color:var(--ocean-soft)"><i class="ti ti-diamond"></i></span><div class="qc-name">Hidden Gems</div><div class="qc-sub">Exclusive stays</div></div>
+    <div class="qc" onclick="openWithPageFlip(this,'go(\'s-heli\')')"><span class="qc-ico" style="color:var(--gold)"><i class="ti ti-helicopter"></i></span><div class="qc-name">Helicopter</div><div class="qc-sub">From $8,930</div></div>
     <div class="qc" onclick="openWithPageFlip(this,'go(\'s-gemstones\')')"><span class="qc-ico" style="color:#7C4DFF"><i class="ti ti-diamond"></i></span><div class="qc-name">Gemstone Sourcing</div><div class="qc-sub">Tanzanite & more</div></div>
+    <div class="qc" onclick="openWithPageFlip(this,'openSpaWithTierCheck()')"><span class="qc-ico" style="color:var(--gold)"><i class="ti ti-sparkles"></i></span><div class="qc-name">Spa & Wellness</div><div class="qc-sub">Peaberries · Siringit</div></div>
+    <div class="qc" onclick="openWithPageFlip(this,'openGemsWithTierCheck()')"><span class="qc-ico" style="color:var(--ocean-soft)"><i class="ti ti-diamond"></i></span><div class="qc-name">Hidden Gems</div><div class="qc-sub">Exclusive stays</div></div>
+    <div class="qc" onclick="openWithPageFlip(this,'go(\'s-f1\')')"><span class="qc-ico" style="color:var(--red)"><i class="ti ti-steering-wheel"></i></span><div class="qc-name">F1 Hospitality</div><div class="qc-sub">14 races</div></div>
     <div class="qc" onclick="openWithPageFlip(this,'go(\'s-realestate\')')"><span class="qc-ico" style="color:var(--gold)"><i class="ti ti-building-estate"></i></span><div class="qc-name">Off-Market Villas</div><div class="qc-sub">Real estate concierge</div></div>
   </div>
 </div>
@@ -2056,6 +2066,7 @@ function removeBookingFB(fbKey){
     <div class="pli" onclick="openMyBookings()"><i class="ti ti-file-invoice pli-ico"></i><div><div class="pli-name">My Bookings</div><div class="pli-sub">View confirmed and pending</div></div><i class="ti ti-chevron-right pli-arr"></i></div>
     <div class="pli" onclick="openPaymentDetails()"><i class="ti ti-credit-card pli-ico"></i><div><div class="pli-name">Payment Details</div><div class="pli-sub">Bank · Airtel Money · M-Pesa</div></div><i class="ti ti-chevron-right pli-arr"></i></div>
     <div class="pli" onclick="go('s-rewards')"><i class="ti ti-diamond pli-ico" style="color:var(--gl);"></i><div><div class="pli-name">Rewards</div><div class="pli-sub">Your Carats & what to redeem them for</div></div><i class="ti ti-chevron-right pli-arr"></i></div>
+    <div class="pli" onclick="showTierComparison()"><i class="ti ti-stack-2 pli-ico" style="color:var(--gold);"></i><div><div class="pli-name">Compare Tiers</div><div class="pli-sub">See what Gold & Obsidian unlock</div></div><i class="ti ti-chevron-right pli-arr"></i></div>
     <div class="pli" onclick="showHowItWorks()"><i class="ti ti-help-circle pli-ico" style="color:var(--gold);"></i><div><div class="pli-name">How Barafu Luxe Works</div><div class="pli-sub">Booking, WhatsApp & confirmations explained</div></div><i class="ti ti-chevron-right pli-arr"></i></div>
     <div class="pli" onclick="openTrustPolicies()"><i class="ti ti-shield-check pli-ico" style="color:#7CB88A;"></i><div><div class="pli-name">Trust & Policies</div><div class="pli-sub">Response times · Cancellations · Privacy</div></div><i class="ti ti-chevron-right pli-arr"></i></div>
     <div class="pli" id="profile-install-item" onclick="showInstallGuide()" style="display:none;"><i class="ti ti-device-mobile-down pli-ico" style="color:var(--gold);"></i><div><div class="pli-name">Add to Home Screen</div><div class="pli-sub">Required for push notifications on iPhone</div></div><i class="ti ti-chevron-right pli-arr"></i></div>
@@ -2889,13 +2900,13 @@ function initUsers(){
 // ════ TIER CONFIGURATION ════
 var TIER_CONFIG = {
   silver:{name:'Silver',label:'Standard Member',icon:'🔘',color:'#C0C0C0',
-    perks:['Access to all core services','Private transfers & helicopters','Yacht charters & F1 hospitality','Flight tracker & empty legs','Concierge chat support'],
+    perks:['Private transfers, anywhere in Arusha','Yacht charters — Zanzibar & Dar es Salaam','Private dining reservations','Flight tracker & empty leg access','Events, galas & equestrian experiences','Concierge chat support'],
     communities:['golf','travel','food','fitness']},
   gold:{name:'Gold',label:'Gold Member ✦',icon:'✦',color:'#B8892A',
-    perks:['Everything in Silver','Peaberries Spa & Wellness access','Hidden Gem stays — exclusive properties','Priority booking & dedicated concierge','Full community participation','10% loyalty reward on repeat bookings','Early access to events & empty legs'],
+    perks:['Everything in Silver','Helicopter experiences — Kilimanjaro & Mount Meru','Tanzanite & gemstone sourcing — direct from source','Peaberries Spa & Wellness access','Hidden Gem stays — exclusive properties','Priority booking & dedicated concierge','Full community participation','10% loyalty reward on repeat bookings','Early access to events & empty legs'],
     communities:['golf','travel','food','fitness','wine','fashion','art']},
   obsidian:{name:'Obsidian',label:'Obsidian Member',icon:'💎',color:'#9C27B0',
-    perks:['Everything in Gold','24/7 personal concierge — direct line','Annual exclusive experience','Members Black Card private dinner invite','First access to all empty legs','Private jet sourcing on request','All 8 communities + Business lounge','Complimentary airport transfers (2/month)'],
+    perks:['Everything in Gold','F1 hospitality — paddock access & private travel','Off-market real estate — introductions & counsel','24/7 personal concierge — direct line','Annual exclusive experience','Members Black Card private dinner invite','First access to all empty legs','Private jet sourcing on request','All 8 communities + Business lounge','Complimentary airport transfers (2/month)'],
     communities:['golf','travel','food','fitness','wine','fashion','art','business']},
   admin:{name:'Admin',label:'Barafu Luxe Admin',icon:'⚙',color:'#B8892A',
     perks:['Full platform access','Admin dashboard','Member management'],
@@ -3302,7 +3313,47 @@ function buildGroupFleet(){
 }
 
 // ── NAV ──
+// Screens requiring a specific tier or higher. Checked centrally inside
+// go() itself, rather than scattered across every entry point — Quick
+// Access cards, Discover, Search, admin pushes, and deep-links from push
+// notifications can ALL reach a screen via go(id) directly, so gating any
+// single entry point individually would leave the others as a bypass.
+var SCREEN_TIER_GATES = {
+  's-heli': 'gold',
+  's-gemstones': 'gold',
+  's-f1': 'obsidian',
+  's-realestate': 'obsidian'
+};
+var TIER_RANK = {silver:1, gold:2, obsidian:3, admin:99};
+
+function meetsTierGate(screenId){
+  var required = SCREEN_TIER_GATES[screenId];
+  if(!required) return true; // not a gated screen
+  if(!currentUser) return false;
+  var userRank = TIER_RANK[currentUser.tier] || 0;
+  var requiredRank = TIER_RANK[required] || 0;
+  return userRank >= requiredRank;
+}
+
+function showTierGateModal(screenId){
+  var required = SCREEN_TIER_GATES[screenId];
+  var requiredLabel = required.charAt(0).toUpperCase()+required.slice(1);
+  var names = {'s-heli':'Helicopter Experiences','s-gemstones':'Tanzanite & Gemstone Sourcing','s-f1':'F1 Hospitality','s-realestate':'Real Estate'};
+  var icons = {'s-heli':'🚁','s-gemstones':'💠','s-f1':'🏎️','s-realestate':'🏛️'};
+  document.getElementById('modal-ttl').textContent = requiredLabel+' Members Only';
+  document.getElementById('modal-body').innerHTML = '<div class="fwrap"><div style="text-align:center;padding:20px 0;">'
+    +'<div style="font-size:44px;margin-bottom:12px;">'+(icons[screenId]||'✦')+'</div>'
+    +'<div style="font-family:Cormorant Garamond,serif;font-size:22px;color:var(--ow);margin-bottom:8px;">'+(names[screenId]||'This experience')+'</div>'
+    +'<div style="font-size:11px;color:var(--mt);line-height:1.7;margin-bottom:16px;">This is available for '+requiredLabel+' members'+(required==='gold'?' and above':'')+'. Upgrade to unlock it.</div>'
+    +'</div><button class="gbtn" onclick="closeModalNow();window.open(\'https://wa.me/255692312366?text=I+would+like+to+upgrade+to+'+requiredLabel+'+membership\',\'_blank\')">Upgrade to '+requiredLabel+' — Contact concierge</button><button class="gghst" onclick="closeModalNow()">Close</button></div>';
+  document.getElementById('modal-bg').classList.add('open');
+}
+
 function go(id){
+  if(!meetsTierGate(id)){
+    showTierGateModal(id);
+    return;
+  }
   // Clear presence if leaving community chat
   if(currentUser && id !== 's-commchat'){
     var rooms = DB.get('active_rooms') || {};
@@ -3617,7 +3668,7 @@ function submitHeliZanzibarEnquiry(){
     +'Guests: '+guests
     +(notes?'\nNotes: '+notes:'');
 
-  if(typeof submitForm==='function') submitForm('Heli Transfer: '+zone);
+  if(typeof submitForm==='function') submitForm('Heli Transfer: '+zone, msg);
   window.open('https://wa.me/255692312366?text='+encodeURIComponent(msg), '_blank');
 }
 
@@ -3643,7 +3694,7 @@ function openHeliBook(dep,price){
       +'Guests: '+guests
       +(ups.length?'\nUpgrades: '+ups.join(', '):'')
       +(notes?'\nNotes: '+notes:'');
-    submitForm('Helicopter Picnic');
+    submitForm('Helicopter Picnic', msg);
     document.getElementById('modal-bg').classList.remove('open');
     window.open('https://wa.me/255692312366?text='+encodeURIComponent(msg), '_blank');
   };
@@ -3723,7 +3774,7 @@ function openF1Book(race,date,venue){
       +'Package: '+pkg
       +(from?'\nTravelling from: '+from:'')
       +(notes?'\nNotes: '+notes:'');
-    submitForm('F1: '+race);
+    submitForm('F1: '+race, msg);
     document.getElementById('modal-bg').classList.remove('open');
     window.open('https://wa.me/255692312366?text='+encodeURIComponent(msg), '_blank');
   };
@@ -4034,6 +4085,10 @@ function renderAdminRequests(requests){
       if(nameEl) nameEl.value = r.name||'';
       if(emailEl) emailEl.value = r.email||'';
       if(phoneEl) phoneEl.value = r.phone||'';
+      // Carry the referral value through to actual member creation, since
+      // the Add Member form has no field for it — this is the only place
+      // it's captured before the real account gets made.
+      window._pendingReferral = r.ref || '';
       var formSection = nameEl ? nameEl.closest('.admin-section') : null;
       if(formSection) formSection.scrollIntoView({behavior:'smooth', block:'start'});
       if(nameEl) nameEl.focus();
@@ -4442,6 +4497,22 @@ function adminAddMember(){
     try{ window.FB.saveUser(newMember); }catch(e){ console.log('FB saveUser:',e); }
   }
 
+  // Referral reward — only if the value carried through actually matches
+  // an existing member's email. Free-text answers like "Instagram" or "a
+  // friend" (the field doubles as "how did you hear about us") simply
+  // won't match anything, which is the correct, safe behavior — no error,
+  // just no reward, since there's no real referrer to credit.
+  var referralValue = (window._pendingReferral || '').trim().toLowerCase();
+  window._pendingReferral = '';
+  if(referralValue){
+    var referrer = existing.filter(function(u){ return u.email && u.email.toLowerCase()===referralValue; })[0];
+    if(referrer && window.FB && typeof window.FB.awardCarats==='function'){
+      window.FB.awardCarats(referrer.email, 25, 'Referred '+name).then(function(){
+        showToast(referrer.name+' awarded 25 Carats for the referral ✓');
+      }).catch(function(err){ console.log('referral awardCarats failed:', err); });
+    }
+  }
+
   // Show result with credentials to send to member
   var r = document.getElementById('adm-new-result');
   if(r){
@@ -4475,11 +4546,12 @@ function copyMemberDetails(name,email,pass){
 
 
 
-function submitForm(service){
+function submitForm(service, detail){
   var now=new Date();
   var t=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
   var clientName = currentUser?currentUser.name:'Guest';
   var clientEmail = currentUser?currentUser.email:'';
+  var detailText = detail || 'App enquiry';
 
   // Save to Firebase — the real, shared source of truth for bookings across
   // every device, so admin sees it and the member's own "My Bookings" can
@@ -4490,7 +4562,7 @@ function submitForm(service){
         service: service,
         client: clientName,
         email: clientEmail,
-        detail: 'App enquiry',
+        detail: detailText,
         price: '—',
         status: 'pending',
         time: t
@@ -4500,7 +4572,7 @@ function submitForm(service){
 
   // Local admin-device cache (instant paint, same as before)
   var bk=DB.get('bookings')||DEFAULT_BOOKINGS;
-  bk.unshift({id:'b'+Date.now(),service,client:clientName,email:clientEmail,detail:'App enquiry',price:'—',status:'pending',time:t});
+  bk.unshift({id:'b'+Date.now(),service,client:clientName,email:clientEmail,detail:detailText,price:'—',status:'pending',time:t});
   DB.set('bookings',bk);
 
   // Local per-user cache too, so My Bookings shows something instantly even
@@ -4509,7 +4581,7 @@ function submitForm(service){
     try{
       var myKey = 'bookings_'+clientEmail;
       var mine = JSON.parse(DB.get(myKey) || '[]');
-      mine.unshift({service: service, date: now.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}), amount:'', status:'pending'});
+      mine.unshift({service: service, detail: detailText, date: now.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}), amount:'', status:'pending'});
       if(mine.length>50) mine = mine.slice(0,50);
       DB.set(myKey, mine);
     }catch(e){}
@@ -5072,6 +5144,20 @@ function sendBroadcastPush(title, body, url, tierFilter, callback){
 
 document.addEventListener('DOMContentLoaded',function(){
   if(typeof applyOutdoorModeFromStorage==='function') applyOutdoorModeFromStorage();
+
+  // Offline banner — calm, not alarming. Doesn't block anything, just
+  // explains why fresh data might not be showing, since a blank/stale
+  // screen with no explanation is what actually looks broken.
+  var offlineBanner = document.getElementById('offline-banner');
+  function updateOnlineStatus(){
+    if(!offlineBanner) return;
+    if(navigator.onLine === false) offlineBanner.classList.add('show');
+    else offlineBanner.classList.remove('show');
+  }
+  window.addEventListener('online', updateOnlineStatus);
+  window.addEventListener('offline', updateOnlineStatus);
+  updateOnlineStatus(); // check immediately, don't wait for a state change event
+
   // Dismiss splash after app initialises
   var splash = document.getElementById('bl-splash');
   if(splash){
@@ -5471,7 +5557,7 @@ function openGemstoneDetail(idx){
   btn.innerHTML='<i class="ti ti-brand-whatsapp"></i> Request '+c.name;
   btn.onclick=function(){
     var msg='Gemstone Sourcing Enquiry\nStone: '+c.name+' ('+c.origin+')\nPlease advise on availability, sizes, and pricing.';
-    if(typeof submitForm==='function') submitForm('Gemstone Sourcing: '+c.name);
+    if(typeof submitForm==='function') submitForm('Gemstone Sourcing: '+c.name, msg);
     document.getElementById('modal-bg').classList.remove('open');
     window.open('https://wa.me/255692312366?text='+encodeURIComponent(msg), '_blank');
   };
@@ -5495,7 +5581,7 @@ function submitGemstoneSourcing(){
     +'Budget: '+budget
     +(notes?'\nNotes: '+notes:'');
 
-  if(typeof submitForm==='function') submitForm('Gemstone Sourcing: '+stone+' ('+form+')');
+  if(typeof submitForm==='function') submitForm('Gemstone Sourcing: '+stone+' ('+form+')', msg);
   window.open('https://wa.me/255692312366?text='+encodeURIComponent(msg), '_blank');
 }
 
@@ -5597,7 +5683,7 @@ function openRealEstateDetail(idx){
   btn.innerHTML='<i class="ti ti-brand-whatsapp"></i> Request introduction — '+c.name;
   btn.onclick=function(){
     var msg='Real Estate Introduction Request\nCategory: '+c.name+' ('+c.origin+')\nPlease introduce me to a licensed agent and legal counsel for this region.';
-    if(typeof submitForm==='function') submitForm('Real Estate: '+c.name);
+    if(typeof submitForm==='function') submitForm('Real Estate: '+c.name, msg);
     document.getElementById('modal-bg').classList.remove('open');
     window.open('https://wa.me/255692312366?text='+encodeURIComponent(msg), '_blank');
   };
@@ -5621,7 +5707,7 @@ function submitRealEstateEnquiry(){
     +'Budget: '+budget
     +(notes?'\nNotes: '+notes:'');
 
-  if(typeof submitForm==='function') submitForm('Real Estate: '+region+' ('+purpose+')');
+  if(typeof submitForm==='function') submitForm('Real Estate: '+region+' ('+purpose+')', msg);
   window.open('https://wa.me/255692312366?text='+encodeURIComponent(msg), '_blank');
 }
 
@@ -6088,7 +6174,7 @@ function openSpaRetreatDetail(idx){
       +'Name: '+(name||'Guest')
       +(dates?'\nPreferred dates: '+dates:'')
       +'\nGuests: '+guests;
-    if(typeof submitForm==='function') submitForm('Wellness Retreat: '+r.name);
+    if(typeof submitForm==='function') submitForm('Wellness Retreat: '+r.name, msg);
     document.getElementById('modal-bg').classList.remove('open');
     window.open('https://wa.me/255692312366?text='+encodeURIComponent(msg), '_blank');
   };
@@ -6249,7 +6335,7 @@ function openSpaDetail(id){
       +'Date: '+(date||'Not specified')+'\n'
       +'Preferred time: '+time
       +(notes?'\nHealth notes: '+notes:'');
-    submitForm('Spa: '+t.name+' - '+blDisplay(t.base));
+    submitForm('Spa: '+t.name+' - '+blDisplay(t.base), msg);
     document.getElementById('modal-bg').classList.remove('open');
     window.open('https://wa.me/255692312366?text='+encodeURIComponent(msg), '_blank');
   };
@@ -6448,7 +6534,7 @@ function openGemDetail(id){
   btn.innerHTML='<i class="ti ti-brand-whatsapp"></i> Enquire — '+(g.name||'');
   btn.onclick=function(){
     var msg='Hidden Gems Enquiry\nProperty: '+(g.name||'')+'\nLocation: '+(g.location||'');
-    submitForm('Hidden Gems: '+g.name);
+    submitForm('Hidden Gems: '+g.name, msg);
     document.getElementById('modal-bg').classList.remove('open');
     window.open('https://wa.me/255692312366?text='+encodeURIComponent(msg), '_blank');
   };
@@ -6646,7 +6732,7 @@ function openELBook(routeOrEl,aircraft,datetime,price,was){
       +(passport?'\nPassport/ID: '+passport:'')
       +'\nPassengers: '+pax
       +(phone?'\nWhatsApp: '+phone:'');
-    submitForm('Empty Leg: '+route);
+    submitForm('Empty Leg: '+route, msg);
     document.getElementById('modal-bg').classList.remove('open');
     window.open('https://wa.me/255692312366?text='+encodeURIComponent(msg), '_blank');
   };
@@ -7531,7 +7617,7 @@ function openDiningDetail(id){
       +'Time: '+time+'\n'
       +'Guests: '+guests
       +(notes?'\nNotes: '+notes:'');
-    submitForm('Dining: '+v.name);
+    submitForm('Dining: '+v.name, msg);
     document.getElementById('modal-bg').classList.remove('open');
     window.open('https://wa.me/255692312366?text='+encodeURIComponent(msg), '_blank');
   };
@@ -7920,7 +8006,7 @@ function openACLReservation(){
       +'Guests: '+guests
       +(occasion?'\nOccasion: '+occasion:'')
       +(dietary?'\nDietary: '+dietary:'');
-    submitForm('Dining: The Grill Room ACL');
+    submitForm('Dining: The Grill Room ACL', msg);
     document.getElementById('modal-bg').classList.remove('open');
     window.open('https://wa.me/255692312366?text='+encodeURIComponent(msg), '_blank');
   };
@@ -8113,7 +8199,7 @@ function openEqBook(name, price) {
       +'\nGuests: '+guests+'\n'
       +'Riding level: '+level
       +(notes?'\nNotes: '+notes:'');
-    submitForm('Equestrian: '+window._eqService);
+    submitForm('Equestrian: '+window._eqService, msg);
     document.getElementById('modal-bg').classList.remove('open');
     window.open('https://wa.me/255692312366?text='+encodeURIComponent(msg), '_blank');
   };
@@ -8385,7 +8471,7 @@ function openObsidianLounge(){
       +'Name: '+(name||'Obsidian member')+'\n'
       +'Looking for: '+purpose
       +(desc?'\nDescription: '+desc:'');
-    submitForm('Obsidian Circle: Introduction Request');
+    submitForm('Obsidian Circle: Introduction Request', msg);
     document.getElementById('modal-bg').classList.remove('open');
     window.open('https://wa.me/255692312366?text='+encodeURIComponent(msg), '_blank');
   };
@@ -8519,6 +8605,36 @@ function renderRewardsScreen(){
   });
 }
 
+function showTierComparison(){
+  document.getElementById('modal-ttl').textContent = 'Compare Tiers';
+  var myTier = (currentUser && currentUser.tier) || 'silver';
+  var order = ['silver','gold','obsidian'];
+  var html = '<div class="fwrap" style="padding-top:0;">'
+    +'<div style="font-size:11px;color:var(--mt);line-height:1.7;margin-bottom:18px;">Each tier includes everything from the one below it.</div>';
+
+  order.forEach(function(tierKey){
+    var t = TIER_CONFIG[tierKey];
+    var isMine = (tierKey===myTier) || (myTier==='admin' && tierKey==='obsidian');
+    html += '<div style="border:0.5px solid '+(isMine?'rgba(184,137,42,0.5)':'var(--bd)')+';background:'+(isMine?'rgba(184,137,42,0.08)':'transparent')+';border-radius:2px;padding:16px;margin-bottom:12px;">'
+      +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">'
+      +'<div style="font-family:Cormorant Garamond,serif;font-size:18px;color:'+t.color+';">'+t.icon+' '+t.name+'</div>'
+      +(isMine ? '<span style="font-size:8px;letter-spacing:0.14em;color:var(--gold);border:0.5px solid rgba(184,137,42,0.4);padding:3px 8px;border-radius:10px;text-transform:uppercase;">Your Tier</span>' : '')
+      +'</div>'
+      +'<ul style="margin:0;padding-left:18px;">';
+    t.perks.forEach(function(p){
+      html += '<li style="font-size:11px;color:var(--ow);line-height:1.9;">'+p+'</li>';
+    });
+    html += '</ul></div>';
+  });
+
+  html += '<div style="font-size:10px;color:var(--mt);line-height:1.7;margin-top:6px;">Curious about upgrading? Ask your concierge — it\'s a conversation, not a form.</div>'
+    +'<a class="wa-btn" style="margin-top:12px;" href="https://wa.me/255692312366?text=I%27d%20like%20to%20know%20more%20about%20upgrading%20my%20membership" target="_blank"><i class="ti ti-brand-whatsapp"></i>Ask About Upgrading</a>'
+    +'</div>';
+
+  document.getElementById('modal-body').innerHTML = html;
+  document.getElementById('modal-bg').classList.add('open');
+}
+
 function redeemCaratReward(threshold, name){
   if(!confirm('Redeem '+threshold+' Carats for "'+name+'"? Your concierge will confirm by WhatsApp.')) return;
   var msg = 'I would like to redeem '+threshold+' Carats for: '+name;
@@ -8632,12 +8748,14 @@ function renderMyBookingsList(bookings){
   var html = '';
   bookings.forEach(function(b){
     var statusColor = b.status==='confirmed' ? '#4CAF50' : b.status==='pending' ? '#FF9800' : 'var(--mt)';
+    var hasRealDetail = b.detail && b.detail !== 'App enquiry';
     html += '<div style="background:var(--card);border:0.5px solid var(--bd);border-radius:2px;padding:12px 14px;margin-bottom:8px;">'
       +'<div style="display:flex;justify-content:space-between;align-items:flex-start;">'
       +'<div style="font-size:13px;color:var(--ow);font-family:Cormorant Garamond,serif;">'+(b.service||'Service')+'</div>'
       +'<span style="font-size:9px;color:'+statusColor+';letter-spacing:0.1em;text-transform:uppercase;">'+(b.status||'pending')+'</span>'
       +'</div>'
-      +'<div style="font-size:10px;color:var(--mt);margin-top:4px;">'+(b.date||b.time||'')+(b.price&&b.price!=='—'?' · '+b.price:'')+'</div>'
+      +(hasRealDetail ? '<div style="font-size:10px;color:var(--ow);margin-top:6px;line-height:1.6;background:var(--soft);padding:8px 10px;border-radius:2px;">'+b.detail+'</div>' : '')
+      +'<div style="font-size:10px;color:var(--mt);margin-top:6px;">'+(b.date||b.time||'')+(b.price&&b.price!=='—'?' · '+b.price:'')+'</div>'
       +'</div>';
   });
   el.innerHTML = html;
