@@ -1057,6 +1057,25 @@ window.FB = {
       callback(list);
     }).catch(() => callback([]));
   },
+  clearNotificationsForUser: (email) => {
+    const safe = email.replace(/\./g,'_').replace(/@/g,'_at_');
+    return remove(ref(db, 'notifications/' + safe));
+  },
+
+  // ── PREFERRED LANGUAGE — tells the concierge which language to reply
+  // in. This is not a full app translation system (that's a much bigger,
+  // separate undertaking); it's a small, honest piece of context that
+  // makes the human-handled WhatsApp side of every interaction better. ──
+  saveLanguagePreference: (email, lang) => {
+    const safe = email.replace(/\./g,'_').replace(/@/g,'_at_');
+    return update(ref(db, 'auth/' + safe), { language: lang });
+  },
+  getLanguagePreference: (email, callback) => {
+    const safe = email.replace(/\./g,'_').replace(/@/g,'_at_');
+    get(ref(db, 'auth/' + safe + '/language')).then(snap => {
+      callback(snap.exists() ? snap.val() : 'English');
+    }).catch(() => callback('English'));
+  },
 
   // ── CARATS — the loyalty/rewards balance. Stored as a running total plus
   // a transparent history log, so a member can always see exactly why
@@ -1780,6 +1799,10 @@ function removeBookingFB(fbKey){
     <div class="is-cell"><div class="is-val">14</div><div class="is-lbl">F1 Races</div></div>
     <div class="is-cell"><div class="is-val">DSM</div><div class="is-lbl">+ Zanzibar</div></div>
   </div>
+  <div id="coming-up-section" style="display:none;">
+    <div class="sec"><div class="slbl">Coming Up</div></div>
+    <div id="coming-up-list" style="padding:0 14px 14px;display:grid;gap:8px;"></div>
+  </div>
   <div class="sec"><div class="slbl">Quick request</div></div>
   <div class="qgrid">
     <div class="qc" onclick="openWithPageFlip(this,'go(\'s-transfers\')')"><span class="qc-ico" style="color:var(--gold)"><i class="ti ti-car"></i></span><div class="qc-name">Transfer</div><div class="qc-sub">From $60</div></div>
@@ -2154,6 +2177,7 @@ function removeBookingFB(fbKey){
     <div class="pli" onclick="openMyBookings()"><i class="ti ti-file-invoice pli-ico"></i><div><div class="pli-name">My Bookings</div><div class="pli-sub">View confirmed and pending</div></div><i class="ti ti-chevron-right pli-arr"></i></div>
     <div class="pli" onclick="openPaymentDetails()"><i class="ti ti-credit-card pli-ico"></i><div><div class="pli-name">Payment Details</div><div class="pli-sub">Bank · Airtel Money · M-Pesa</div></div><i class="ti ti-chevron-right pli-arr"></i></div>
     <div class="pli" onclick="go('s-rewards')"><i class="ti ti-diamond pli-ico" style="color:var(--gl);"></i><div><div class="pli-name">Rewards</div><div class="pli-sub">Your Carats & what to redeem them for</div></div><i class="ti ti-chevron-right pli-arr"></i></div>
+    <div class="pli" onclick="openInviteFriend()"><i class="ti ti-user-plus pli-ico" style="color:var(--gold);"></i><div><div class="pli-name">Invite a Friend</div><div class="pli-sub">Earn 25 Carats when they join</div></div><i class="ti ti-chevron-right pli-arr"></i></div>
     <div class="pli" onclick="showTierComparison()"><i class="ti ti-stack-2 pli-ico" style="color:var(--gold);"></i><div><div class="pli-name">Compare Tiers</div><div class="pli-sub">See what Gold & Obsidian unlock</div></div><i class="ti ti-chevron-right pli-arr"></i></div>
     <div class="pli" onclick="showHowItWorks()"><i class="ti ti-help-circle pli-ico" style="color:var(--gold);"></i><div><div class="pli-name">How Barafu Luxe Works</div><div class="pli-sub">Booking, WhatsApp & confirmations explained</div></div><i class="ti ti-chevron-right pli-arr"></i></div>
     <div class="pli" onclick="openTrustPolicies()"><i class="ti ti-shield-check pli-ico" style="color:#7CB88A;"></i><div><div class="pli-name">Trust & Policies</div><div class="pli-sub">Response times · Cancellations · Privacy</div></div><i class="ti ti-chevron-right pli-arr"></i></div>
@@ -2169,6 +2193,15 @@ function removeBookingFB(fbKey){
         <input type="checkbox" id="outdoor-mode-toggle" onchange="toggleOutdoorMode(this.checked)">
         <span class="bl-switch-track"></span>
       </label>
+    </div>
+    <div class="pli" style="cursor:default;"><i class="ti ti-language pli-ico" style="color:var(--gold);"></i><div><div class="pli-name">Preferred Language</div><div class="pli-sub">Your concierge replies in this language</div></div>
+      <select id="preferred-language-select" onchange="setPreferredLanguage(this.value)" style="background:var(--soft);color:var(--ow);border:0.5px solid var(--bd);border-radius:2px;padding:6px 10px;font-size:11px;">
+        <option value="English">English</option>
+        <option value="Swahili">Swahili</option>
+        <option value="French">French</option>
+        <option value="German">German</option>
+        <option value="Other">Other</option>
+      </select>
     </div>
     <div class="pli" onclick="window.open('https://wa.me/255692312366','_blank')"><i class="ti ti-brand-whatsapp pli-ico" style="color:#128C7E;"></i><div><div class="pli-name">WhatsApp Concierge</div><div class="pli-sub">+255 692 312 366 · Tap to open</div></div><i class="ti ti-external-link pli-arr"></i></div>
     <div class="pli" onclick="window.open('mailto:barafuluxe@gmail.com','_blank')"><i class="ti ti-mail pli-ico"></i><div><div class="pli-name">Email</div><div class="pli-sub">barafuluxe@gmail.com</div></div><i class="ti ti-external-link pli-arr"></i></div>
@@ -3484,6 +3517,7 @@ function go(id){
   if(id==='s-profile' && currentUser){
     updateProfileForTier(currentUser);
     if(typeof applyOutdoorModeFromStorage==='function') applyOutdoorModeFromStorage();
+    if(typeof loadPreferredLanguage==='function') loadPreferredLanguage();
     var alreadyInstalledNow = window.navigator.standalone===true || (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
     var installItem = document.getElementById('profile-install-item');
     if(installItem) installItem.style.display = alreadyInstalledNow ? 'none' : 'flex';
@@ -4029,6 +4063,7 @@ function enterApp(user){
   if('clearAppBadge' in navigator) navigator.clearAppBadge().catch(function(){});
   if(typeof resetServiceWorkerBadge==='function') resetServiceWorkerBadge();
   if(typeof loadNotificationsFromFirebase==='function') loadNotificationsFromFirebase(user);
+  if(typeof renderComingUpStrip==='function') renderComingUpStrip();
   setTimeout(function(){
     if(typeof maybeShowWelcomeBack==='function') maybeShowWelcomeBack(user);
   },2300);
@@ -4927,6 +4962,29 @@ function applyOutdoorModeFromStorage(){
   document.body.classList.toggle('outdoor-mode', enabled);
   var toggle = document.getElementById('outdoor-mode-toggle');
   if(toggle) toggle.checked = enabled;
+}
+
+function setPreferredLanguage(lang){
+  if(!currentUser || !currentUser.email) return;
+  currentUser.language = lang;
+  if(window.FB && typeof window.FB.saveLanguagePreference==='function'){
+    window.FB.saveLanguagePreference(currentUser.email, lang).then(function(){
+      showToast('Preferred language set to '+lang+' ✓');
+    }).catch(function(err){
+      console.log('saveLanguagePreference failed:', err);
+      showToast('⚠ Could not save — check your connection');
+    });
+  }
+}
+
+function loadPreferredLanguage(){
+  var select = document.getElementById('preferred-language-select');
+  if(!select || !currentUser || !currentUser.email) return;
+  if(window.FB && typeof window.FB.getLanguagePreference==='function'){
+    window.FB.getLanguagePreference(currentUser.email, function(lang){
+      select.value = lang || 'English';
+    });
+  }
 }
 
 function openSearch(){
@@ -8054,6 +8112,7 @@ function openNotifications(){
       +'<div style="font-size:11px;color:var(--mt);">New bookings, events and empty legs will appear here.</div>'
       +'</div>';
   } else {
+    html += '<div style="text-align:right;margin-bottom:10px;"><span style="font-size:9px;letter-spacing:0.08em;color:var(--mt);text-transform:uppercase;cursor:pointer;" onclick="clearAllNotifications()">Clear all</span></div>';
     NOTIFICATIONS.slice(0,20).forEach(function(n){
       var icons = {booking:'📋',event:'📅',emptylegs:'✈️',community:'💬',flight:'🛫',info:'✦'};
       var hasAction = !!n.action;
@@ -8070,6 +8129,22 @@ function openNotifications(){
   html += '</div>';
   document.getElementById('modal-body').innerHTML = html;
   document.getElementById('modal-bg').classList.add('open');
+}
+
+function clearAllNotifications(){
+  NOTIFICATIONS.length = 0;
+  updateNotifBadge();
+  openNotifications(); // re-render to show the empty state immediately
+
+  // Clearing the local view alone isn't enough — notifications are
+  // persisted in Firebase (that's what makes them survive across app
+  // reopens and devices), so leaving that untouched would mean they just
+  // reappear next time the list reloads from there.
+  if(currentUser && currentUser.email && window.FB && typeof window.FB.clearNotificationsForUser==='function'){
+    window.FB.clearNotificationsForUser(currentUser.email).catch(function(err){
+      console.log('clearNotificationsForUser failed:', err);
+    });
+  }
 }
 
 // Auto-generate notifications from app activity
@@ -8916,6 +8991,55 @@ function renderRewardsScreen(){
   });
 }
 
+function openInviteFriend(){
+  if(!currentUser || !currentUser.email){ showToast('Please sign in first'); return; }
+  var email = currentUser.email;
+  var inviteMsg = currentUser.name+' has invited you to Barafu Luxe, a private concierge in Arusha, Tanzania.\n\n'
+    +'Request access here: https://app.barafuluxe.com\n\n'
+    +'When asked "how did you hear about us," mention: '+email;
+
+  document.getElementById('modal-ttl').textContent = 'Invite a Friend';
+  document.getElementById('modal-body').innerHTML = '<div class="fwrap">'
+    +'<div style="text-align:center;padding:10px 0 20px;">'
+    +'<div style="font-size:36px;margin-bottom:10px;">✦</div>'
+    +'<div style="font-family:Cormorant Garamond,serif;font-size:19px;color:var(--ow);margin-bottom:8px;">Share Barafu Luxe</div>'
+    +'<div style="font-size:11px;color:var(--mt);line-height:1.7;">When a friend you\'ve invited is approved for membership, you\'ll receive 25 Carats — automatically, no need to ask.</div>'
+    +'</div>'
+    +'<div style="background:var(--soft);border:0.5px solid var(--bd);border-radius:2px;padding:12px 14px;margin-bottom:16px;">'
+    +'<div style="font-size:9px;letter-spacing:0.1em;color:var(--gold);text-transform:uppercase;margin-bottom:4px;">Your referral email</div>'
+    +'<div style="font-size:13px;color:var(--ow);font-family:Montserrat,sans-serif;">'+email+'</div>'
+    +'<div style="font-size:9px;color:var(--mt);margin-top:6px;line-height:1.6;">Ask your friend to mention this when they request access.</div>'
+    +'</div>'
+    +'<button class="gbtn" style="margin-bottom:8px;" onclick="shareInviteLink()"><i class="ti ti-share"></i> Share Invite</button>'
+    +'<button class="gghst" onclick="copyInviteMessage()"><i class="ti ti-copy"></i> Copy Message</button>'
+    +'</div>';
+  document.getElementById('modal-bg').classList.add('open');
+
+  window._inviteMsg = inviteMsg; // stashed for the two buttons above
+}
+
+function shareInviteLink(){
+  var msg = window._inviteMsg || '';
+  if(navigator.share){
+    navigator.share({ text: msg }).catch(function(){}); // user cancelling the share sheet isn't an error worth reporting
+  } else {
+    window.open('https://wa.me/?text='+encodeURIComponent(msg), '_blank');
+  }
+}
+
+function copyInviteMessage(){
+  var msg = window._inviteMsg || '';
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(msg).then(function(){
+      showToast('Copied ✓');
+    }).catch(function(){
+      showToast('⚠ Could not copy — try Share instead');
+    });
+  } else {
+    showToast('⚠ Copy not supported on this device — try Share instead');
+  }
+}
+
 function showTierComparison(){
   document.getElementById('modal-ttl').textContent = 'Compare Tiers';
   var myTier = (currentUser && currentUser.tier) || 'silver';
@@ -9057,9 +9181,11 @@ function renderMyBookingsList(bookings){
     return;
   }
   var html = '';
-  bookings.forEach(function(b){
+  bookings.forEach(function(b, idx){
     var statusColor = b.status==='confirmed' ? '#4CAF50' : b.status==='pending' ? '#FF9800' : 'var(--mt)';
     var hasRealDetail = b.detail && b.detail !== 'App enquiry';
+    var canCancel = b.status==='confirmed' || b.status==='pending';
+    var cancelMsg = 'I would like to cancel my booking: '+(b.service||'Service')+(b.date?' — '+b.date:'')+(hasRealDetail?'\n\n'+b.detail:'');
     html += '<div style="background:var(--card);border:0.5px solid var(--bd);border-radius:2px;padding:12px 14px;margin-bottom:8px;">'
       +'<div style="display:flex;justify-content:space-between;align-items:flex-start;">'
       +'<div style="font-size:13px;color:var(--ow);font-family:Cormorant Garamond,serif;">'+(b.service||'Service')+'</div>'
@@ -9067,9 +9193,64 @@ function renderMyBookingsList(bookings){
       +'</div>'
       +(hasRealDetail ? '<div style="font-size:10px;color:var(--ow);margin-top:6px;line-height:1.6;background:var(--soft);padding:8px 10px;border-radius:2px;">'+b.detail+'</div>' : '')
       +'<div style="font-size:10px;color:var(--mt);margin-top:6px;">'+(b.date||b.time||'')+(b.price&&b.price!=='—'?' · '+b.price:'')+'</div>'
+      +(canCancel ? '<div style="text-align:right;margin-top:8px;"><span style="font-size:9px;letter-spacing:0.06em;color:#e57373;text-transform:uppercase;cursor:pointer;" onclick="requestCancelBooking(\''+cancelMsg.replace(/'/g,"\\'").replace(/\n/g,'\\n')+'\')">Request to cancel</span></div>' : '')
       +'</div>';
   });
   el.innerHTML = html;
+}
+
+function requestCancelBooking(message){
+  if(!confirm('Send a cancellation request to your concierge via WhatsApp?')) return;
+  window.open('https://wa.me/255692312366?text='+encodeURIComponent(message), '_blank');
+}
+
+// Shows a member's next 2-3 confirmed bookings right on Home, so the app
+// feels like it's tracking their actual life, not just a catalog to
+// browse. Scoped to confirmed bookings specifically — event RSVPs aren't
+// tracked per-member anywhere in the app yet, so including those would
+// mean showing something that isn't real data.
+function renderComingUpStrip(){
+  var section = document.getElementById('coming-up-section');
+  var list = document.getElementById('coming-up-list');
+  if(!section || !list || !currentUser || !currentUser.email) return;
+
+  function paint(bookings){
+    var upcoming = (bookings||[]).filter(function(b){
+      if(b.status !== 'confirmed' || !b.date) return false;
+      var d = new Date(b.date);
+      return !isNaN(d.getTime());
+    }).sort(function(a,b){
+      return new Date(a.date) - new Date(b.date);
+    }).slice(0,3);
+
+    if(!upcoming.length){ section.style.display='none'; return; }
+
+    var html = '';
+    upcoming.forEach(function(b){
+      html += '<div class="rc" style="padding:12px 14px;display:flex;justify-content:space-between;align-items:center;gap:10px;cursor:pointer;" onclick="openMyBookings()">'
+        +'<div style="min-width:0;">'
+        +'<div style="font-size:12px;color:var(--ow);font-family:Cormorant Garamond,serif;">'+(b.service||'Booking')+'</div>'
+        +'<div style="font-size:10px;color:var(--mt);margin-top:2px;">'+b.date+'</div>'
+        +'</div>'
+        +'<span style="font-size:8px;color:#4CAF50;letter-spacing:0.08em;text-transform:uppercase;flex-shrink:0;">Confirmed</span>'
+        +'</div>';
+    });
+    list.innerHTML = html;
+    section.style.display = 'block';
+  }
+
+  var localCache = [];
+  try{ localCache = JSON.parse(DB.get('bookings_'+currentUser.email) || '[]'); }catch(e){}
+  paint(localCache);
+
+  if(window.FB && typeof window.FB.listenBookings==='function'){
+    window.FB.listenBookings(function(allBookings){
+      var mine = allBookings.filter(function(b){
+        return b.email === currentUser.email || (!b.email && b.client === currentUser.name);
+      });
+      if(mine.length) paint(mine);
+    });
+  }
 }
 
 function openMyBookings(){
