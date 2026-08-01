@@ -1341,6 +1341,22 @@ window.sendCommMsgFB = function(commId, userName, userInitials, text) {
   window.FB.deleteEvent = (id) => {
     return remove(ref(db, 'events/' + id));
   };
+
+  // ── DISCOVER CARDS — admin-added ones, layered on top of the static
+  // hand-picked set already in the code. Same real-sync pattern as
+  // events: saved to Firebase so every member's device actually sees
+  // them, not just whichever device added them. ──
+  window.FB.saveDiscoverCard = (card) => {
+    return set(ref(db, 'discoverCards/' + card.id), card);
+  };
+  window.FB.getDiscoverCards = (callback) => {
+    get(ref(db, 'discoverCards')).then(snap => {
+      callback(snap.exists() ? Object.values(snap.val()) : []);
+    }).catch(() => callback([]));
+  };
+  window.FB.deleteDiscoverCard = (id) => {
+    return remove(ref(db, 'discoverCards/' + id));
+  };
   // ── Load Firebase auth members into local DB on start ──
   onValue(ref(db, 'auth'), snap => {
     const fbMembers = Object.values(snap.val()||{});
@@ -1683,6 +1699,42 @@ function removeBookingFB(fbKey){
     <div class="admin-section">
       <div class="admin-sec-title">Posted events</div>
       <div id="adm-events-list"><div style="font-size:11px;color:var(--mt);padding:10px 0;">Loading...</div></div>
+    </div>
+
+    <div class="admin-section">
+      <div class="admin-sec-title">Add to Discover</div>
+      <div style="font-size:10px;color:var(--mt);line-height:1.7;padding:0 2px 12px;">Spotlight anything worth highlighting — an event, a seasonal push, anything. You decide case-by-case what earns a spot, not every event automatically.</div>
+      <div class="admin-add-form">
+        <input class="admin-inp" id="adm-disc-tag" placeholder="Tag e.g. GALA · EXCLUSIVE">
+        <input class="admin-inp" id="adm-disc-title" placeholder="Title e.g. An Evening Worth Remembering">
+        <input class="admin-inp" id="adm-disc-sub" placeholder="Sub-line e.g. Sept 5 · Ngorongoro Crater Lodge">
+        <select class="admin-inp" id="adm-disc-dest" style="appearance:none;cursor:pointer;">
+          <option value="s-events">Events</option>
+          <option value="s-heli">Helicopter</option>
+          <option value="s-yacht">Yacht Charters</option>
+          <option value="s-f1">F1 Hospitality</option>
+          <option value="s-emptylegs">Empty Legs</option>
+          <option value="s-dining">Private Dining</option>
+          <option value="s-spa">Spa & Wellness</option>
+          <option value="s-gems">Hidden Gems</option>
+          <option value="s-gemstones">Gemstone Sourcing</option>
+          <option value="s-realestate">Real Estate</option>
+          <option value="s-transfers">Transfers</option>
+          <option value="s-flights">Flight Tracker</option>
+          <option value="s-circle">The Circle</option>
+          <option value="s-equestrian">Equestrian</option>
+        </select>
+        <select class="admin-inp" id="adm-disc-color" style="appearance:none;cursor:pointer;">
+          <option value="var(--gold)">Gold</option>
+          <option value="var(--ocean-soft)">Ocean</option>
+          <option value="var(--red)">Red</option>
+          <option value="#9C27B0">Purple</option>
+          <option value="#7C4DFF">Violet</option>
+          <option value="#D4AF37">Champagne</option>
+        </select>
+        <button class="admin-submit" onclick="adminAddDiscoverCard()">Add to Discover</button>
+      </div>
+      <div id="adm-discover-manage-list" style="margin-top:14px;"></div>
     </div>
 
     <div style="padding:20px 0 40px;text-align:center;">
@@ -4057,6 +4109,7 @@ function openAdmin(){
   if(window._fbBookings&&window._fbBookings.length>0) renderAdminBookingsFromFB(window._fbBookings);
   else renderAdminBookings();
   if(typeof renderAdminEvents==='function') renderAdminEvents();
+  if(typeof renderDiscoverManageList==='function') renderDiscoverManageList();
 
   // Render immediately from whatever's cached, so the dashboard isn't blank —
   // then refresh live from Firebase, which is the actual source of truth.
@@ -6983,6 +7036,67 @@ function deleteEvent(id){
   }
 }
 
+function adminAddDiscoverCard(){
+  var tag=(document.getElementById('adm-disc-tag')||{}).value||'';
+  var title=(document.getElementById('adm-disc-title')||{}).value||'';
+  var sub=(document.getElementById('adm-disc-sub')||{}).value||'';
+  var dest=(document.getElementById('adm-disc-dest')||{}).value||'s-events';
+  var color=(document.getElementById('adm-disc-color')||{}).value||'var(--gold)';
+  if(!tag||!title||!sub){ alert('Please fill in tag, title and sub-line.'); return; }
+
+  var card = { id:'disc'+Date.now(), tag:tag.toUpperCase(), title:title, sub:sub, action:"go('"+dest+"')", color:color };
+
+  if(window.FB && typeof window.FB.saveDiscoverCard==='function'){
+    window.FB.saveDiscoverCard(card).then(function(){
+      showToast('Added to Discover ✓');
+      ['adm-disc-tag','adm-disc-title','adm-disc-sub'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
+      renderDiscoverFeed();
+      renderDiscoverManageList();
+    }).catch(function(err){
+      console.log('saveDiscoverCard failed:', err);
+      showToast('⚠ Could not save — check your connection and try again');
+    });
+  }
+}
+
+function renderDiscoverManageList(){
+  var el = document.getElementById('adm-discover-manage-list');
+  if(!el) return;
+  if(!window.FB || typeof window.FB.getDiscoverCards!=='function') return;
+
+  window.FB.getDiscoverCards(function(cards){
+    if(!cards || !cards.length){
+      el.innerHTML = '<div style="font-size:11px;color:var(--mt);padding:6px 0;">No admin-added Discover cards yet — the ones below are the built-in set.</div>';
+      return;
+    }
+    var html = '<div style="font-size:9px;letter-spacing:0.1em;color:var(--mt);text-transform:uppercase;margin-bottom:8px;">Your Discover cards</div>';
+    cards.forEach(function(c){
+      html += '<div style="background:var(--card);border:0.5px solid var(--bd);border-radius:2px;padding:12px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:10px;">'
+        +'<div style="min-width:0;">'
+        +'<div style="font-size:8px;letter-spacing:0.14em;color:'+c.color+';text-transform:uppercase;margin-bottom:3px;">'+c.tag+'</div>'
+        +'<div style="font-size:13px;color:var(--ow);font-family:Cormorant Garamond,serif;">'+c.title+'</div>'
+        +'</div>'
+        +'<button class="ab-btn" style="flex-shrink:0;color:#e57373;border-color:rgba(229,115,115,0.35);" onclick="deleteDiscoverCard(\''+c.id+'\')">Delete</button>'
+        +'</div>';
+    });
+    el.innerHTML = html;
+  });
+}
+
+function deleteDiscoverCard(id){
+  if(!confirm('Remove this from Discover? This removes it for every member.')) return;
+  if(window.FB && typeof window.FB.deleteDiscoverCard==='function'){
+    window.FB.deleteDiscoverCard(id).then(function(){
+      showToast('Removed from Discover ✓');
+      renderDiscoverFeed();
+      renderDiscoverManageList();
+    }).catch(function(err){
+      console.log('deleteDiscoverCard failed:', err);
+      showToast('⚠ Could not remove — check your connection and try again');
+    });
+  }
+}
+
 // ════ BROADCAST TEMPLATES ════
 var BROADCAST_TEMPLATES={
   newevent:'✦ Barafu Luxe Members Update\n\nA new exclusive event has just been added to your app.\n\nOpen the app → Events to view and RSVP.\n\nLimited spots — first come, first served.\n\nBarafu Luxe · Private Concierge 🖤',
@@ -7798,15 +7912,30 @@ function openDiningDetail(id){
 function renderDiscoverFeed(){
   var el=document.getElementById('discover-feed');
   if(!el) return;
-  var html='';
-  DISCOVER_FEED.forEach(function(item){
-    html+='<div class="discover-card" onclick="'+item.action+'">'
-      +'<div style="font-size:8px;letter-spacing:0.18em;color:'+item.color+';text-transform:uppercase;margin-bottom:8px;font-weight:500;">'+item.tag+'</div>'
-      +'<div style="font-family:Cormorant Garamond,serif;font-size:18px;color:var(--ow);line-height:1.2;margin-bottom:6px;">'+item.title+'</div>'
-      +'<div style="font-size:10px;color:var(--mt);">'+item.sub+'</div>'
-      +'</div>';
-  });
-  el.innerHTML=html;
+
+  function paint(cards){
+    var html='';
+    cards.forEach(function(item){
+      html+='<div class="discover-card" onclick="'+item.action+'">'
+        +'<div style="font-size:8px;letter-spacing:0.18em;color:'+item.color+';text-transform:uppercase;margin-bottom:8px;font-weight:500;">'+item.tag+'</div>'
+        +'<div style="font-family:Cormorant Garamond,serif;font-size:18px;color:var(--ow);line-height:1.2;margin-bottom:6px;">'+item.title+'</div>'
+        +'<div style="font-size:10px;color:var(--mt);">'+item.sub+'</div>'
+        +'</div>';
+    });
+    el.innerHTML=html;
+  }
+
+  // Static set paints instantly, admin-added ones layer in once Firebase
+  // responds — same instant-paint-then-sync pattern used elsewhere in
+  // the app, so Discover never looks empty while waiting on a network call.
+  paint(DISCOVER_FEED);
+  if(window.FB && typeof window.FB.getDiscoverCards==='function'){
+    window.FB.getDiscoverCards(function(adminCards){
+      if(adminCards && adminCards.length){
+        paint(adminCards.concat(DISCOVER_FEED));
+      }
+    });
+  }
 }
 
 // Run on load
