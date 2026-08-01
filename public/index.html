@@ -1637,6 +1637,11 @@ function removeBookingFB(fbKey){
     <div class="admin-section">
       <div class="admin-sec-title">Add event</div>
       <div class="admin-add-form">
+        <div style="display:flex;gap:8px;margin-bottom:4px;">
+          <input class="admin-inp" id="adm-ev-source-url" placeholder="Paste an AllEvents.in event link..." style="flex:1;">
+          <button class="admin-submit" style="width:auto;padding:0 16px;white-space:nowrap;" onclick="fetchEventFromUrl()">Fetch</button>
+        </div>
+        <div id="adm-ev-fetch-status" style="font-size:10px;color:var(--mt);margin-bottom:6px;"></div>
         <input class="admin-inp" id="adm-ev-name" placeholder="Event name">
         <input class="admin-inp" id="adm-ev-cat" placeholder="Category: gala / golf / wine / fashion / sports / travel / private">
         <input class="admin-inp" id="adm-ev-date" placeholder="Date (YYYY-MM-DD)">
@@ -6796,6 +6801,48 @@ function adminAddGem(){
     console.log('Hidden Gem broadcast:', r);
   });
 }
+// Pulls structured data from a pasted AllEvents.in link and pre-fills the
+// Post Event form — admin still reviews, edits, and explicitly posts
+// afterward, same as every other admin action in this app. This is a
+// convenience for typing less, not an automated pipeline that publishes
+// anything on its own.
+function fetchEventFromUrl(){
+  var urlInput = document.getElementById('adm-ev-source-url');
+  var statusEl = document.getElementById('adm-ev-fetch-status');
+  var url = (urlInput.value || '').trim();
+  if(!url){
+    statusEl.textContent = 'Paste an AllEvents.in event link first';
+    statusEl.style.color = 'var(--mt)';
+    return;
+  }
+  statusEl.textContent = 'Fetching...';
+  statusEl.style.color = 'var(--mt)';
+
+  fetch('/api/fetch-event?url=' + encodeURIComponent(url))
+    .then(function(res){ return res.json(); })
+    .then(function(data){
+      if(!data || !data.ok){
+        statusEl.textContent = '⚠ ' + ((data && data.error) || 'Could not read that event');
+        statusEl.style.color = '#e57373';
+        return;
+      }
+      var setVal = function(id, val){ var el = document.getElementById(id); if(el && val) el.value = val; };
+      setVal('adm-ev-name', data.name);
+      setVal('adm-ev-date', data.date);
+      setVal('adm-ev-time', data.time);
+      setVal('adm-ev-venue', data.venue);
+      setVal('adm-ev-price', data.price);
+      setVal('adm-ev-desc', data.description);
+      statusEl.textContent = '✓ Filled in — review everything below before posting, especially the category and description';
+      statusEl.style.color = '#4CAF50';
+    })
+    .catch(function(err){
+      console.log('fetchEventFromUrl failed:', err);
+      statusEl.textContent = '⚠ Could not reach that link — check the URL and try again';
+      statusEl.style.color = '#e57373';
+    });
+}
+
 function adminAddEvent(){
   var name=(document.getElementById('adm-ev-name')||{}).value||'';
   var cat=(document.getElementById('adm-ev-cat')||{}).value||'gala';
