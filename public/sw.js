@@ -1,7 +1,7 @@
 // Barafu Luxe — Service Worker
 // Handles offline caching (existing behavior) plus Web Push notifications.
 
-const CACHE = 'bl-v9';
+const CACHE = 'bl-v10';
 
 // ── APP ICON BADGE COUNTER ──
 // Service workers don't share memory between wake-ups and can't see
@@ -84,18 +84,24 @@ self.addEventListener('push', function(e){
     renotify: !!data.tag
   };
 
-  e.waitUntil(
-    getBadgeCount().then(function(current){
-      var next = current + 1;
-      return setBadgeCount(next).then(function(){
-        if(self.navigator && 'setAppBadge' in self.navigator){
-          return self.navigator.setAppBadge(next);
-        }
-      });
-    }).then(function(){
-      return self.registration.showNotification(title, options);
-    })
-  );
+  // Showing the actual notification is the one thing that must never fail
+  // to happen — everything else (badge count) is a secondary enhancement
+  // that runs independently and is not allowed to block or break it, even
+  // if IndexedDB or the Badging API misbehave on a given device.
+  var showNotificationPromise = self.registration.showNotification(title, options);
+
+  var updateBadgePromise = getBadgeCount().then(function(current){
+    var next = current + 1;
+    return setBadgeCount(next).then(function(){
+      if(self.navigator && 'setAppBadge' in self.navigator){
+        return self.navigator.setAppBadge(next);
+      }
+    });
+  }).catch(function(err){
+    console.log('Badge update failed (notification still shown regardless):', err);
+  });
+
+  e.waitUntil(Promise.all([showNotificationPromise, updateBadgePromise]));
 });
 
 // The main app tells us to reset once someone's actually opened it and seen
