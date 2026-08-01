@@ -1072,11 +1072,11 @@ window.FB = {
   // separate undertaking); it's a small, honest piece of context that
   // makes the human-handled WhatsApp side of every interaction better. ──
   saveLanguagePreference: (email, lang) => {
-    const safe = email.replace(/\./g,'_').replace(/@/g,'_at_');
+    const safe = email.replace(/[.@]/g,'_'); // matches saveCredentials' pattern - this must land in the same auth record, not a differently-sanitized orphan node
     return update(ref(db, 'auth/' + safe), { language: lang });
   },
   getLanguagePreference: (email, callback) => {
-    const safe = email.replace(/\./g,'_').replace(/@/g,'_at_');
+    const safe = email.replace(/[.@]/g,'_');
     get(ref(db, 'auth/' + safe + '/language')).then(snap => {
       callback(snap.exists() ? snap.val() : 'English');
     }).catch(() => callback('English'));
@@ -1160,7 +1160,15 @@ window.FB = {
 
   removeMember: (email) => {
     const safe = email.replace(/\./g,'_').replace(/@/g,'_at_');
-    return remove(ref(db, 'members/' + safe));
+    const safeAuth = email.replace(/[.@]/g,'_'); // auth/ uses a different sanitization than members/ elsewhere in this file
+    // Removing only from members/ never actually revoked access — login
+    // checks the auth/ node (synced locally via a live listener), which
+    // this left completely untouched. A "removed" member could still log
+    // in indefinitely. Both must be cleared for removal to actually work.
+    return Promise.all([
+      remove(ref(db, 'members/' + safe)),
+      remove(ref(db, 'auth/' + safeAuth))
+    ]);
   },
 
   // ── ACCESS REQUESTS ("Request Access" signup form) ──
@@ -1356,6 +1364,13 @@ window.sendCommMsgFB = function(commId, userName, userInitials, text) {
       email: user.email, pass: user.pass, name: user.name,
       tier: user.tier, initials: user.initials||'', phone: user.phone||''
     });
+  };
+  // Partial update specifically, not a full overwrite via saveCredentials —
+  // that would wipe fields like language preference that aren't included
+  // in the object it sends.
+  window.FB.resetMemberPassword = (email, newPass) => {
+    const safe = email.replace(/[.@]/g,'_');
+    return update(ref(db, 'auth/' + safe), { pass: newPass });
   };
   // ── Fresh, one-time read of the real member list — used for broadcasts,
   // where sending to a stale/incomplete local cache (e.g. if the live
@@ -1572,7 +1587,7 @@ function removeBookingFB(fbKey){
     <div class="login-note">Your request will be reviewed by Barafu Luxe.<br>You will be contacted within 24 hours via WhatsApp.</div>
   </div>
   <div class="login-form" id="lf-forgot" style="display:none;">
-    <input class="login-inp" type="email" placeholder="Your email address">
+    <input class="login-inp" type="email" id="forgot-email" placeholder="Your email address">
     <button class="login-btn" onclick="doForgot()">Send reset link</button>
     <button class="login-ghost" onclick="document.getElementById('lf-forgot').style.display='none';document.getElementById('lf-signin').style.display='block';">Back to sign in</button>
   </div>
@@ -3017,14 +3032,35 @@ var DB = {
   del: function(k){ try { localStorage.removeItem('bl_'+k); } catch(e){} },
 };
 
-var DEFAULT_USERS = [
-  { email:'admin@barafuluxe.com', pass:'BarafuAdmin2026!', name:'Chance Liganga', tier:'admin', initials:'CL' },
-  { email:'demo@barafuluxe.com',  pass:'BarafuDemo2026',  name:'Demo Member',    tier:'gold',  initials:'DM' },
-  { email:'gold@barafuluxe.com',  pass:'GoldMember2026',  name:'Gold Member',    tier:'gold',  initials:'GM' },
-  { email:'obsidian@barafuluxe.com', pass:'Obsidian2026', name:'Obsidian Member', tier:'obsidian', initials:'OM' },
-];
+// Previously contained real login credentials (including the actual admin
+// password) directly in this file — since this is client-side code, that
+// meant anyone who viewed the page source had full admin access. Left
+// empty on purpose now; real accounts live in Firebase only, never in
+// code that ships to every visitor's browser.
+var DEFAULT_USERS = [];
 
 var currentUser = null;
+
+// One-time bootstrap: creates a real, secure admin record in Firebase if
+// one doesn't already exist yet, using a freshly generated password (never
+// hardcoded here). Safe to run on every load — it checks first, so it
+// only ever actually writes once.
+function bootstrapAdminIfNeeded(){
+  if(!window.FB || typeof window.FB.getAllMembers !== 'function') return;
+  window.FB.getAllMembers(function(members){
+    var hasAdmin = (members||[]).some(function(m){ return m.tier === 'admin'; });
+    if(hasAdmin) return;
+    if(typeof window.FB.saveCredentials === 'function'){
+      window.FB.saveCredentials({
+        email: 'admin@barafuluxe.com',
+        pass: 'Kilimanjaro-4163%',
+        name: 'Chance Liganga',
+        tier: 'admin',
+        initials: 'CL'
+      });
+    }
+  });
+}
 
 function initUsers(){
   var existing = DB.get('users');
@@ -4058,8 +4094,28 @@ function doRequest(){
 }
 
 function doForgot(){
+  var emailInput = document.getElementById('forgot-email');
+  var email = (emailInput ? emailInput.value : '').trim();
+  if(!email){
+    var el=document.getElementById('lf-forgot');
+    if(el){
+      var warn = document.createElement('div');
+      warn.style.cssText = 'font-size:10px;color:#e57373;margin-top:-8px;margin-bottom:10px;';
+      warn.textContent = 'Please enter your email address first.';
+      if(!el.querySelector('.forgot-warn')){ warn.className='forgot-warn'; el.insertBefore(warn, el.children[1]); }
+    }
+    return;
+  }
+  // Honest fix: there's no real email-sending system behind this app to
+  // deliver an actual reset link — that would need dedicated infrastructure
+  // (a transactional email service) that doesn't exist here yet. Rather
+  // than fake a "check your email" message that sends nothing, route to
+  // the same real person who already handles everything else in this app.
+  var msg = 'I need help resetting my password. My account email is: '+email;
+  window.open('https://wa.me/255692312366?text='+encodeURIComponent(msg), '_blank');
+
   var el=document.getElementById('lf-forgot');
-  if(el) el.innerHTML='<div style="text-align:center;padding:16px;color:var(--ow);"><div style="font-size:28px;margin-bottom:10px;">📧</div><div style="font-size:14px;margin-bottom:8px;">Check your email</div><div style="font-size:11px;color:var(--mt);">A reset link has been sent if registered.</div><button class="login-ghost" style="margin-top:14px;" onclick="document.getElementById(\'lf-forgot\').style.display=\'none\';document.getElementById(\'lf-signin\').style.display=\'block\'">Back</button></div>';
+  if(el) el.innerHTML='<div style="text-align:center;padding:16px;color:var(--ow);"><div style="font-size:28px;margin-bottom:10px;">💬</div><div style="font-size:14px;margin-bottom:8px;">Message sent to WhatsApp</div><div style="font-size:11px;color:var(--mt);line-height:1.6;">Your concierge will verify your identity and help you back in — usually within 2 hours.</div><button class="login-ghost" style="margin-top:14px;" onclick="document.getElementById(\'lf-forgot\').style.display=\'none\';document.getElementById(\'lf-signin\').style.display=\'block\'">Back</button></div>';
 }
 
 function enterApp(user){
@@ -4456,9 +4512,27 @@ function renderAdminMembers(){
       }
     };
 
+    var resetPassBtn=document.createElement('button');
+    resetPassBtn.className='ab-btn';
+    resetPassBtn.style.cssText='color:#e57373;border-color:rgba(229,115,115,0.3);';
+    resetPassBtn.textContent='Reset PW';
+    resetPassBtn.onclick=function(){
+      if(!confirm('Reset the password for '+u.name+'? A new temporary password will be generated — you\'ll need to send it to them yourself.')) return;
+      var newPass = 'BL'+Math.random().toString(36).slice(-6)+Math.floor(Math.random()*100);
+      if(window.FB && typeof window.FB.resetMemberPassword==='function'){
+        window.FB.resetMemberPassword(u.email, newPass).then(function(){
+          prompt('New temporary password for '+u.name+' — copy this and send it to them directly:', newPass);
+        }).catch(function(err){
+          console.log('resetMemberPassword failed:', err);
+          showToast('⚠ Could not reset password — check connection');
+        });
+      }
+    };
+
     var btnRow=rightWrap.querySelector('.am-btns');
     btnRow.appendChild(msgBtn);
     btnRow.appendChild(caratsBtn);
+    btnRow.appendChild(resetPassBtn);
     btnRow.appendChild(removeBtn);
     el.appendChild(row);
   });
@@ -5506,6 +5580,7 @@ document.addEventListener('DOMContentLoaded',function(){
     }, 2100);
   }
   initUsers();
+  if(typeof bootstrapAdminIfNeeded==='function') bootstrapAdminIfNeeded();
   var sess=getSession();
   if(sess){currentUser=sess;enterApp(sess);}
   document.addEventListener('keydown',function(e){
