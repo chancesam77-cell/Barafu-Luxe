@@ -424,6 +424,11 @@
 .gem-prop-card{padding:24px 0;border-bottom:0.5px solid rgba(255,255,255,0.05);cursor:pointer;}
 .gem-prop-card:last-child{border-bottom:none;}
 .gem-prop-inner{position:relative;}
+.save-heart{position:absolute;top:0;right:0;font-size:18px;color:var(--mt);cursor:pointer;padding:6px;z-index:2;transition:color .2s,transform .15s;}
+.save-heart:active{transform:scale(0.85);}
+.save-heart.saved{color:#e57373;}
+.discover-card{position:relative;}
+.discover-card .save-heart{font-size:14px;padding:4px;}
 .gem-new-badge{display:inline-block;font-size:8px;letter-spacing:0.2em;color:var(--gold);text-transform:uppercase;border:0.5px solid rgba(184,137,42,0.3);padding:3px 12px;border-radius:10px;margin-bottom:12px;}
 .gem-prop-num{font-family:Montserrat,Georgia,sans-serif;font-size:10px;letter-spacing:0.22em;color:rgba(184,137,42,0.3);margin-bottom:10px;}
 .gem-prop-icon{font-size:42px;margin-bottom:14px;line-height:1;}
@@ -1075,6 +1080,24 @@ window.FB = {
     get(ref(db, 'auth/' + safe + '/language')).then(snap => {
       callback(snap.exists() ? snap.val() : 'English');
     }).catch(() => callback('English'));
+  },
+
+  // ── SAVED ITEMS — a member's own wishlist, across Gems, Dining, and
+  // Discover. Keyed by a sanitized item id so saving the same thing twice
+  // just overwrites rather than duplicating. ──
+  saveFavorite: (email, item) => {
+    const safe = email.replace(/\./g,'_').replace(/@/g,'_at_');
+    return set(ref(db, 'favorites/' + safe + '/' + item.id), item);
+  },
+  removeFavorite: (email, itemId) => {
+    const safe = email.replace(/\./g,'_').replace(/@/g,'_at_');
+    return remove(ref(db, 'favorites/' + safe + '/' + itemId));
+  },
+  getFavorites: (email, callback) => {
+    const safe = email.replace(/\./g,'_').replace(/@/g,'_at_');
+    get(ref(db, 'favorites/' + safe)).then(snap => {
+      callback(snap.exists() ? Object.values(snap.val()) : []);
+    }).catch(() => callback([]));
   },
 
   // ── CARATS — the loyalty/rewards balance. Stored as a running total plus
@@ -1951,6 +1974,8 @@ function removeBookingFB(fbKey){
     <div style="width:32px"></div>
   </div>
 
+  <div id="weather-widget-heli" style="margin:14px 14px 0;display:none;"></div>
+
   <div class="luxury-tabs" style="margin:14px 14px 0;">
     <button class="luxury-tab active" id="heli-mode-meru" onclick="switchHeliMode('meru')">Mt. Meru</button>
     <button class="luxury-tab" id="heli-mode-znz" onclick="switchHeliMode('znz')">Zanzibar &amp; Pemba</button>
@@ -2047,6 +2072,7 @@ function removeBookingFB(fbKey){
     <span class="tb-title">Yacht · Indian Ocean</span>
     <div style="width:32px"></div>
   </div>
+  <div id="weather-widget-yacht" style="margin:14px 14px 0;display:none;"></div>
   <div class="luxury-hero">
     <div class="luxury-hero-eyebrow">Rock the Yacht · Barafu Luxe</div>
     <div class="luxury-hero-title">Sail the<br><em>Indian Ocean.</em></div>
@@ -2176,6 +2202,7 @@ function removeBookingFB(fbKey){
   <div class="plist"><div class="pli" id="profile-spa-access" onclick="openSpaWithTierCheck()" style="display:none;"><i class="ti ti-sparkles pli-ico" style="color:var(--gold);"></i><div><div class="pli-name">Spa & Wellness</div><div class="pli-sub">Peaberries · Siringit · Book treatment</div></div><i class="ti ti-chevron-right pli-arr"></i></div><div class="pli" id="profile-gems-access" onclick="openGemsWithTierCheck()" style="display:none;"><i class="ti ti-diamond pli-ico" style="color:var(--ocean-soft);"></i><div><div class="pli-name">Hidden Gems</div><div class="pli-sub">Exclusive stays · Members only</div></div><i class="ti ti-chevron-right pli-arr"></i></div>
     <div class="pli" onclick="openMyBookings()"><i class="ti ti-file-invoice pli-ico"></i><div><div class="pli-name">My Bookings</div><div class="pli-sub">View confirmed and pending</div></div><i class="ti ti-chevron-right pli-arr"></i></div>
     <div class="pli" onclick="openPaymentDetails()"><i class="ti ti-credit-card pli-ico"></i><div><div class="pli-name">Payment Details</div><div class="pli-sub">Bank · Airtel Money · M-Pesa</div></div><i class="ti ti-chevron-right pli-arr"></i></div>
+    <div class="pli" onclick="openSavedItems()"><i class="ti ti-heart pli-ico" style="color:#e57373;"></i><div><div class="pli-name">Saved</div><div class="pli-sub">Villas, dining & experiences you've saved</div></div><i class="ti ti-chevron-right pli-arr"></i></div>
     <div class="pli" onclick="go('s-rewards')"><i class="ti ti-diamond pli-ico" style="color:var(--gl);"></i><div><div class="pli-name">Rewards</div><div class="pli-sub">Your Carats & what to redeem them for</div></div><i class="ti ti-chevron-right pli-arr"></i></div>
     <div class="pli" onclick="openInviteFriend()"><i class="ti ti-user-plus pli-ico" style="color:var(--gold);"></i><div><div class="pli-name">Invite a Friend</div><div class="pli-sub">Earn 25 Carats when they join</div></div><i class="ti ti-chevron-right pli-arr"></i></div>
     <div class="pli" onclick="showTierComparison()"><i class="ti ti-stack-2 pli-ico" style="color:var(--gold);"></i><div><div class="pli-name">Compare Tiers</div><div class="pli-sub">See what Gold & Obsidian unlock</div></div><i class="ti ti-chevron-right pli-arr"></i></div>
@@ -3499,7 +3526,8 @@ function go(id){
   if(id==='s-emptylegs'){ setTimeout(function(){ try{fetchLiveEmptyLegs();}catch(e){}; },100); }
   if(id==='s-transfers'){ setTimeout(function(){ try{buildRoutes();}catch(e){} },100); }
   if(id==='s-f1'){ setTimeout(function(){ try{buildF1();}catch(e){console.log('F1 err:',e);} setTimeout(function(){try{fetchF1Live();}catch(e){}},400); },100); }
-  if(id==='s-yacht'){ setTimeout(function(){ try{buildGroupFleet();}catch(e){console.log('Fleet err:',e);} },100); }
+  if(id==='s-yacht'){ setTimeout(function(){ try{buildGroupFleet();}catch(e){console.log('Fleet err:',e);} },100); setTimeout(function(){ try{renderWeatherWidget('weather-widget-yacht');}catch(e){} },150); }
+  if(id==='s-heli'){ setTimeout(function(){ try{renderWeatherWidget('weather-widget-heli');}catch(e){} },150); }
   if(id==='s-concierge'){ try{
 }catch(e){} }
   if(id!=='s-concierge'){ try{
@@ -4064,6 +4092,7 @@ function enterApp(user){
   if(typeof resetServiceWorkerBadge==='function') resetServiceWorkerBadge();
   if(typeof loadNotificationsFromFirebase==='function') loadNotificationsFromFirebase(user);
   if(typeof renderComingUpStrip==='function') renderComingUpStrip();
+  if(typeof loadFavorites==='function') loadFavorites();
   setTimeout(function(){
     if(typeof maybeShowWelcomeBack==='function') maybeShowWelcomeBack(user);
   },2300);
@@ -4987,6 +5016,132 @@ function loadPreferredLanguage(){
   }
 }
 
+// ── SAVE / FAVORITES ──
+// A local, in-memory index of saved item ids for instant heart-icon
+// rendering (no need to wait on Firebase just to know what's already
+// saved), kept in sync with the real Firebase list underneath.
+var SAVED_ITEMS = {};
+
+function loadFavorites(){
+  if(!currentUser || !currentUser.email) return;
+  if(window.FB && typeof window.FB.getFavorites==='function'){
+    window.FB.getFavorites(currentUser.email, function(items){
+      SAVED_ITEMS = {};
+      (items||[]).forEach(function(it){ SAVED_ITEMS[it.id] = it; });
+      // Re-paint whichever screen is currently open so hearts reflect
+      // the real saved state once it's loaded in, not just whatever
+      // was true before the app last closed.
+      document.querySelectorAll('.save-heart').forEach(function(h){
+        h.classList.toggle('saved', !!SAVED_ITEMS[h.dataset.itemId]);
+      });
+    });
+  }
+}
+
+function isItemSaved(id){ return !!SAVED_ITEMS[id]; }
+
+function toggleSaveItem(el, type, id, name, sub, icon, action){
+  if(!currentUser || !currentUser.email){ showToast('Please sign in to save items'); return; }
+  var nowSaved = !SAVED_ITEMS[id];
+
+  if(nowSaved){
+    SAVED_ITEMS[id] = { id:id, type:type, name:name, sub:sub||'', icon:icon||'✦', action:action||'', savedAt:Date.now() };
+  } else {
+    delete SAVED_ITEMS[id];
+  }
+  if(el) el.classList.toggle('saved', nowSaved);
+
+  if(window.FB){
+    if(nowSaved && typeof window.FB.saveFavorite==='function'){
+      window.FB.saveFavorite(currentUser.email, SAVED_ITEMS[id]).catch(function(err){
+        console.log('saveFavorite failed:', err);
+      });
+    } else if(!nowSaved && typeof window.FB.removeFavorite==='function'){
+      window.FB.removeFavorite(currentUser.email, id).catch(function(err){
+        console.log('removeFavorite failed:', err);
+      });
+    }
+  }
+}
+
+function openSavedItems(){
+  var items = Object.values(SAVED_ITEMS).sort(function(a,b){ return (b.savedAt||0)-(a.savedAt||0); });
+
+  document.getElementById('modal-ttl').textContent = 'Saved';
+  var html = '<div class="fwrap">';
+  if(!items.length){
+    html += '<div style="text-align:center;padding:30px 0;">'
+      +'<div style="font-size:32px;margin-bottom:10px;">🤍</div>'
+      +'<div style="font-family:Cormorant Garamond,serif;font-size:18px;color:var(--ow);margin-bottom:6px;">Nothing saved yet</div>'
+      +'<div style="font-size:11px;color:var(--mt);line-height:1.7;">Tap the heart on any villa, restaurant or experience to save it here for later.</div>'
+      +'</div>';
+  } else {
+    items.forEach(function(it){
+      html += '<div class="rc" style="padding:12px 14px;display:flex;align-items:center;gap:12px;cursor:pointer;" onclick="openSavedItem(\''+it.type+'\',\''+it.id+'\',\''+(it.action||'').replace(/'/g,"\\'")+'\')">'
+        +'<span style="font-size:22px;flex-shrink:0;">'+it.icon+'</span>'
+        +'<div style="flex:1;min-width:0;">'
+        +'<div style="font-size:13px;color:var(--ow);font-family:Cormorant Garamond,serif;">'+it.name+'</div>'
+        +'<div style="font-size:10px;color:var(--mt);">'+it.sub+'</div>'
+        +'</div>'
+        +'<i class="ti ti-chevron-right" style="color:var(--mt);flex-shrink:0;"></i>'
+        +'</div>';
+    });
+  }
+  html += '</div>';
+  document.getElementById('modal-body').innerHTML = html;
+  document.getElementById('modal-bg').classList.add('open');
+}
+
+function openSavedItem(type, id, action){
+  document.getElementById('modal-bg').classList.remove('open');
+  setTimeout(function(){
+    if(type==='gem') openGemDetail(id);
+    else if(type==='dining') openDiningDetail(id);
+    else if(type==='discover' && action){ try{ eval(action); }catch(e){ console.log('saved item navigate failed:', e); } }
+  }, 250);
+}
+
+// Real conditions for weather-dependent services (helicopter flights,
+// yacht days out) — shown right where a member is already deciding
+// whether to book, rather than leaving them to check a separate app.
+var _weatherCache = null;
+var _weatherCacheTime = 0;
+function renderWeatherWidget(elementId){
+  var el = document.getElementById(elementId);
+  if(!el) return;
+
+  function paint(w){
+    if(!w || !w.ok){ el.style.display='none'; return; }
+    var icons = {Clear:'☀️',Clouds:'☁️',Rain:'🌧️',Drizzle:'🌦️',Thunderstorm:'⛈️',Mist:'🌫️',Haze:'🌫️'};
+    el.innerHTML = '<div style="padding:10px 14px;background:var(--card);border:0.5px solid var(--bd);border-radius:2px;display:flex;align-items:center;gap:10px;">'
+      +'<span style="font-size:22px;">'+(icons[w.condition]||'✦')+'</span>'
+      +'<div style="flex:1;">'
+      +'<div style="font-size:12px;color:var(--ow);">'+w.tempC+'°C in '+w.location+' <span style="color:var(--mt);text-transform:capitalize;">· '+w.description+'</span></div>'
+      +'<div style="font-size:9px;color:var(--mt);margin-top:2px;">Wind '+w.windKph+' km/h · Humidity '+w.humidity+'%</div>'
+      +'</div>'
+      +'</div>';
+    el.style.display = 'block';
+  }
+
+  // Cached for 10 minutes across screens/taps — weather doesn't need a
+  // fresh network call every single time someone reopens Helicopter.
+  if(_weatherCache && (Date.now()-_weatherCacheTime) < 10*60*1000){
+    paint(_weatherCache);
+    return;
+  }
+
+  fetch('/api/weather')
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      if(data && data.ok){ _weatherCache = data; _weatherCacheTime = Date.now(); }
+      paint(data);
+    })
+    .catch(function(err){
+      console.log('renderWeatherWidget failed:', err);
+      el.style.display = 'none';
+    });
+}
+
 function openSearch(){
   document.getElementById('modal-ttl').textContent = 'Search';
   document.getElementById('modal-body').innerHTML =
@@ -5064,7 +5219,18 @@ function showHowItWorks(){
     +'<div class="ig-step"><div class="ig-num">1</div><div class="ig-txt">Browse anything — a villa, a helicopter, a table — and tap <b>Book</b> or <b>Enquire</b>.</div></div>'
     +'<div class="ig-step"><div class="ig-num">2</div><div class="ig-txt">It opens <b>WhatsApp</b> with your request already written out. That\'s not a glitch — it\'s the whole point.</div></div>'
     +'<div class="ig-step"><div class="ig-num">3</div><div class="ig-txt">A real person confirms it personally, usually within <b>2 hours</b>. No payment happens inside the app.</div></div>'
-    +'<div class="ig-step"><div class="ig-num">4</div><div class="ig-txt">Track everything under <b>My Bookings</b> in your Profile.</div></div>'
+    +'<div class="ig-step"><div class="ig-num">4</div><div class="ig-txt">Track everything under <b>My Bookings</b> in your Profile — including a one-tap way to request a cancellation, if plans change.</div></div>'
+
+    +'<div style="height:0.5px;background:var(--bd);margin:20px 0 16px;"></div>'
+    +'<div style="font-size:9px;letter-spacing:0.16em;color:var(--gold);text-transform:uppercase;text-align:center;margin-bottom:14px;">Also Worth Knowing</div>'
+
+    +'<div style="display:flex;gap:10px;margin-bottom:12px;"><span style="font-size:18px;flex-shrink:0;">💠</span><div style="font-size:11px;color:var(--mt);line-height:1.6;"><b style="color:var(--ow);">Carats</b> — earned automatically with confirmed bookings and referrals, redeemable in <b style="color:var(--ow);">Rewards</b> for real experiences, not points for their own sake.</div></div>'
+    +'<div style="display:flex;gap:10px;margin-bottom:12px;"><span style="font-size:18px;flex-shrink:0;">✦</span><div style="font-size:11px;color:var(--mt);line-height:1.6;"><b style="color:var(--ow);">Silver, Gold, Obsidian</b> — each tier unlocks more. See exactly what, under <b style="color:var(--ow);">Compare Tiers</b> in Profile.</div></div>'
+    +'<div style="display:flex;gap:10px;margin-bottom:12px;"><span style="font-size:18px;flex-shrink:0;">👑</span><div style="font-size:11px;color:var(--mt);line-height:1.6;"><b style="color:var(--ow);">The Circle</b> — a private members\' network, separate from booking, for members who want to connect with each other.</div></div>'
+    +'<div style="display:flex;gap:10px;margin-bottom:12px;"><span style="font-size:18px;flex-shrink:0;">🎗️</span><div style="font-size:11px;color:var(--mt);line-height:1.6;"><b style="color:var(--ow);">Invite a Friend</b> — in Profile. Earn Carats automatically when someone you refer is approved.</div></div>'
+    +'<div style="display:flex;gap:10px;margin-bottom:12px;"><span style="font-size:18px;flex-shrink:0;">🛫</span><div style="font-size:11px;color:var(--mt);line-height:1.6;"><b style="color:var(--ow);">Flight Tracker</b> — track a specific flight and get notified when it lands.</div></div>'
+    +'<div style="display:flex;gap:10px;margin-bottom:6px;"><span style="font-size:18px;flex-shrink:0;">🤍</span><div style="font-size:11px;color:var(--mt);line-height:1.6;"><b style="color:var(--ow);">Save for later</b> — tap the heart on any villa, restaurant or experience. Find them again under <b style="color:var(--ow);">Saved</b> in Profile.</div></div>'
+
     +'<button class="gbtn" style="margin-top:18px;" onclick="document.getElementById(\'modal-bg\').classList.remove(\'open\')">Got it</button>'
     +'</div>';
   document.getElementById('modal-bg').classList.add('open');
@@ -7904,6 +8070,7 @@ function renderDining(){
     var num=String(i+1).padStart(2,'0');
     card.innerHTML=
       '<div class="gem-prop-inner">'
+      +'<i class="ti ti-heart save-heart'+(isItemSaved(v.id)?' saved':'')+'" data-item-id="'+v.id+'"></i>'
       +(v.hasMenu ? '<div class="gem-new-badge">Full Menu ✦</div>' : '')
       +'<div class="gem-prop-num">'+num+'</div>'
       +'<div class="gem-prop-icon">'+v.icon+'</div>'
@@ -7912,6 +8079,8 @@ function renderDining(){
       +'<div class="gem-prop-desc">'+v.desc+'</div>'
       +'<div class="gem-prop-feats"><span class="gem-feat-tag">'+v.cuisine+'</span><span class="gem-feat-tag">'+v.hours+'</span></div>'
       +'</div>';
+    var heart = card.querySelector('.save-heart');
+    if(heart) heart.onclick = function(e){ e.stopPropagation(); toggleSaveItem(this, 'dining', v.id, v.name, v.location, v.icon||'🍽️'); };
     card.onclick=function(){ openDiningDetail(v.id); };
     el.appendChild(card);
   });
@@ -7974,7 +8143,9 @@ function renderDiscoverFeed(){
   function paint(cards){
     var html='';
     cards.forEach(function(item){
+      var itemId = 'disc_'+item.title.replace(/[^a-zA-Z0-9]/g,'').toLowerCase();
       html+='<div class="discover-card" onclick="'+item.action+'">'
+        +'<i class="ti ti-heart save-heart'+(isItemSaved(itemId)?' saved':'')+'" onclick="event.stopPropagation();toggleSaveItem(this,\'discover\',\''+itemId+'\',\''+item.title.replace(/'/g,"\\'")+'\',\''+item.sub.replace(/'/g,"\\'")+'\',\'✦\',\''+item.action.replace(/'/g,"\\'")+'\')"></i>'
         +'<div style="font-size:8px;letter-spacing:0.18em;color:'+item.color+';text-transform:uppercase;margin-bottom:8px;font-weight:500;">'+item.tag+'</div>'
         +'<div style="font-family:Cormorant Garamond,serif;font-size:18px;color:var(--ow);line-height:1.2;margin-bottom:6px;">'+item.title+'</div>'
         +'<div style="font-size:10px;color:var(--mt);">'+item.sub+'</div>'
@@ -9092,6 +9263,13 @@ function openTrustPolicies(){
     +'Every request is personally reviewed — not automated. Booking enquiries from members typically receive a WhatsApp reply within <b style="color:var(--ow);">2 hours</b> during business hours (08:00–20:00 EAT). New membership requests (Request Access) are reviewed within <b style="color:var(--ow);">24 hours</b>. Outside business hours, expect a response first thing the next morning.'
     +'</div>'
 
+    +'<div style="font-size:9px;letter-spacing:0.2em;color:var(--gold);text-transform:uppercase;margin-bottom:10px;">Safety & emergencies</div>'
+    +'<div class="info-box" style="margin:0 0 18px;">'
+    +'During an active booking — a helicopter flight, safari, yacht day — your <b style="color:var(--ow);">WhatsApp concierge line is your fastest, most reliable point of contact</b>: +255 692 312 366.<br><br>'
+    +'For a genuine medical or life-threatening emergency, Tanzania\'s general emergency number is <b style="color:var(--ow);">112</b> — though be aware mobile coverage and response reliability vary significantly outside Dar es Salaam and Arusha town.<br><br>'
+    +'Arusha Medivac, an independent private medical evacuation service based at Arusha Airport, can be reached directly at <b style="color:var(--ow);">+255 767 996 996</b> (24 hours). This is a separate service, not operated by Barafu Luxe — worth saving in your phone before setting out on any remote excursion.'
+    +'</div>'
+
     +'<div style="font-size:9px;letter-spacing:0.2em;color:var(--gold);text-transform:uppercase;margin-bottom:10px;">Cancellations & refunds</div>'
     +'<div class="info-box" style="margin:0 0 18px;">'
     +'Cancellation terms vary by service and by partner property, since each villa, charter, and restaurant sets its own policy. Your concierge will confirm the specific cancellation window and any deposit terms in writing before you pay for a booking — never after.'
@@ -9988,6 +10166,7 @@ function renderGems(filter){
 
     card.innerHTML =
       '<div class="gem-prop-inner">'
+      +'<i class="ti ti-heart save-heart'+(isItemSaved(g.id)?' saved':'')+'" data-item-id="'+g.id+'"></i>'
       +(g.new ? '<div class="gem-new-badge">New ✦</div>' : '')
       +'<div class="gem-prop-num">'+num+'</div>'
       +'<div class="gem-prop-icon">'+(g.icon||'🏡')+'</div>'
@@ -10007,6 +10186,8 @@ function renderGems(filter){
 
     var btn = card.querySelector('.gem-enquire-btn');
     if(btn) btn.onclick = function(e){ e.stopPropagation(); openGemDetail(g.id); };
+    var heart = card.querySelector('.save-heart');
+    if(heart) heart.onclick = function(e){ e.stopPropagation(); toggleSaveItem(this, 'gem', g.id, g.name, g.location, g.icon||'🏡'); };
     card.onclick = function(){ openGemDetail(this.dataset.gid); };
     el.appendChild(card);
   });
