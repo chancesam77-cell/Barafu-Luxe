@@ -1315,6 +1315,15 @@ window.sendCommMsgFB = function(commId, userName, userInitials, text) {
       tier: user.tier, initials: user.initials||'', phone: user.phone||''
     });
   };
+  // ── Fresh, one-time read of the real member list — used for broadcasts,
+  // where sending to a stale/incomplete local cache (e.g. if the live
+  // listener below hasn't received its first snapshot yet) would mean
+  // silently missing real members entirely. ──
+  window.FB.getAllMembers = (callback) => {
+    get(ref(db, 'auth')).then(snap => {
+      callback(snap.exists() ? Object.values(snap.val()) : []);
+    }).catch(() => callback(null)); // null signals a fetch failure, distinct from a genuinely empty list
+  };
   // ── Load Firebase auth members into local DB on start ──
   onValue(ref(db, 'auth'), snap => {
     const fbMembers = Object.values(snap.val()||{});
@@ -5121,27 +5130,47 @@ function sendBroadcastPush(title, body, url, tierFilter, callback){
   callback = callback || function(){};
   tierFilter = tierFilter || 'all';
 
-  var users = (DB.get('users') || DEFAULT_USERS).filter(function(u){ return u.tier !== 'admin'; });
-  var targets = tierFilter === 'all' ? users : users.filter(function(u){ return u.tier === tierFilter; });
+  function runBroadcast(allUsers){
+    var users = allUsers.filter(function(u){ return u.tier !== 'admin'; });
+    var targets = tierFilter === 'all' ? users : users.filter(function(u){ return u.tier === tierFilter; });
 
-  if (!targets.length) { callback({ sent: 0, notSubscribed: 0, failed: 0, total: 0 }); return; }
+    if (!targets.length) { callback({ sent: 0, notSubscribed: 0, failed: 0, total: 0 }); return; }
 
-  var sent = 0, notSubscribed = 0, failed = 0, expired = 0;
-  var completed = 0;
+    var sent = 0, notSubscribed = 0, failed = 0, expired = 0;
+    var completed = 0;
 
-  targets.forEach(function(u){
-    sendPushToMember(u.email, title, body, url, function(status){
-      completed++;
-      if (status === 'sent') sent++;
-      else if (status === 'not-subscribed') notSubscribed++;
-      else if (status === 'expired') expired++;
-      else failed++;
+    targets.forEach(function(u){
+      sendPushToMember(u.email, title, body, url, function(status){
+        completed++;
+        if (status === 'sent') sent++;
+        else if (status === 'not-subscribed') notSubscribed++;
+        else if (status === 'expired') expired++;
+        else failed++;
 
-      if (completed === targets.length) {
-        callback({ sent: sent, notSubscribed: notSubscribed, expired: expired, failed: failed, total: targets.length });
+        if (completed === targets.length) {
+          callback({ sent: sent, notSubscribed: notSubscribed, expired: expired, failed: failed, total: targets.length });
+        }
+      });
+    });
+  }
+
+  // Fetch the real, current member list fresh from Firebase rather than
+  // trusting the local cache, which syncs via an async listener that may
+  // not have received its first snapshot yet — a real gap that could mean
+  // silently broadcasting to an empty or stale list. Only fall back to the
+  // local cache if the live fetch itself genuinely fails (e.g. offline).
+  if(window.FB && typeof window.FB.getAllMembers === 'function'){
+    window.FB.getAllMembers(function(freshUsers){
+      if(freshUsers === null){
+        console.log('sendBroadcastPush: live fetch failed, falling back to local cache');
+        runBroadcast(DB.get('users') || DEFAULT_USERS);
+      } else {
+        runBroadcast(freshUsers);
       }
     });
-  });
+  } else {
+    runBroadcast(DB.get('users') || DEFAULT_USERS);
+  }
 }
 
 // Manifest is now a real static file at /manifest.json — see that file
@@ -6768,6 +6797,9 @@ function adminAddEmptyLeg(){
   alert('Empty leg posted: '+route+' at $'+now2.toLocaleString()+' ('+saving+'% off)');
   sendBroadcastPush('⚡ Empty Leg Alert', route+' — $'+now2.toLocaleString()+' ('+saving+'% off). Limited seats.', '/?screen=s-emptylegs', 'all', function(r){
     console.log('Empty leg broadcast:', r);
+    if(r.total === 0){ showToast('⚠ No members found to notify — check your connection'); }
+    else if(r.sent === 0){ showToast('⚠ Notification did not reach anyone (0 of '+r.total+' subscribed)'); }
+    else { showToast('Notified '+r.sent+' of '+r.total+' members ✓'); }
   });
 }
 function adminAddSpa(){
@@ -6783,6 +6815,9 @@ function adminAddSpa(){
   alert('Spa treatment added: '+name+' — Partner $'+base+' → Your price $'+bl(base));
   sendBroadcastPush('💆 New at Spa & Wellness', name+' is now available to book.', '/?screen=s-spa', 'all', function(r){
     console.log('Spa broadcast:', r);
+    if(r.total === 0){ showToast('⚠ No members found to notify — check your connection'); }
+    else if(r.sent === 0){ showToast('⚠ Notification did not reach anyone (0 of '+r.total+' subscribed)'); }
+    else { showToast('Notified '+r.sent+' of '+r.total+' members ✓'); }
   });
 }
 function adminAddGem(){
@@ -6799,6 +6834,9 @@ function adminAddGem(){
   alert('Hidden Gem added: '+name+' → Your price $'+bl(base)+'/night');
   sendBroadcastPush('✦ New Hidden Gem', name+' — '+(loc||'Tanzania')+'. Now open for booking.', '/?screen=s-gems', 'all', function(r){
     console.log('Hidden Gem broadcast:', r);
+    if(r.total === 0){ showToast('⚠ No members found to notify — check your connection'); }
+    else if(r.sent === 0){ showToast('⚠ Notification did not reach anyone (0 of '+r.total+' subscribed)'); }
+    else { showToast('Notified '+r.sent+' of '+r.total+' members ✓'); }
   });
 }
 // Pulls structured data from a pasted AllEvents.in link and pre-fills the
@@ -6860,6 +6898,13 @@ function adminAddEvent(){
   alert('Event posted: '+name+' on '+date);
   sendBroadcastPush('✦ New Event', name+' — '+date+' at '+venue, '/?screen=s-events', 'all', function(r){
     console.log('Event broadcast:', r);
+    if(r.total === 0){
+      showToast('⚠ No members found to notify — check your connection and try posting again');
+    } else if(r.sent === 0){
+      showToast('⚠ Notification did not reach anyone (0 of '+r.total+' members are subscribed to push)');
+    } else {
+      showToast('Notified '+r.sent+' of '+r.total+' members ✓');
+    }
   });
 }
 
