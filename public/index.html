@@ -2202,7 +2202,7 @@ function removeBookingFB(fbKey){
   <div class="plist"><div class="pli" id="profile-spa-access" onclick="openSpaWithTierCheck()" style="display:none;"><i class="ti ti-sparkles pli-ico" style="color:var(--gold);"></i><div><div class="pli-name">Spa & Wellness</div><div class="pli-sub">Peaberries · Siringit · Book treatment</div></div><i class="ti ti-chevron-right pli-arr"></i></div><div class="pli" id="profile-gems-access" onclick="openGemsWithTierCheck()" style="display:none;"><i class="ti ti-diamond pli-ico" style="color:var(--ocean-soft);"></i><div><div class="pli-name">Hidden Gems</div><div class="pli-sub">Exclusive stays · Members only</div></div><i class="ti ti-chevron-right pli-arr"></i></div>
     <div class="pli" onclick="openMyBookings()"><i class="ti ti-file-invoice pli-ico"></i><div><div class="pli-name">My Bookings</div><div class="pli-sub">View confirmed and pending</div></div><i class="ti ti-chevron-right pli-arr"></i></div>
     <div class="pli" onclick="openPaymentDetails()"><i class="ti ti-credit-card pli-ico"></i><div><div class="pli-name">Payment Details</div><div class="pli-sub">Bank · Airtel Money · M-Pesa</div></div><i class="ti ti-chevron-right pli-arr"></i></div>
-    <div class="pli" onclick="openSavedItems()"><i class="ti ti-heart pli-ico" style="color:#e57373;"></i><div><div class="pli-name">Saved</div><div class="pli-sub">Villas, dining & experiences you've saved</div></div><i class="ti ti-chevron-right pli-arr"></i></div>
+    <div class="pli" onclick="openSavedItems()"><span class="pli-ico" style="color:#e57373;">🤍</span><div><div class="pli-name">Saved</div><div class="pli-sub">Villas, dining & experiences you've saved</div></div><i class="ti ti-chevron-right pli-arr"></i></div>
     <div class="pli" onclick="go('s-rewards')"><i class="ti ti-diamond pli-ico" style="color:var(--gl);"></i><div><div class="pli-name">Rewards</div><div class="pli-sub">Your Carats & what to redeem them for</div></div><i class="ti ti-chevron-right pli-arr"></i></div>
     <div class="pli" onclick="openInviteFriend()"><i class="ti ti-user-plus pli-ico" style="color:var(--gold);"></i><div><div class="pli-name">Invite a Friend</div><div class="pli-sub">Earn 25 Carats when they join</div></div><i class="ti ti-chevron-right pli-arr"></i></div>
     <div class="pli" onclick="showTierComparison()"><i class="ti ti-stack-2 pli-ico" style="color:var(--gold);"></i><div><div class="pli-name">Compare Tiers</div><div class="pli-sub">See what Gold & Obsidian unlock</div></div><i class="ti ti-chevron-right pli-arr"></i></div>
@@ -5032,7 +5032,9 @@ function loadFavorites(){
       // the real saved state once it's loaded in, not just whatever
       // was true before the app last closed.
       document.querySelectorAll('.save-heart').forEach(function(h){
-        h.classList.toggle('saved', !!SAVED_ITEMS[h.dataset.itemId]);
+        var saved = !!SAVED_ITEMS[h.dataset.itemId];
+        h.classList.toggle('saved', saved);
+        h.textContent = saved ? '❤️' : '🤍';
       });
     });
   }
@@ -5049,7 +5051,10 @@ function toggleSaveItem(el, type, id, name, sub, icon, action){
   } else {
     delete SAVED_ITEMS[id];
   }
-  if(el) el.classList.toggle('saved', nowSaved);
+  if(el){
+    el.classList.toggle('saved', nowSaved);
+    el.textContent = nowSaved ? '❤️' : '🤍';
+  }
 
   if(window.FB){
     if(nowSaved && typeof window.FB.saveFavorite==='function'){
@@ -8070,7 +8075,7 @@ function renderDining(){
     var num=String(i+1).padStart(2,'0');
     card.innerHTML=
       '<div class="gem-prop-inner">'
-      +'<i class="ti ti-heart save-heart'+(isItemSaved(v.id)?' saved':'')+'" data-item-id="'+v.id+'"></i>'
+      +'<span class="save-heart'+(isItemSaved(v.id)?' saved':'')+'" data-item-id="'+v.id+'">'+(isItemSaved(v.id)?'❤️':'🤍')+'</span>'
       +(v.hasMenu ? '<div class="gem-new-badge">Full Menu ✦</div>' : '')
       +'<div class="gem-prop-num">'+num+'</div>'
       +'<div class="gem-prop-icon">'+v.icon+'</div>'
@@ -8145,7 +8150,7 @@ function renderDiscoverFeed(){
     cards.forEach(function(item){
       var itemId = 'disc_'+item.title.replace(/[^a-zA-Z0-9]/g,'').toLowerCase();
       html+='<div class="discover-card" onclick="'+item.action+'">'
-        +'<i class="ti ti-heart save-heart'+(isItemSaved(itemId)?' saved':'')+'" onclick="event.stopPropagation();toggleSaveItem(this,\'discover\',\''+itemId+'\',\''+item.title.replace(/'/g,"\\'")+'\',\''+item.sub.replace(/'/g,"\\'")+'\',\'✦\',\''+item.action.replace(/'/g,"\\'")+'\')"></i>'
+        +'<span class="save-heart'+(isItemSaved(itemId)?' saved':'')+'" data-item-id="'+itemId+'" onclick="event.stopPropagation();toggleSaveItem(this,\'discover\',\''+itemId+'\',\''+item.title.replace(/'/g,"\\'")+'\',\''+item.sub.replace(/'/g,"\\'")+'\',\'✦\',\''+item.action.replace(/'/g,"\\'")+'\')">'+(isItemSaved(itemId)?'❤️':'🤍')+'</span>'
         +'<div style="font-size:8px;letter-spacing:0.18em;color:'+item.color+';text-transform:uppercase;margin-bottom:8px;font-weight:500;">'+item.tag+'</div>'
         +'<div style="font-family:Cormorant Garamond,serif;font-size:18px;color:var(--ow);line-height:1.2;margin-bottom:6px;">'+item.title+'</div>'
         +'<div style="font-size:10px;color:var(--mt);">'+item.sub+'</div>'
@@ -10166,7 +10171,7 @@ function renderGems(filter){
 
     card.innerHTML =
       '<div class="gem-prop-inner">'
-      +'<i class="ti ti-heart save-heart'+(isItemSaved(g.id)?' saved':'')+'" data-item-id="'+g.id+'"></i>'
+      +'<span class="save-heart'+(isItemSaved(g.id)?' saved':'')+'" data-item-id="'+g.id+'">'+(isItemSaved(g.id)?'❤️':'🤍')+'</span>'
       +(g.new ? '<div class="gem-new-badge">New ✦</div>' : '')
       +'<div class="gem-prop-num">'+num+'</div>'
       +'<div class="gem-prop-icon">'+(g.icon||'🏡')+'</div>'
