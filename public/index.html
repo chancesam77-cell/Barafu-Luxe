@@ -1324,6 +1324,23 @@ window.sendCommMsgFB = function(commId, userName, userInitials, text) {
       callback(snap.exists() ? Object.values(snap.val()) : []);
     }).catch(() => callback(null)); // null signals a fetch failure, distinct from a genuinely empty list
   };
+
+  // ── EVENTS — admin-posted events were previously never actually saved
+  // anywhere shared (purely an in-memory array on whichever device posted
+  // them), meaning a member could get the "New Event" push, tap it, and
+  // find the event genuinely wasn't there on their own device. These
+  // fix that by making Firebase the real, shared source of truth. ──
+  window.FB.saveEvent = (event) => {
+    return set(ref(db, 'events/' + event.id), event);
+  };
+  window.FB.getEvents = (callback) => {
+    get(ref(db, 'events')).then(snap => {
+      callback(snap.exists() ? Object.values(snap.val()) : []);
+    }).catch(() => callback([]));
+  };
+  window.FB.deleteEvent = (id) => {
+    return remove(ref(db, 'events/' + id));
+  };
   // ── Load Firebase auth members into local DB on start ──
   onValue(ref(db, 'auth'), snap => {
     const fbMembers = Object.values(snap.val()||{});
@@ -1661,6 +1678,11 @@ function removeBookingFB(fbKey){
         <input class="admin-inp" id="adm-ev-desc" placeholder="Description">
         <button class="admin-submit" onclick="adminAddEvent()">Post event</button>
       </div>
+    </div>
+
+    <div class="admin-section">
+      <div class="admin-sec-title">Posted events</div>
+      <div id="adm-events-list"><div style="font-size:11px;color:var(--mt);padding:10px 0;">Loading...</div></div>
     </div>
 
     <div style="padding:20px 0 40px;text-align:center;">
@@ -4034,6 +4056,7 @@ function openAdmin(){
   renderAdminStats();
   if(window._fbBookings&&window._fbBookings.length>0) renderAdminBookingsFromFB(window._fbBookings);
   else renderAdminBookings();
+  if(typeof renderAdminEvents==='function') renderAdminEvents();
 
   // Render immediately from whatever's cached, so the dashboard isn't blank —
   // then refresh live from Firebase, which is the actual source of truth.
@@ -6892,8 +6915,16 @@ function adminAddEvent(){
   var desc=(document.getElementById('adm-ev-desc')||{}).value||'';
   if(!name||!date||!venue){alert('Please fill in name, date and venue.');return;}
   var colMap={gala:'gold',golf:'green',wine:'purple',fashion:'purple',sports:'blue',travel:'gold',private:'gold'};
-  EVENTS_DATA.unshift({id:'ev'+Date.now(),name,cat,color:colMap[cat]||'gold',date,time,venue,price,desc,attendees:0,capacity:cap,going:false,tags:[cat]});
+  var newEvent={id:'ev'+Date.now(),name,cat,color:colMap[cat]||'gold',date,time,venue,price,desc,attendees:0,capacity:cap,going:false,tags:[cat]};
+  EVENTS_DATA.unshift(newEvent);
   renderCalendar();renderEvents();
+  if(typeof renderAdminEvents==='function') renderAdminEvents();
+  if(window.FB && typeof window.FB.saveEvent==='function'){
+    window.FB.saveEvent(newEvent).catch(function(err){
+      console.log('saveEvent failed:', err);
+      showToast('⚠ Event shown locally but failed to save — it may not reach other members');
+    });
+  }
   ['adm-ev-name','adm-ev-cat','adm-ev-date','adm-ev-time','adm-ev-venue','adm-ev-price','adm-ev-capacity','adm-ev-desc'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
   alert('Event posted: '+name+' on '+date);
   sendBroadcastPush('✦ New Event', name+' — '+date+' at '+venue, '/?screen=s-events', 'all', function(r){
@@ -6906,6 +6937,50 @@ function adminAddEvent(){
       showToast('Notified '+r.sent+' of '+r.total+' members ✓');
     }
   });
+}
+
+function renderAdminEvents(){
+  var el = document.getElementById('adm-events-list');
+  if(!el) return;
+  // Only admin-posted events are shown here — the "cur_" ones are baked-in
+  // placeholder content, not real posted events, so there's nothing
+  // meaningful to delete about them.
+  var adminEvents = EVENTS_DATA.filter(function(e){ return e.id && e.id.indexOf('ev')===0; });
+  if(!adminEvents.length){
+    el.innerHTML = '<div style="font-size:11px;color:var(--mt);padding:10px 0;">No events posted yet.</div>';
+    return;
+  }
+  var html = '';
+  adminEvents.forEach(function(e){
+    html += '<div style="background:var(--card);border:0.5px solid var(--bd);border-radius:2px;padding:12px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:10px;">'
+      +'<div style="min-width:0;">'
+      +'<div style="font-size:13px;color:var(--ow);font-family:Cormorant Garamond,serif;">'+e.name+'</div>'
+      +'<div style="font-size:10px;color:var(--mt);">'+e.date+(e.time?' · '+e.time:'')+' · '+e.venue+'</div>'
+      +'</div>'
+      +'<button class="ab-btn" style="flex-shrink:0;color:#e57373;border-color:rgba(229,115,115,0.35);" onclick="deleteEvent(\''+e.id+'\')">Delete</button>'
+      +'</div>';
+  });
+  el.innerHTML = html;
+}
+
+function deleteEvent(id){
+  if(!confirm('Delete this event? This removes it for every member, not just from your own view.')) return;
+  var idx = EVENTS_DATA.findIndex(function(e){ return e.id === id; });
+  if(idx !== -1) EVENTS_DATA.splice(idx, 1);
+  renderCalendar();
+  renderEvents();
+  renderAdminEvents();
+
+  if(window.FB && typeof window.FB.deleteEvent==='function'){
+    window.FB.deleteEvent(id).then(function(){
+      showToast('Event deleted ✓');
+    }).catch(function(err){
+      console.log('deleteEvent failed:', err);
+      showToast('⚠ Removed locally, but may not have deleted for other members — check your connection');
+    });
+  } else {
+    showToast('Event deleted ✓');
+  }
 }
 
 // ════ BROADCAST TEMPLATES ════
@@ -8320,31 +8395,46 @@ function fetchLiveEvents(){
   {name:'Zanzibar Private Sailing Regatta',cat:'sports',color:'blue',date:'2026-10-03',time:'07:00',venue:'Zanzibar Marina',price:'$150 per person',desc:'Barafu Luxe arranges a private vessel and VIP spectator package for the Zanzibar sailing season. Charter and viewing packages available on request.',capacity:500},
   ];
 
-  var adm=EVENTS_DATA.filter(function(e){return e.id&&e.id.indexOf('ev')===0;});
-  EVENTS_DATA.length=0;
-  adm.forEach(function(e){EVENTS_DATA.push(e);});
   var cc={gala:'gold',golf:'green',wine:'purple',fashion:'purple',sports:'blue',travel:'gold'};
-  CURATED.forEach(function(ev,i){
-    EVENTS_DATA.push({
-      id:'cur_'+i+'_'+Date.now(),
-      name:String(ev.name||'Exclusive Event'),
-      cat:String(ev.cat||'gala'),
-      color:String(ev.color||cc[ev.cat]||'gold'),
-      date:String(ev.date||'2026-08-01'),
-      time:String(ev.time||'10:00'),
-      venue:String(ev.venue||'Tanzania'),
-      price:String(ev.price||'Custom'),
-      desc:String(ev.desc||''),
-      attendees:0,capacity:parseInt(ev.capacity)||100,
-      going:false,tags:[String(ev.cat||'gala')],
-      source:'Barafu Luxe'
-    });
-  });
 
-  _eventsFetched=true;
-  if(statusEl) statusEl.textContent='Curated \u00b7 '+EVENTS_DATA.length+' events';
-  renderCalendar();
-  renderEvents();
+  function finishLoadingEvents(adminEvents){
+    EVENTS_DATA.length=0;
+    (adminEvents||[]).forEach(function(e){EVENTS_DATA.push(e);});
+    CURATED.forEach(function(ev,i){
+      EVENTS_DATA.push({
+        id:'cur_'+i+'_'+Date.now(),
+        name:String(ev.name||'Exclusive Event'),
+        cat:String(ev.cat||'gala'),
+        color:String(ev.color||cc[ev.cat]||'gold'),
+        date:String(ev.date||'2026-08-01'),
+        time:String(ev.time||'10:00'),
+        venue:String(ev.venue||'Tanzania'),
+        price:String(ev.price||'Custom'),
+        desc:String(ev.desc||''),
+        attendees:0,capacity:parseInt(ev.capacity)||100,
+        going:false,tags:[String(ev.cat||'gala')],
+        source:'Barafu Luxe'
+      });
+    });
+
+    _eventsFetched=true;
+    if(statusEl) statusEl.textContent='Curated \u00b7 '+EVENTS_DATA.length+' events';
+    renderCalendar();
+    renderEvents();
+  }
+
+  // Real fix: fetch admin-added events fresh from Firebase, the shared
+  // source of truth, rather than only trusting whatever this specific
+  // device already happened to have in memory — which, for anyone other
+  // than the admin's own device, was always empty.
+  if(window.FB && typeof window.FB.getEvents==='function'){
+    window.FB.getEvents(function(adminEvents){
+      finishLoadingEvents(adminEvents);
+    });
+  } else {
+    var localAdm=EVENTS_DATA.filter(function(e){return e.id&&e.id.indexOf('ev')===0;});
+    finishLoadingEvents(localAdm);
+  }
 }
 
 
