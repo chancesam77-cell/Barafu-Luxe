@@ -4824,6 +4824,16 @@ function submitForm(service, detail){
 }
 
 var deferredInstall=null;
+
+// Lets the banner state be cleared without wiping all site data/login -
+// visiting the app with ?reset_install=1 once clears just these two flags.
+(function(){
+  if(location.search.indexOf('reset_install=1')!==-1){
+    localStorage.removeItem('bl_install_snooze_until');
+    localStorage.removeItem('bl_install_confirmed');
+  }
+})();
+
 window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferredInstall=e;showInstallBanner();});
 
 function isInstallSnoozed(){
@@ -5514,11 +5524,11 @@ function sendBroadcastPush(title, body, url, tierFilter, callback){
   callback = callback || function(){};
   tierFilter = tierFilter || 'all';
 
-  function runBroadcast(allUsers){
+  function runBroadcast(allUsers, fetchFailed){
     var users = allUsers.filter(function(u){ return u.tier !== 'admin'; });
     var targets = tierFilter === 'all' ? users : users.filter(function(u){ return u.tier === tierFilter; });
 
-    if (!targets.length) { callback({ sent: 0, notSubscribed: 0, failed: 0, total: 0 }); return; }
+    if (!targets.length) { callback({ sent: 0, notSubscribed: 0, failed: 0, total: 0, fetchFailed: !!fetchFailed }); return; }
 
     var sent = 0, notSubscribed = 0, failed = 0, expired = 0;
     var completed = 0;
@@ -5532,7 +5542,7 @@ function sendBroadcastPush(title, body, url, tierFilter, callback){
         else failed++;
 
         if (completed === targets.length) {
-          callback({ sent: sent, notSubscribed: notSubscribed, expired: expired, failed: failed, total: targets.length });
+          callback({ sent: sent, notSubscribed: notSubscribed, expired: expired, failed: failed, total: targets.length, fetchFailed: false });
         }
       });
     });
@@ -5543,17 +5553,24 @@ function sendBroadcastPush(title, body, url, tierFilter, callback){
   // not have received its first snapshot yet — a real gap that could mean
   // silently broadcasting to an empty or stale list. Only fall back to the
   // local cache if the live fetch itself genuinely fails (e.g. offline).
+  //
+  // That fallback can itself land on an empty list (DEFAULT_USERS is
+  // intentionally empty as of the admin-credential security fix), which
+  // used to look identical to "there are genuinely zero members" - the
+  // fetchFailed flag threaded through above is what lets callers tell
+  // those two very different situations apart instead of silently
+  // reporting a misleading "0 of 0".
   if(window.FB && typeof window.FB.getAllMembers === 'function'){
     window.FB.getAllMembers(function(freshUsers){
       if(freshUsers === null){
         console.log('sendBroadcastPush: live fetch failed, falling back to local cache');
-        runBroadcast(DB.get('users') || DEFAULT_USERS);
+        runBroadcast(DB.get('users') || DEFAULT_USERS, true);
       } else {
-        runBroadcast(freshUsers);
+        runBroadcast(freshUsers, false);
       }
     });
   } else {
-    runBroadcast(DB.get('users') || DEFAULT_USERS);
+    runBroadcast(DB.get('users') || DEFAULT_USERS, true);
   }
 }
 
@@ -7232,7 +7249,8 @@ function adminAddEmptyLeg(){
   alert('Empty leg posted: '+route+' at $'+now2.toLocaleString()+' ('+saving+'% off)');
   sendBroadcastPush('⚡ Empty Leg Alert', route+' — $'+now2.toLocaleString()+' ('+saving+'% off). Limited seats.', '/?screen=s-emptylegs', 'all', function(r){
     console.log('Empty leg broadcast:', r);
-    if(r.total === 0){ showToast('⚠ No members found to notify — check your connection'); }
+    if(r.fetchFailed){ showToast('⚠ Could not reach the member list — check your connection and try posting again'); }
+    else if(r.total === 0){ showToast('⚠ No members found to notify'); }
     else if(r.sent === 0){ showToast('⚠ Notification did not reach anyone (0 of '+r.total+' subscribed)'); }
     else { showToast('Notified '+r.sent+' of '+r.total+' members ✓'); }
   });
@@ -7250,7 +7268,8 @@ function adminAddSpa(){
   alert('Spa treatment added: '+name+' — Partner $'+base+' → Your price $'+bl(base));
   sendBroadcastPush('💆 New at Spa & Wellness', name+' is now available to book.', '/?screen=s-spa', 'all', function(r){
     console.log('Spa broadcast:', r);
-    if(r.total === 0){ showToast('⚠ No members found to notify — check your connection'); }
+    if(r.fetchFailed){ showToast('⚠ Could not reach the member list — check your connection and try posting again'); }
+    else if(r.total === 0){ showToast('⚠ No members found to notify'); }
     else if(r.sent === 0){ showToast('⚠ Notification did not reach anyone (0 of '+r.total+' subscribed)'); }
     else { showToast('Notified '+r.sent+' of '+r.total+' members ✓'); }
   });
@@ -7269,7 +7288,8 @@ function adminAddGem(){
   alert('Hidden Gem added: '+name+' → Your price $'+bl(base)+'/night');
   sendBroadcastPush('✦ New Hidden Gem', name+' — '+(loc||'Tanzania')+'. Now open for booking.', '/?screen=s-gems', 'all', function(r){
     console.log('Hidden Gem broadcast:', r);
-    if(r.total === 0){ showToast('⚠ No members found to notify — check your connection'); }
+    if(r.fetchFailed){ showToast('⚠ Could not reach the member list — check your connection and try posting again'); }
+    else if(r.total === 0){ showToast('⚠ No members found to notify'); }
     else if(r.sent === 0){ showToast('⚠ Notification did not reach anyone (0 of '+r.total+' subscribed)'); }
     else { showToast('Notified '+r.sent+' of '+r.total+' members ✓'); }
   });
@@ -7341,8 +7361,10 @@ function adminAddEvent(){
   alert('Event posted: '+name+' on '+date);
   sendBroadcastPush('✦ New Event', name+' — '+date+' at '+venue, '/?screen=s-events', 'all', function(r){
     console.log('Event broadcast:', r);
-    if(r.total === 0){
-      showToast('⚠ No members found to notify — check your connection and try posting again');
+    if(r.fetchFailed){
+      showToast('⚠ Could not reach the member list — check your connection and try posting again');
+    } else if(r.total === 0){
+      showToast('⚠ No members found to notify');
     } else if(r.sent === 0){
       showToast('⚠ Notification did not reach anyone (0 of '+r.total+' members are subscribed to push)');
     } else {
@@ -7413,8 +7435,10 @@ function adminAddDiscoverCard(){
       renderDiscoverManageList();
       sendBroadcastPush('✦ '+card.tag, card.title+' — '+card.sub, '/?screen='+dest, 'all', function(r){
         console.log('Discover broadcast:', r);
-        if(r.total === 0){
-          showToast('⚠ No members found to notify — check your connection and try posting again');
+        if(r.fetchFailed){
+          showToast('⚠ Could not reach the member list — check your connection and try posting again');
+        } else if(r.total === 0){
+          showToast('⚠ No members found to notify');
         } else if(r.sent === 0){
           showToast('⚠ Notification did not reach anyone (0 of '+r.total+' members are subscribed to push)');
         } else {
