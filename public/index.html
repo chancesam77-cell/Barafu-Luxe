@@ -4206,16 +4206,11 @@ function enterApp(user){
     if(typeof startEventsRefresh==='function') startEventsRefresh();
     if(typeof startMyTierListener==='function') startMyTierListener();
   },3000);
-  // Start community activity simulation
-  setTimeout(function(){
-    COMMUNITIES.forEach(function(c){
-      if(typeof hasJoinedCommunity==='function' && hasJoinedCommunity(c.id)){
-        setTimeout(function(){
-          if(typeof startCommunityActivity==='function') startCommunityActivity(c.id);
-        },2000+Math.random()*20000);
-      }
-    });
-  },5000);
+  // Fabricated community activity was previously started here — fake member
+  // names, fake messages, a fake typing indicator, on a timer, indistinguishable
+  // from real member activity. Removed entirely. On a platform built around
+  // member trust, simulated activity is a real problem, not a cosmetic one.
+  if(typeof purgeSimulatedCommunityMessages==='function') purgeSimulatedCommunityMessages();
 }
 
 function doLogout(){
@@ -4393,7 +4388,7 @@ function renderAdminBookings(){
     var pr=b.price||'—';
     var st=b.status||'pending';
     var bid=b.id||'';
-    var confirmBtn=st==='pending'?('<button class="ab-btn confirm" onclick="confirmBooking(\"'+bid+'\")">Confirm</button>'):'';
+    var confirmBtn=st==='pending'?('<button class="ab-btn confirm" onclick="confirmBooking(\''+bid+'\')">Confirm</button>'):'';
     var waUrl='https://wa.me/255692312366?text=Re:+'+encodeURIComponent(svc+' - '+cli);
     bHtml+='<div class="admin-booking">'
       +'<div class="ab-top">'
@@ -5645,23 +5640,31 @@ function leaveCommunity(commId){
   renderCommunities();
 }
 function promptJoin(commId){
-  window._promptCommId=commId;
-  var comm=(COMMUNITIES.filter(function(c){return c.id===commId;})||[null])[0];
-  if(!comm) return;
-  var count=getCommunityMembers(commId).length;
-  document.getElementById('modal-ttl').textContent='Join '+comm.name;
-  document.getElementById('modal-body').innerHTML=
-    '<div class="fwrap">'
-    +'<div style="text-align:center;padding:16px 0 20px;">'
-    +'<div style="font-size:48px;margin-bottom:12px;">'+comm.icon+'</div>'
-    +'<div style="font-family:Cormorant Garamond,serif;font-size:24px;color:var(--ow);margin-bottom:8px;">'+comm.name+'</div>'
-    +'<div style="font-size:11px;color:var(--mt);line-height:1.7;margin-bottom:16px;">'+comm.desc+'</div>'
-    +'<div style="font-size:10px;color:var(--mt);margin-bottom:20px;">'+count+' member'+(count!==1?'s':'')+' · Members only</div>'
-    +'</div>'
-    +'<button class="gbtn" onclick="joinAndOpenCommunity()">Join '+comm.name+'</button>'
-    +'<button class="gghst" onclick="closeModalNow()">Not now</button>'
-    +'</div>';
-  document.getElementById('modal-bg').classList.add('open');
+  try{
+    window._promptCommId=commId;
+    var comm=COMMUNITIES.find(function(c){return c.id===commId;});
+    if(!comm){
+      showToast('⚠ Could not find that community (id: '+commId+')');
+      return;
+    }
+    var count=getCommunityMembers(commId).length;
+    document.getElementById('modal-ttl').textContent='Join '+comm.name;
+    document.getElementById('modal-body').innerHTML=
+      '<div class="fwrap">'
+      +'<div style="text-align:center;padding:16px 0 20px;">'
+      +'<div style="font-size:48px;margin-bottom:12px;">'+comm.icon+'</div>'
+      +'<div style="font-family:Cormorant Garamond,serif;font-size:24px;color:var(--ow);margin-bottom:8px;">'+comm.name+'</div>'
+      +'<div style="font-size:11px;color:var(--mt);line-height:1.7;margin-bottom:16px;">'+comm.desc+'</div>'
+      +'<div style="font-size:10px;color:var(--mt);margin-bottom:20px;">'+count+' member'+(count!==1?'s':'')+' · Members only</div>'
+      +'</div>'
+      +'<button class="gbtn" onclick="joinAndOpenCommunity()">Join '+comm.name+'</button>'
+      +'<button class="gghst" onclick="closeModalNow()">Not now</button>'
+      +'</div>';
+    document.getElementById('modal-bg').classList.add('open');
+  }catch(err){
+    console.log('promptJoin failed:', err);
+    showToast('⚠ Something went wrong opening that room: '+err.message);
+  }
 }
 function openJoinAlert(){
   document.getElementById('modal-ttl').textContent='All Communities';
@@ -7648,17 +7651,17 @@ function renderCommunities(){
 
     var clickFn, opacity, bottomHtml;
     if(!canAccess) {
-      clickFn = 'showTierUpgradeAlert("'+c.id+'")';
+      clickFn = "showTierUpgradeAlert('"+c.id+"')";
       opacity = 'opacity:0.4;filter:grayscale(0.5);';
       bottomHtml = '<div style="font-size:9px;color:#CE93D8;margin-top:4px;">🔒 Upgrade to access</div>';
     } else if(joined) {
-      clickFn = 'openCommunity("'+c.id+'")';
+      clickFn = "openCommunity('"+c.id+"')";
       opacity = '';
       bottomHtml = stats.onlineNow>0
         ? '<div class="comm-online"><span class="comm-online-dot"></span>'+stats.onlineNow+' here now</div>'
         : '<div style="font-size:9px;color:var(--mt);margin-top:2px;">'+lastTxt+'</div>';
     } else {
-      clickFn = 'promptJoin("'+c.id+'")';
+      clickFn = "promptJoin('"+c.id+"')";
       opacity = 'opacity:0.65;';
       bottomHtml = '<div style="font-size:9px;color:var(--gold);margin-top:4px;letter-spacing:0.1em;text-transform:uppercase;">+ Tap to join</div>';
     }
@@ -7741,129 +7744,33 @@ function showMsgNotification(from, text) {
 
 // Random community activity simulation for engagement
 var COMMUNITY_REACTIONS = ['🔥','👏','💯','✦','🙌','❤️','👍','🎯','💎','🚀'];
-var COMM_ACTIVITY = {
-  golf: [
-    'Just broke 80 at Arusha Golf Club! 🏌️',
-    'Anyone joining the Saturday morning round?',
-    'Kilimanjaro Golf Classic registrations are open',
-    'New equipment just arrived from the UK 🏌️',
-    'That sunset round yesterday was magic',
-    'Handicap dropped to 12 — celebrating tonight'
-  ],
-  travel: [
-    'Zanzibar yesterday was absolutely stunning 🌊',
-    'Just booked the helicopter picnic — cannot wait',
-    'Pemba Island is untouched — highly recommend',
-    'Safari in Serengeti this weekend — who is joining?',
-    'Migration season starting — catch it while you can'
-  ],
-  wine: [
-    'Trying a 2019 Kanonkop tonight — thoughts?',
-    'Wine tasting this Friday — limited spots left',
-    'Found an exceptional Barolo — sharing at the next dinner',
-    'South African Chenin Blanc in this heat is perfect'
-  ],
-  fashion: [
-    'East Africa Fashion Week tickets are live!',
-    'That bespoke suit from Dar turned out incredible',
-    'Anyone know a good tailor in Arusha?',
-    'New season arrivals at the boutique on Sokoine'
-  ],
-  business: [
-    'Looking for hospitality investors in Zanzibar',
-    'Mining sector is booming — good time to network',
-    'F1 hospitality packages are perfect for client entertainment',
-    'Embassy connections useful — anyone have contacts?'
-  ],
-  food: [
-    'Private chef dinner last week — absolutely world class',
-    'New Japanese restaurant opened in Dar — impressive',
-    'Farm to table at Gibbs Farm was outstanding',
-    'Who wants to organise a group chef dinner?'
-  ],
-  fitness: [
-    'Altitude training on Kilimanjaro changed everything',
-    'Wellness retreat at Kili Lodge — life changing',
-    'Morning runs on the slopes with Kibo views — unmatched',
-    'Anyone trying the new gym downtown?'
-  ],
-  art: [
-    'Sanlam Art Fair is incredible this year',
-    'New gallery opening in Stone Town next week',
-    'Collecting Tinga Tinga — any recommendations?',
-    'Cultural evening at the Cultural Heritage Centre'
-  ]
-};
-
+// Previously, this held pre-written fake messages ('Just broke 80 at
+// Arusha Golf Club!', etc.) that got injected into every room on a timer,
+// attributed to fabricated members with random initials, complete with a
+// fake typing indicator. Removed entirely — chat in this app now only
+// ever shows what a real member actually sent.
 var _commActivityTimers = {};
 
-function startCommunityActivity(commId) {
-  // Simulate organic community activity with random messages
-  if(_commActivityTimers[commId]) return;
-  var msgs = COMM_ACTIVITY[commId];
-  if(!msgs || !msgs.length) return;
-  var names = ['A.M.','J.K.','S.T.','R.N.','C.B.','M.P.','L.A.','N.D.','T.W.','F.O.'];
-  
-  function postActivity() {
-    var delay = 45000 + Math.random()*90000; // 45s-135s between posts
-    _commActivityTimers[commId] = setTimeout(function() {
-      if(!window.currentComm || window.currentComm.id !== commId) {
-        // Post in background — show notification
-        var name = names[Math.floor(Math.random()*names.length)];
-        var msg = msgs[Math.floor(Math.random()*msgs.length)];
-        var now = new Date();
-        var t = now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
-        var stored = DB.get('comm_msgs_'+commId)||[];
-        stored.push({from:name, av:name[0], text:msg, time:t, simulated:true});
-        if(stored.length > 50) stored = stored.slice(-50); // keep last 50
-        DB.set('comm_msgs_'+commId, stored);
-        // Show notification if on communities screen
-        if((document.getElementById('s-communities') && document.getElementById('s-communities').classList.contains('active'))) {
-          playChatSound();
-          showMsgNotification(name, msg);
-          renderCommunities();
-        }
-        postActivity();
-      } else {
-        // In this community chat — show the message live
-        var name = names[Math.floor(Math.random()*names.length)];
-        var msg = msgs[Math.floor(Math.random()*msgs.length)];
-        var now = new Date();
-        var t = now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
-        var msgsEl = document.getElementById('commchat-msgs');
-        if(msgsEl) {
-          // Show typing indicator first
-          var typing = document.getElementById('comm-typing');
-          if(typing) { typing.classList.add('show'); }
-          setTimeout(function() {
-            if(typing) typing.classList.remove('show');
-            var stored = DB.get('comm_msgs_'+commId)||[];
-            stored.push({from:name, av:name[0], text:msg, time:t, simulated:true});
-            DB.set('comm_msgs_'+commId, stored);
-            msgsEl.innerHTML += '<div class="cmsg them">'
-              +'<div class="cmsg-av">'+name[0]+'</div>'
-              +'<div class="cmsg-body">'
-              +'<div class="cmsg-name">'+name+'</div>'
-              +'<div class="cmsg-bubble">'+msg+'</div>'
-              +'<div class="cmsg-time">'+t+'</div>'
-              +'</div></div>';
-            msgsEl.scrollTop = msgsEl.scrollHeight;
-            playChatSound();
-          }, 2000);
-        }
-        postActivity();
-      }
-    }, delay);
-  }
-  postActivity();
+// One-time cleanup: strips any previously-injected fake messages (tagged
+// simulated:true when they were created) out of every room's stored
+// history, so rooms that already had fabricated activity sitting in them
+// get genuinely cleaned, not just stopped from getting worse.
+function purgeSimulatedCommunityMessages(){
+  if(DB.get('simulated_msgs_purged')) return; // only needs to run once, ever
+  COMMUNITIES.forEach(function(c){
+    var stored = DB.get('comm_msgs_'+c.id) || [];
+    var real = stored.filter(function(m){ return !m.simulated; });
+    if(real.length !== stored.length){
+      DB.set('comm_msgs_'+c.id, real);
+    }
+  });
+  DB.set('simulated_msgs_purged', true);
 }
 
-function stopCommunityActivity(commId) {
-  if(_commActivityTimers[commId]) {
-    clearTimeout(_commActivityTimers[commId]);
-    delete _commActivityTimers[commId];
-  }
-}
+// Kept as safe no-ops in case anything else still calls these by name —
+// they no longer do anything, on purpose.
+function startCommunityActivity(commId){}
+function stopCommunityActivity(commId){}
 
 // Override openCommunity to add leave button and start activity
 function openCommunity(id) {
@@ -8015,7 +7922,6 @@ function openCommunityAfterAck(id, comm) {
   // This must run regardless of whether anything above succeeded — the
   // room itself opening is the one thing that must never be blocked by a
   // problem in the header, member list, or message history.
-  startCommunityActivity(id);
   go('s-commchat');
 
   // Confidentiality protections — scoped to the Business room specifically,
