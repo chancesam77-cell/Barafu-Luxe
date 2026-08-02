@@ -1,7 +1,7 @@
 // Barafu Luxe — Service Worker
 // Handles offline caching (existing behavior) plus Web Push notifications.
 
-const CACHE = 'bl-v11';
+const CACHE = 'bl-v12';
 
 // ── APP ICON BADGE COUNTER ──
 // Service workers don't share memory between wake-ups and can't see
