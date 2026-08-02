@@ -3560,6 +3560,7 @@ function go(id){
       DB.set('active_rooms', rooms);
     }
     if(window.FB) window.FB.clearPresence(currentUser.email);
+    if(typeof deactivateBusinessRoomProtection==='function') deactivateBusinessRoomProtection();
   }
   document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');s.classList.remove('slide-left');});
   var t = document.getElementById(id);
@@ -7868,6 +7869,38 @@ function stopCommunityActivity(commId) {
 function openCommunity(id) {
   var comm = COMMUNITIES.find(function(c){ return c.id===id; });
   if(!comm) return;
+  // The Business room carries real confidential conversation between
+  // high-net-worth members — gate entry on an explicit acknowledgment,
+  // shown once per member, before they ever see the room itself.
+  if(id==='business' && currentUser && currentUser.email && !DB.get('business_ack_'+currentUser.email)){
+    showBusinessRoomAck(id);
+    return;
+  }
+  openCommunityAfterAck(id, comm);
+}
+
+function showBusinessRoomAck(id){
+  document.getElementById('modal-ttl').textContent = 'Business Network';
+  document.getElementById('modal-body').innerHTML = '<div class="fwrap">'
+    +'<div style="text-align:center;padding:10px 0 20px;">'
+    +'<div style="font-size:36px;margin-bottom:12px;">💼</div>'
+    +'<div style="font-family:Cormorant Garamond,serif;font-size:19px;color:var(--ow);margin-bottom:10px;">A confidential space</div>'
+    +'<div style="font-size:11px;color:var(--mt);line-height:1.8;">This room is for genuine business conversation among Obsidian members — deals, introductions, opportunities. What\'s discussed here stays here. Screenshots and sharing outside this room are a violation of membership, and repeat or serious violations result in removal from Barafu Luxe.</div>'
+    +'</div>'
+    +'<button class="gbtn" onclick="acknowledgeBusinessRoom(\''+id+'\')">I Understand — Enter</button>'
+    +'<button class="gghst" style="margin-top:10px;" onclick="document.getElementById(\'modal-bg\').classList.remove(\'open\')">Not now</button>'
+    +'</div>';
+  document.getElementById('modal-bg').classList.add('open');
+}
+
+function acknowledgeBusinessRoom(id){
+  if(currentUser && currentUser.email) DB.set('business_ack_'+currentUser.email, true);
+  document.getElementById('modal-bg').classList.remove('open');
+  var comm = COMMUNITIES.find(function(c){ return c.id===id; });
+  setTimeout(function(){ openCommunityAfterAck(id, comm); }, 250);
+}
+
+function openCommunityAfterAck(id, comm) {
   currentComm = comm;
   if(currentUser) {
     var rooms = DB.get('active_rooms')||{};
@@ -7968,6 +8001,53 @@ function openCommunity(id) {
   // Start simulated activity
   startCommunityActivity(id);
   go('s-commchat');
+
+  // Confidentiality protections — scoped to the Business room specifically,
+  // not applied to casual rooms where they'd just be unnecessary friction.
+  if(id==='business' && currentUser){
+    activateBusinessRoomProtection(currentUser);
+  } else {
+    deactivateBusinessRoomProtection();
+  }
+}
+
+// Real screenshot prevention isn't possible from a web app — no browser
+// API can detect or block OS-level screen capture, on iOS or Android. What
+// this actually does: makes any leak traceable (watermark), and reduces
+// casual/accidental exposure (blur when the app isn't in view). It does
+// not stop a deliberate screenshot, and never claims to.
+function activateBusinessRoomProtection(user){
+  var wm = document.getElementById('business-watermark');
+  if(!wm){
+    wm = document.createElement('div');
+    wm.id = 'business-watermark';
+    wm.style.cssText = 'position:fixed;inset:0;z-index:500;pointer-events:none;overflow:hidden;opacity:0.07;';
+    document.body.appendChild(wm);
+  }
+  var label = (user.name||'')+' · '+(user.email||'');
+  var rows = '';
+  for(var i=0; i<14; i++){
+    rows += '<div style="white-space:nowrap;font-size:11px;color:#fff;transform:rotate(-28deg);margin:26px -40px;font-family:Montserrat,sans-serif;letter-spacing:0.05em;">'
+      + (label+'   ').repeat(6) + '</div>';
+  }
+  wm.innerHTML = rows;
+  wm.style.display = 'block';
+
+  if(!window._businessBlurBound){
+    window._businessBlurBound = true;
+    document.addEventListener('visibilitychange', function(){
+      var chatRoom = document.querySelector('.chat-room');
+      if(!chatRoom || !window.currentComm || window.currentComm.id !== 'business') return;
+      chatRoom.style.filter = document.hidden ? 'blur(20px)' : 'none';
+    });
+  }
+}
+
+function deactivateBusinessRoomProtection(){
+  var wm = document.getElementById('business-watermark');
+  if(wm) wm.style.display = 'none';
+  var chatRoom = document.querySelector('.chat-room');
+  if(chatRoom) chatRoom.style.filter = 'none';
 }
 
 // [merged into original functions]
