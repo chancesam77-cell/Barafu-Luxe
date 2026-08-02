@@ -5548,19 +5548,20 @@ function sendBroadcastPush(title, body, url, tierFilter, callback){
     });
   }
 
-  // Fetch the real, current member list fresh from Firebase rather than
-  // trusting the local cache, which syncs via an async listener that may
-  // not have received its first snapshot yet — a real gap that could mean
-  // silently broadcasting to an empty or stale list. Only fall back to the
-  // local cache if the live fetch itself genuinely fails (e.g. offline).
-  //
-  // That fallback can itself land on an empty list (DEFAULT_USERS is
-  // intentionally empty as of the admin-credential security fix), which
-  // used to look identical to "there are genuinely zero members" - the
-  // fetchFailed flag threaded through above is what lets callers tell
-  // those two very different situations apart instead of silently
-  // reporting a misleading "0 of 0".
-  if(window.FB && typeof window.FB.getAllMembers === 'function'){
+  // The live onValue listener set up at startup (see 'Load Firebase auth
+  // members into local DB on start') keeps DB.get('fb_members') continuously
+  // synced with the real auth node, and is confirmed working - real members
+  // do populate through it. A one-time get() fetch here was found to
+  // sometimes come back empty even with real members present in Firebase,
+  // for reasons that don't reproduce through the live listener - rather
+  // than depend on that unreliable one-time read, use the proven cache
+  // first and only attempt a fresh fetch if that cache is genuinely still
+  // empty (e.g. very early in the session before the listener's first
+  // snapshot has arrived).
+  var cachedMembers = DB.get('fb_members');
+  if(cachedMembers && cachedMembers.length){
+    runBroadcast(cachedMembers, false);
+  } else if(window.FB && typeof window.FB.getAllMembers === 'function'){
     window.FB.getAllMembers(function(freshUsers){
       if(freshUsers === null){
         console.log('sendBroadcastPush: live fetch failed, falling back to local cache');
@@ -7549,8 +7550,13 @@ function pushDiscoverHighlight(idx){
 
   sendBroadcastPush(item.title, item.sub, url, tier, function(r){
     if(statusEl){
-      statusEl.textContent = 'Sent: ' + r.sent + ' of ' + r.total + (r.failed ? ' (' + r.failed + ' failed)' : '');
-      statusEl.style.color = r.sent > 0 ? '#4CAF50' : 'var(--mt)';
+      if(r.fetchFailed){
+        statusEl.textContent = 'Could not reach the member list — check your connection and try again';
+        statusEl.style.color = '#e57373';
+      } else {
+        statusEl.textContent = 'Sent: ' + r.sent + ' of ' + r.total + (r.failed ? ' (' + r.failed + ' failed)' : '');
+        statusEl.style.color = r.sent > 0 ? '#4CAF50' : 'var(--mt)';
+      }
     }
   });
 }
@@ -7590,7 +7596,11 @@ function sendBroadcast(){
   sendBroadcastPush(short.title, short.body, '/', tier, function(r){
     var statusEl = document.getElementById('adm-bc-push-status');
     if(statusEl){
-      statusEl.textContent = 'Push: ' + r.sent + ' sent' + (r.failed ? ', ' + r.failed + ' failed' : '') + ' (of ' + r.total + ' ' + (tier==='all'?'members':tier+' members') + ')';
+      if(r.fetchFailed){
+        statusEl.textContent = 'Push: could not reach the member list — check your connection and try again';
+      } else {
+        statusEl.textContent = 'Push: ' + r.sent + ' sent' + (r.failed ? ', ' + r.failed + ' failed' : '') + ' (of ' + r.total + ' ' + (tier==='all'?'members':tier+' members') + ')';
+      }
     }
   });
 }
