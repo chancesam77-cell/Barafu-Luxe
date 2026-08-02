@@ -7902,103 +7902,119 @@ function acknowledgeBusinessRoom(id){
 
 function openCommunityAfterAck(id, comm) {
   currentComm = comm;
-  if(currentUser) {
-    var rooms = DB.get('active_rooms')||{};
-    rooms[currentUser.email] = id;
-    DB.set('active_rooms', rooms);
-    if(window.FB) window.FB.setPresence(currentUser.email, id);
-  }
-  DB.set('comm_unread_'+id, 0);
-  renderCommunities();
-  document.getElementById('commchat-title').textContent = comm.name;
 
-  // Build header with member pills + online count
-  var hStats = getRealCommunityStats(id);
-  var hUsers = (DB.get('users')||DEFAULT_USERS).filter(function(u){ return u.tier!=='admin'; });
-  var onlineSpan = hStats.onlineNow>0
-    ? '<span class="online-count"><span class="online-count-dot"></span>'+hStats.onlineNow+' here now</span>'
-    : '<span style="font-size:9px;color:var(--mt);">'+hStats.totalPosts+' posts</span>';
-  
-  var pillsHtml = '';
-  hUsers.slice(0,6).forEach(function(u){
-    var tierClass = u.tier||'silver';
-    pillsHtml += '<div class="member-pill">'
-      +'<div class="mp-avatar '+tierClass+'">'+((u.initials||u.name.slice(0,2))[0])+'</div>'
-      +'<span class="mp-name">'+u.name.split(' ')[0]+'</span>'
-      +'</div>';
-  });
+  // Opening the room itself is the one thing that must never fail to
+  // happen — everything below (header, member pills, message history) is
+  // enrichment that can legitimately fail on a malformed record or a slow
+  // network call, and none of it should be able to block the room from
+  // actually showing. Same principle as the earlier push notification fix:
+  // separate the critical action from everything decorative around it.
+  try{
+    if(currentUser) {
+      var rooms = DB.get('active_rooms')||{};
+      rooms[currentUser.email] = id;
+      DB.set('active_rooms', rooms);
+      if(window.FB) window.FB.setPresence(currentUser.email, id);
+    }
+    DB.set('comm_unread_'+id, 0);
+    renderCommunities();
+    document.getElementById('commchat-title').textContent = comm.name;
 
-  document.getElementById('commchat-header').innerHTML =
-    '<div class="cch-top">'
-    +'<span class="cch-icon">'+comm.icon+'</span>'
-    +'<div><div class="cch-name">'+comm.name+'</div><div class="cch-desc">'+comm.desc+'</div></div>'
-    +'<button onclick="leaveCommunity(\''+id+'\')" style="background:rgba(204,0,0,0.1);border:0.5px solid rgba(204,0,0,0.25);color:#CC5555;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;padding:5px 10px;cursor:pointer;border-radius:2px;font-family:Montserrat,sans-serif;white-space:nowrap;margin-left:auto;flex-shrink:0;">Leave</button>'
-    +'</div>'
-    +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">'
-    +'<span style="font-size:9px;color:var(--mt);">'+hStats.memberCount+' member'+(hStats.memberCount!==1?'s':'')+'</span>'
-    +onlineSpan
-    +'</div>'
-    +'<div class="cch-members-strip">'+pillsHtml+'</div>'
-    +'<div class="typing-indicator" id="comm-typing">'
-    +'<div class="typing-dots"><span></span><span></span><span></span></div>'
-    +'<span style="font-size:10px;color:var(--mt);">someone is typing...</span>'
-    +'</div>';
+    // Build header with member pills + online count
+    var hStats = getRealCommunityStats(id);
+    var hUsers = (DB.get('users')||DEFAULT_USERS).filter(function(u){ return u.tier!=='admin'; });
+    var onlineSpan = hStats.onlineNow>0
+      ? '<span class="online-count"><span class="online-count-dot"></span>'+hStats.onlineNow+' here now</span>'
+      : '<span style="font-size:9px;color:var(--mt);">'+hStats.totalPosts+' posts</span>';
 
-  // Render messages
-  var msgs = document.getElementById('commchat-msgs');
-  var today = new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long'});
-  var storedMsgs = DB.get('comm_msgs_'+id)||[];
-
-  if(!storedMsgs.length) {
-    msgs.innerHTML = '<div class="comm-divider">— '+today+' —</div>'
-      +'<div style="text-align:center;padding:30px 20px;">'
-      +'<div style="font-size:32px;margin-bottom:10px;">'+comm.icon+'</div>'
-      +'<div style="font-family:Cormorant Garamond,serif;font-size:20px;color:var(--ow);margin-bottom:6px;">Welcome to '+comm.name+'</div>'
-      +'<div style="font-size:11px;color:var(--mt);line-height:1.7;">'+comm.desc+'</div>'
-      +'<div style="font-size:11px;color:var(--mt);margin-top:12px;">Be the first to start the conversation.</div>'
-      +'</div>';
-  } else {
-    var mHtml = '<div class="comm-divider">— '+today+' —</div>';
-    storedMsgs.forEach(function(m) {
-      var isMe = currentUser && m.from===currentUser.name;
-      var side = isMe?'me':'them';
-      mHtml += '<div class="cmsg '+side+'">'
-        +'<div class="cmsg-av'+(isMe?' online-av':'')+'">'+( m.av||m.from||'?')[0]+'</div>'
-        +'<div class="cmsg-body">'
-        +'<div class="cmsg-name" style="'+(isMe?'text-align:right;':'')+'">'+m.from+'</div>'
-        +'<div class="cmsg-bubble">'+m.text+'</div>'
-        +'<div style="display:flex;align-items:center;justify-content:'+(isMe?'flex-end':'space-between')+';margin-top:3px;">'
-        +(isMe?'':buildReactions(m))
-        +'<div class="cmsg-time">'+m.time+'</div>'
-        +'</div>'
-        +'</div></div>';
+    var pillsHtml = '';
+    hUsers.slice(0,6).forEach(function(u){
+      var tierClass = u.tier||'silver';
+      var displayName = u.name || u.email || 'Member'; // defensive: a malformed record must not throw here
+      pillsHtml += '<div class="member-pill">'
+        +'<div class="mp-avatar '+tierClass+'">'+((u.initials||displayName.slice(0,2))[0])+'</div>'
+        +'<span class="mp-name">'+displayName.split(' ')[0]+'</span>'
+        +'</div>';
     });
-    msgs.innerHTML = mHtml;
-  }
-  msgs.scrollTop = msgs.scrollHeight;
 
-  // Firebase listener
-  if(window.FB) {
-    window.FB.listenMessages(id, function(msg) {
-      var msgsEl = document.getElementById('commchat-msgs');
-      if(!msgsEl || !window.currentComm || window.currentComm.id!==id) return;
-      var isMe = currentUser && msg.from===currentUser.name;
-      if(!isMe) {
-        msgsEl.innerHTML += '<div class="cmsg them">'
-          +'<div class="cmsg-av">'+((msg.av||msg.from||'?')[0])+'</div>'
-          +'<div class="cmsg-body">'
-          +'<div class="cmsg-name">'+msg.from+'</div>'
-          +'<div class="cmsg-bubble">'+msg.text+'</div>'
-          +'<div class="cmsg-time">'+msg.time+'</div>'
-          +'</div></div>';
-        msgsEl.scrollTop = msgsEl.scrollHeight;
-        playChatSound();
+    document.getElementById('commchat-header').innerHTML =
+      '<div class="cch-top">'
+      +'<span class="cch-icon">'+comm.icon+'</span>'
+      +'<div><div class="cch-name">'+comm.name+'</div><div class="cch-desc">'+comm.desc+'</div></div>'
+      +'<button onclick="leaveCommunity(\''+id+'\')" style="background:rgba(204,0,0,0.1);border:0.5px solid rgba(204,0,0,0.25);color:#CC5555;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;padding:5px 10px;cursor:pointer;border-radius:2px;font-family:Montserrat,sans-serif;white-space:nowrap;margin-left:auto;flex-shrink:0;">Leave</button>'
+      +'</div>'
+      +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">'
+      +'<span style="font-size:9px;color:var(--mt);">'+hStats.memberCount+' member'+(hStats.memberCount!==1?'s':'')+'</span>'
+      +onlineSpan
+      +'</div>'
+      +'<div class="cch-members-strip">'+pillsHtml+'</div>'
+      +'<div class="typing-indicator" id="comm-typing">'
+      +'<div class="typing-dots"><span></span><span></span><span></span></div>'
+      +'<span style="font-size:10px;color:var(--mt);">someone is typing...</span>'
+      +'</div>';
+
+    // Render messages
+    var msgs = document.getElementById('commchat-msgs');
+    var today = new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long'});
+    var storedMsgs = DB.get('comm_msgs_'+id)||[];
+
+    if(msgs){
+      if(!storedMsgs.length) {
+        msgs.innerHTML = '<div class="comm-divider">— '+today+' —</div>'
+          +'<div style="text-align:center;padding:30px 20px;">'
+          +'<div style="font-size:32px;margin-bottom:10px;">'+comm.icon+'</div>'
+          +'<div style="font-family:Cormorant Garamond,serif;font-size:20px;color:var(--ow);margin-bottom:6px;">Welcome to '+comm.name+'</div>'
+          +'<div style="font-size:11px;color:var(--mt);line-height:1.7;">'+comm.desc+'</div>'
+          +'<div style="font-size:11px;color:var(--mt);margin-top:12px;">Be the first to start the conversation.</div>'
+          +'</div>';
+      } else {
+        var mHtml = '<div class="comm-divider">— '+today+' —</div>';
+        storedMsgs.forEach(function(m) {
+          var isMe = currentUser && m.from===currentUser.name;
+          var side = isMe?'me':'them';
+          mHtml += '<div class="cmsg '+side+'">'
+            +'<div class="cmsg-av'+(isMe?' online-av':'')+'">'+( m.av||m.from||'?')[0]+'</div>'
+            +'<div class="cmsg-body">'
+            +'<div class="cmsg-name" style="'+(isMe?'text-align:right;':'')+'">'+m.from+'</div>'
+            +'<div class="cmsg-bubble">'+m.text+'</div>'
+            +'<div style="display:flex;align-items:center;justify-content:'+(isMe?'flex-end':'space-between')+';margin-top:3px;">'
+            +(isMe?'':buildReactions(m))
+            +'<div class="cmsg-time">'+m.time+'</div>'
+            +'</div>'
+            +'</div></div>';
+        });
+        msgs.innerHTML = mHtml;
       }
-    });
-    window.FB.setPresence((currentUser && currentUser.email), id);
+      msgs.scrollTop = msgs.scrollHeight;
+    }
+
+    // Firebase listener
+    if(window.FB) {
+      window.FB.listenMessages(id, function(msg) {
+        var msgsEl = document.getElementById('commchat-msgs');
+        if(!msgsEl || !window.currentComm || window.currentComm.id!==id) return;
+        var isMe = currentUser && msg.from===currentUser.name;
+        if(!isMe) {
+          msgsEl.innerHTML += '<div class="cmsg them">'
+            +'<div class="cmsg-av">'+((msg.av||msg.from||'?')[0])+'</div>'
+            +'<div class="cmsg-body">'
+            +'<div class="cmsg-name">'+msg.from+'</div>'
+            +'<div class="cmsg-bubble">'+msg.text+'</div>'
+            +'<div class="cmsg-time">'+msg.time+'</div>'
+            +'</div></div>';
+          msgsEl.scrollTop = msgsEl.scrollHeight;
+          playChatSound();
+        }
+      });
+      window.FB.setPresence((currentUser && currentUser.email), id);
+    }
+  }catch(err){
+    console.log('openCommunityAfterAck enrichment failed (room still opens):', err);
   }
 
-  // Start simulated activity
+  // This must run regardless of whether anything above succeeded — the
+  // room itself opening is the one thing that must never be blocked by a
+  // problem in the header, member list, or message history.
   startCommunityActivity(id);
   go('s-commchat');
 
