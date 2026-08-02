@@ -2935,6 +2935,15 @@ function removeBookingFB(fbKey){
     <div class="circle-hero-rule"></div>
   </div>
 
+  <!-- COMMUNITY ROOMS ENTRY POINT -->
+  <div style="margin:0 14px 16px;padding:14px 16px;background:var(--card);border:0.5px solid var(--bd);border-radius:2px;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;" onclick="go('s-communities')">
+    <div>
+      <div style="font-size:13px;color:var(--ow);font-family:Cormorant Garamond,serif;">Community Rooms</div>
+      <div style="font-size:10px;color:var(--mt);margin-top:2px;">Live chat with members who share your interests</div>
+    </div>
+    <i class="ti ti-chevron-right" style="color:var(--mt);flex-shrink:0;"></i>
+  </div>
+
   <!-- FILTER TABS -->
   <div class="circle-tabs">
     <button class="circle-tab active" onclick="filterCircle('all',this)">All</button>
@@ -3568,6 +3577,7 @@ function go(id){
   if(id==='s-transfers'){ setTimeout(function(){ try{buildRoutes();}catch(e){} },100); }
   if(id==='s-f1'){ setTimeout(function(){ try{buildF1();}catch(e){console.log('F1 err:',e);} setTimeout(function(){try{fetchF1Live();}catch(e){}},400); },100); }
   if(id==='s-yacht'){ setTimeout(function(){ try{buildGroupFleet();}catch(e){console.log('Fleet err:',e);} },100); setTimeout(function(){ try{renderWeatherWidget('weather-widget-yacht');}catch(e){} },150); }
+  if(id==='s-communities'){ setTimeout(function(){ try{renderCommunities();}catch(e){console.log('renderCommunities err:',e);} },100); }
   if(id==='s-heli'){ setTimeout(function(){ try{renderWeatherWidget('weather-widget-heli');}catch(e){} },150); }
   if(id==='s-concierge'){ try{
 }catch(e){} }
