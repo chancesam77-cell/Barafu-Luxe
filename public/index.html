@@ -7411,6 +7411,16 @@ function adminAddDiscoverCard(){
       ['adm-disc-tag','adm-disc-title','adm-disc-sub'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
       renderDiscoverFeed();
       renderDiscoverManageList();
+      sendBroadcastPush('✦ '+card.tag, card.title+' — '+card.sub, '/?screen='+dest, 'all', function(r){
+        console.log('Discover broadcast:', r);
+        if(r.total === 0){
+          showToast('⚠ No members found to notify — check your connection and try posting again');
+        } else if(r.sent === 0){
+          showToast('⚠ Notification did not reach anyone (0 of '+r.total+' members are subscribed to push)');
+        } else {
+          showToast('Notified '+r.sent+' of '+r.total+' members ✓');
+        }
+      });
     }).catch(function(err){
       console.log('saveDiscoverCard failed:', err);
       showToast('⚠ Could not save — check your connection and try again');
