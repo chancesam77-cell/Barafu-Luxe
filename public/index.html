@@ -1373,9 +1373,16 @@ window.sendCommMsgFB = function(commId, userName, userInitials, text) {
   // ── Fresh, one-time read of the real member list — used for broadcasts,
   // where sending to a stale/incomplete local cache (e.g. if the live
   // listener below hasn't received its first snapshot yet) would mean
-  // silently missing real members entirely. ──
+  // silently missing real members entirely.
+  //
+  // Reads from 'members' - the same path saveUser() writes new members to
+  // and getMembers()/login reads from. This previously read from 'auth'
+  // instead, a separate, essentially-unused node that only ever contains
+  // the bootstrapped admin record - meaning every broadcast was checking
+  // a path with no real members in it, regardless of how many people had
+  // actually signed up. ──
   window.FB.getAllMembers = (callback) => {
-    get(ref(db, 'auth')).then(snap => {
+    get(ref(db, 'members')).then(snap => {
       callback(snap.exists() ? Object.values(snap.val()) : []);
     }).catch(() => callback(null)); // null signals a fetch failure, distinct from a genuinely empty list
   };
@@ -1412,8 +1419,10 @@ window.sendCommMsgFB = function(commId, userName, userInitials, text) {
   window.FB.deleteDiscoverCard = (id) => {
     return remove(ref(db, 'discoverCards/' + id));
   };
-  // ── Load Firebase auth members into local DB on start ──
-  onValue(ref(db, 'auth'), snap => {
+  // ── Load real members into local DB on start — reads from 'members',
+  // the actual, actively-used member store (see getAllMembers fix above
+  // for why 'auth' was the wrong path here). ──
+  onValue(ref(db, 'members'), snap => {
     const fbMembers = Object.values(snap.val()||{});
     if(fbMembers.length){
       DB.set('fb_members', fbMembers);
