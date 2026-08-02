@@ -451,6 +451,11 @@
 .offline-banner-dot{width:6px;height:6px;border-radius:50%;background:var(--gl);flex-shrink:0;animation:offlinePulse 1.6s ease-in-out infinite;}
 @keyframes offlinePulse{0%,100%{opacity:0.4;}50%{opacity:1;}}
 
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:0.01ms!important;animation-iteration-count:1!important;transition-duration:0.01ms!important;scroll-behavior:auto!important;}
+  .water-ripple{display:none!important;}
+}
+
 </style>
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="theme-color" content="#080808">
@@ -2962,11 +2967,11 @@ function removeBookingFB(fbKey){
 
 <!-- ════════════════════ BOTTOM NAV ════════════════════ -->
 <nav class="bnav">
-  <button class="ni active" onclick="go('s-home');setNav(this)" id="n-home"><i class="ti ti-home ni-ico"></i><span class="ni-lbl">Home</span></button>
-  <button class="ni" onclick="go('s-transfers');setNav(this)"><i class="ti ti-car ni-ico"></i><span class="ni-lbl">Transfers</span></button>
-  <button class="ni" onclick="go('s-concierge');setNav(this)"><i class="ti ti-message ni-ico"></i><span class="ni-lbl">Concierge</span></button>
-  <button class="ni" onclick="go('s-circle');setNav(this)"><i class="ti ti-crown ni-ico"></i><span class="ni-lbl">Circle</span></button>
-  <button class="ni" onclick="go('s-profile');setNav(this)"><i class="ti ti-user ni-ico"></i><span class="ni-lbl">Profile</span></button>
+  <button class="ni active" onclick="go('s-home');setNav(this)" id="n-home" aria-label="Home" aria-current="page"><i class="ti ti-home ni-ico" aria-hidden="true"></i><span class="ni-lbl">Home</span></button>
+  <button class="ni" onclick="go('s-transfers');setNav(this)" aria-label="Transfers"><i class="ti ti-car ni-ico" aria-hidden="true"></i><span class="ni-lbl">Transfers</span></button>
+  <button class="ni" onclick="go('s-concierge');setNav(this)" aria-label="Concierge chat"><i class="ti ti-message ni-ico" aria-hidden="true"></i><span class="ni-lbl">Concierge</span></button>
+  <button class="ni" onclick="go('s-circle');setNav(this)" aria-label="The Circle"><i class="ti ti-crown ni-ico" aria-hidden="true"></i><span class="ni-lbl">Circle</span></button>
+  <button class="ni" onclick="go('s-profile');setNav(this)" aria-label="Profile"><i class="ti ti-user ni-ico" aria-hidden="true"></i><span class="ni-lbl">Profile</span></button>
 </nav>
 
 <!-- ════════════════════ MODAL ════════════════════ -->
@@ -3659,9 +3664,10 @@ document.addEventListener('click', function(e){
 }, true);
 
 function setNav(el){
-  document.querySelectorAll('.ni').forEach(function(n){n.classList.remove('active');});
+  document.querySelectorAll('.ni').forEach(function(n){n.classList.remove('active');n.removeAttribute('aria-current');});
   void el.offsetWidth; // force reflow so the bounce animation restarts even if this tab was already active
   el.classList.add('active');
+  el.setAttribute('aria-current', 'page');
 }
 
 // ── ACCORDION ──
@@ -5867,6 +5873,16 @@ var GEMS = [
      mid:{label:'Mar · Jun · Nov–Dec',bb:275,fb:350,ai:425},
      low:{label:'Apr–May',bb:215,fb:290,ai:365}
    }},
+  // ── Arusha Coffee Lodge — Elewana Collection partner ──
+  // No real photos or rates supplied yet — Chance to provide both.
+  // Gallery left empty and pricing left unset on purpose, rather than
+  // filling either with placeholders that could look like real content.
+  {id:'acl-lodge',type:'safari',name:'Arusha Coffee Lodge',location:'Arusha, Tanzania',
+   desc:'Thirty Plantation Houses set among working coffee fields at the foot of Mt Meru, built around a landowner\'s homestead dating to the early 1900s. The main house holds an à la carte restaurant, a cafe bistro, and a fireside lounge — with a private pool and garden terrace beyond. A natural stop either side of a Northern Circuit safari.',
+   base:null,per:'per person/night — rates on request',
+   features:['30 Plantation Houses','À la carte restaurant & bistro','Fireside lounge','Private pool','Coffee plantation setting','Ideal pre/post-safari stay'],
+   icon:'☕',new:true,verified:true,
+   gallery:[]},
 ];
 var gemFilter='all';
 var gemTypeLabels={safari:'Safari Lodge',villa:'Beach Villa',camp:'Tented Camp',residence:'Private Residence',retreat:'Wellness Retreat'};
@@ -6128,13 +6144,26 @@ function submitRealEstateEnquiry(){
 // ════ PRICE ENGINE ════
 function bl(base){ return Math.round(base*1.35/5)*5; }
 function blDisplay(base){ return '$'+bl(base).toLocaleString(); }
+// Static reference rate (~2,600 TZS/USD as of mid-2026) — not live, just
+// enough context for international members to get their bearings. Worth
+// updating this number periodically; genuinely live rates would need a
+// currency API, which is a separate piece of infrastructure.
+var TZS_RATE = 2600;
+// UI-only — blDisplay() itself must stay plain text, since it's also used
+// to build WhatsApp messages and booking records where HTML tags would
+// show up as literal garbled text instead of being rendered.
+function blDisplayWithTZS(base){
+  var usd = bl(base);
+  var tzs = Math.round(usd * TZS_RATE / 1000) * 1000; // rounded to nearest 1,000 TZS, not falsely precise
+  return '$'+usd.toLocaleString()+' <span style="opacity:0.55;font-size:0.82em;">(≈ TSh '+tzs.toLocaleString()+')</span>';
+}
 function priceLine(base){
-  return '<div style="font-family:Cormorant Garamond,serif;font-size:20px;color:var(--gl);">'+blDisplay(base)+'</div>'
+  return '<div style="font-family:Cormorant Garamond,serif;font-size:20px;color:var(--gl);">'+blDisplayWithTZS(base)+'</div>'
     +'<div style="font-size:9px;color:var(--mt);">per person</div>';
 }
 function gemPriceLine(base,per){
   return '<div class="gem-price-was">Partner rate: $'+base.toLocaleString()+'</div>'
-    +'<div class="gem-price">'+blDisplay(base)+'</div>'
+    +'<div class="gem-price">'+blDisplayWithTZS(base)+'</div>'
     +'<div class="gem-per">'+per+' · Barafu Luxe arranged</div>';
 }
 
@@ -6725,7 +6754,7 @@ function openSpaDetail(id){
     +'<div class="pc-title">'+pName+' · Barafu Luxe Price</div>'
     +'<div class="pc-row"><span class="pc-label">Partner rate</span><span class="pc-val">$'+t.base+'</span></div>'
     +'<div class="pc-row"><span class="pc-label">Barafu Luxe service (35%)</span><span class="pc-val">$'+Math.round(t.base*0.35)+'</span></div>'
-    +'<div class="pc-total"><span class="pc-total-lbl">Your price · '+t.duration+'</span><span class="pc-total-val">'+blDisplay(t.base)+'</span></div>'
+    +'<div class="pc-total"><span class="pc-total-lbl">Your price · '+t.duration+'</span><span class="pc-total-val">'+blDisplayWithTZS(t.base)+'</span></div>'
     +'</div>'
     +noteHtml
     +'<div style="font-size:10px;color:var(--mt);line-height:1.7;margin-bottom:12px;">'+(t.desc||'')+'</div>'
@@ -6941,7 +6970,8 @@ function openGemDetail(id){
     +'<div style="font-size:11px;color:var(--mt);line-height:1.8;margin-bottom:12px;">'+(g.desc||'')+'</div>'
     +'<div style="margin-bottom:14px;">'+featsHtml+'</div>'
     +seasonHtml
-    +((!g.seasons)?'<div class="price-calc"><div class="pc-total"><span class="pc-total-lbl">From per night</span><span class="pc-total-val">$'+g.base+'</span></div></div>':'');
+    +((!g.seasons && g.base)?'<div class="price-calc"><div class="pc-total"><span class="pc-total-lbl">From per night</span><span class="pc-total-val">$'+g.base+'</span></div></div>':'')
+    +((!g.seasons && !g.base)?'<div class="price-calc"><div class="pc-total"><span class="pc-total-lbl">Rates</span><span class="pc-total-val" style="font-size:14px;">On request</span></div></div>':'');
 
   var btn=document.createElement('button');
   btn.className='gbtn';
@@ -10238,6 +10268,7 @@ function renderGems(filter){
     var priceFrom = g.seasons && g.seasons.low ? g.seasons.low.bb
       : g.seasons && g.seasons.mid ? g.seasons.mid.bb
       : g.base || 0;
+    var priceDisplay = priceFrom > 0 ? ('$'+priceFrom) : 'On request';
     var perLabel = g.per || 'per person / night';
 
     var featsHtml = (g.features||[]).slice(0,5).map(function(f){
@@ -10257,7 +10288,7 @@ function renderGems(filter){
       +'<div class="gem-prop-bottom">'
       +'<div>'
       +'<div class="gem-prop-from">From</div>'
-      +'<div class="gem-prop-price">$'+priceFrom+'</div>'
+      +'<div class="gem-prop-price">'+priceDisplay+'</div>'
       +'<div class="gem-prop-per">'+perLabel+'</div>'
       +'</div>'
       +'<button class="gem-enquire-btn">View rates</button>'
