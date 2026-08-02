@@ -5525,10 +5525,12 @@ function sendBroadcastPush(title, body, url, tierFilter, callback){
   tierFilter = tierFilter || 'all';
 
   function runBroadcast(allUsers, fetchFailed){
+    var rawCount = allUsers.length;
     var users = allUsers.filter(function(u){ return u.tier !== 'admin'; });
     var targets = tierFilter === 'all' ? users : users.filter(function(u){ return u.tier === tierFilter; });
+    var debugInfo = { rawCount: rawCount, afterAdminFilter: users.length, tierFilter: tierFilter };
 
-    if (!targets.length) { callback({ sent: 0, notSubscribed: 0, failed: 0, total: 0, fetchFailed: !!fetchFailed }); return; }
+    if (!targets.length) { callback({ sent: 0, notSubscribed: 0, failed: 0, total: 0, fetchFailed: !!fetchFailed, debugInfo: debugInfo }); return; }
 
     var sent = 0, notSubscribed = 0, failed = 0, expired = 0;
     var completed = 0;
@@ -7552,6 +7554,9 @@ function pushDiscoverHighlight(idx){
     if(statusEl){
       if(r.fetchFailed){
         statusEl.textContent = 'Could not reach the member list — check your connection and try again';
+        statusEl.style.color = '#e57373';
+      } else if(r.total === 0 && r.debugInfo){
+        statusEl.textContent = 'Sent: 0 of 0 — fetched '+r.debugInfo.rawCount+' record(s), '+r.debugInfo.afterAdminFilter+' after removing admin, tier filter: "'+r.debugInfo.tierFilter+'"';
         statusEl.style.color = '#e57373';
       } else {
         statusEl.textContent = 'Sent: ' + r.sent + ' of ' + r.total + (r.failed ? ' (' + r.failed + ' failed)' : '');
