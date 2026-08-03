@@ -546,6 +546,20 @@ html,body{height:100%;background:var(--black);color:var(--ow);font-family:'Monts
 .discover-card{flex-shrink:0;width:200px;background:var(--card);border:0.5px solid var(--bd);border-radius:2px;padding:16px;cursor:pointer;position:relative;overflow:hidden;transition:transform .15s cubic-bezier(0.34,1.56,0.64,1),border-color .15s;}
 .discover-card:active{transform:scale(0.92);border-color:rgba(184,137,42,0.35);}
 
+/* Discover highlights auto-scroll continuously to the left, like a slow
+   ticker, so a member can watch cards drift by and tap the heart to save
+   one as it passes rather than having to manually swipe through the row.
+   The track's content is rendered twice back to back (see
+   renderDiscoverFeed) purely so the loop point at -50% lines up exactly
+   with a full, seamless repeat instead of a visible jump/reset.
+   Paused on touch/hover so a moving target isn't fighting for a tap. */
+.discover-track{display:flex;gap:10px;width:max-content;animation:discoverScroll linear infinite;animation-duration:var(--discover-scroll-duration,40s);}
+.discover-track:hover,.discover-track.touching{animation-play-state:paused;}
+@keyframes discoverScroll{
+  from{transform:translateX(0);}
+  to{transform:translateX(-50%);}
+}
+
 /* App-wide jellybean press feedback — every tappable element gets a soft
    squish on press. .ni, .qc, .luxury-tab and .discover-card already have
    their own more pronounced version above; this covers everything else
@@ -1862,7 +1876,7 @@ function removeBookingFB(fbKey){
   </div>
   <div class="divider"></div>
   <div class="sec"><div class="slbl">Discover</div></div>
-  <div style="display:flex;gap:10px;padding:0 14px 14px;overflow-x:auto;-webkit-overflow-scrolling:touch;" id="discover-feed"></div>
+  <div style="padding:0 14px 14px;overflow:hidden;" id="discover-feed"></div>
   <div class="sec" style="padding-top:4px;"><div class="slbl">Exclusive Access</div></div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 14px 14px;">
     <div class="qc" onclick="openWithPageFlip(this,'go(\'s-heli\')')"><span class="qc-ico" style="color:var(--gold)"><i class="ti ti-helicopter"></i></span><div class="qc-name">Helicopter</div><div class="qc-sub">From $8,930</div></div>
@@ -5153,6 +5167,14 @@ function toggleSaveItem(el, type, id, name, sub, icon, action){
     el.classList.toggle('saved', nowSaved);
     el.textContent = nowSaved ? '❤️' : '🤍';
   }
+  // Sync every other heart for this same item too - Discover's auto-scroll
+  // track renders each card's content twice for a seamless loop, so the
+  // same item exists as two separate elements on screen at once.
+  document.querySelectorAll('.save-heart[data-item-id="'+id+'"]').forEach(function(other){
+    if(other === el) return;
+    other.classList.toggle('saved', nowSaved);
+    other.textContent = nowSaved ? '❤️' : '🤍';
+  });
 
   if(window.FB){
     if(nowSaved && typeof window.FB.saveFavorite==='function'){
@@ -7904,15 +7926,21 @@ function openCommunityAfterAck(id, comm) {
       : '<span style="font-size:9px;color:var(--mt);">'+hStats.totalPosts+' posts</span>';
 
     var pillsHtml = '';
-    hUsers.slice(0,6).forEach(function(u){
-      var tierClass = u.tier||'silver';
-      var fullDisplayName = u.name || u.email || 'Member'; // defensive: a malformed record must not throw here
-      var pillName = id==='business' ? fullDisplayName : fullDisplayName.split(' ')[0];
-      pillsHtml += '<div class="member-pill">'
-        +'<div class="mp-avatar '+tierClass+'">'+((u.initials||fullDisplayName.slice(0,2))[0])+'</div>'
-        +'<span class="mp-name">'+pillName+'</span>'
-        +'</div>';
-    });
+    if(id==='business'){
+      hUsers.slice(0,6).forEach(function(u){
+        var tierClass = u.tier||'silver';
+        var fullDisplayName = u.name || u.email || 'Member'; // defensive: a malformed record must not throw here
+        pillsHtml += '<div class="member-pill">'
+          +'<div class="mp-avatar '+tierClass+'">'+((u.initials||fullDisplayName.slice(0,2))[0])+'</div>'
+          +'<span class="mp-name">'+fullDisplayName+'</span>'
+          +'</div>';
+      });
+    }
+    // Casual rooms deliberately skip named pills - the member/online counts
+    // already shown just above this strip give the room a sense of being
+    // alive without silently disclosing who specifically opened it. Someone
+    // browsing a casual room without posting anything shouldn't be named
+    // to everyone else in there just for having looked.
 
     document.getElementById('commchat-header').innerHTML =
       '<div class="cch-top">'
@@ -7924,7 +7952,7 @@ function openCommunityAfterAck(id, comm) {
       +'<span style="font-size:9px;color:var(--mt);">'+hStats.memberCount+' member'+(hStats.memberCount!==1?'s':'')+'</span>'
       +onlineSpan
       +'</div>'
-      +'<div class="cch-members-strip">'+pillsHtml+'</div>'
+      +(pillsHtml ? '<div class="cch-members-strip">'+pillsHtml+'</div>' : '')
       +'<div class="typing-indicator" id="comm-typing">'
       +'<div class="typing-dots"><span></span><span></span><span></span></div>'
       +'<span style="font-size:10px;color:var(--mt);">someone is typing...</span>'
@@ -8335,17 +8363,42 @@ function renderDiscoverFeed(){
   if(!el) return;
 
   function paint(cards){
-    var html='';
+    if(!cards.length){ el.innerHTML=''; return; }
+
+    var cardsHtml='';
     cards.forEach(function(item){
       var itemId = 'disc_'+item.title.replace(/[^a-zA-Z0-9]/g,'').toLowerCase();
-      html+='<div class="discover-card" onclick="'+item.action+'">'
+      cardsHtml+='<div class="discover-card" onclick="'+item.action+'">'
         +'<span class="save-heart'+(isItemSaved(itemId)?' saved':'')+'" data-item-id="'+itemId+'" onclick="event.stopPropagation();toggleSaveItem(this,\'discover\',\''+itemId+'\',\''+item.title.replace(/'/g,"\\'")+'\',\''+item.sub.replace(/'/g,"\\'")+'\',\'✦\',\''+item.action.replace(/'/g,"\\'")+'\')">'+(isItemSaved(itemId)?'❤️':'🤍')+'</span>'
         +'<div style="font-size:8px;letter-spacing:0.18em;color:'+item.color+';text-transform:uppercase;margin-bottom:8px;font-weight:500;">'+item.tag+'</div>'
         +'<div style="font-family:Cormorant Garamond,serif;font-size:18px;color:var(--ow);line-height:1.2;margin-bottom:6px;">'+item.title+'</div>'
         +'<div style="font-size:10px;color:var(--mt);">'+item.sub+'</div>'
         +'</div>';
     });
-    el.innerHTML=html;
+
+    // Content is duplicated back to back so translateX(-50%) is exactly
+    // one full set — the loop resets invisibly rather than jumping.
+    // Speed is scaled to the actual content width so the pace feels the
+    // same (a comfortable, readable ~28px/second) whether there are 4
+    // cards or 14, rather than a fixed duration that'd race by with a
+    // lot of cards or crawl with only a couple.
+    var approxSetWidth = cards.length * 210; // 200px card + 10px gap
+    var durationSeconds = Math.max(18, Math.round(approxSetWidth / 28));
+
+    el.innerHTML = '<div class="discover-track" style="--discover-scroll-duration:'+durationSeconds+'s;">'
+      + cardsHtml + cardsHtml
+      + '</div>';
+
+    var track = el.querySelector('.discover-track');
+    if(track){
+      // :hover alone doesn't reliably fire on touchscreens, so touch
+      // start/end explicitly pause/resume the animation - without this
+      // a member's tap on the heart could land while the card is still
+      // sliding out from under their finger.
+      track.addEventListener('touchstart', function(){ track.classList.add('touching'); }, {passive:true});
+      track.addEventListener('touchend', function(){ track.classList.remove('touching'); }, {passive:true});
+      track.addEventListener('touchcancel', function(){ track.classList.remove('touching'); }, {passive:true});
+    }
   }
 
   // Static set paints instantly, admin-added ones layer in once Firebase
