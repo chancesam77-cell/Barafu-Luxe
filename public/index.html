@@ -1356,14 +1356,15 @@ window.addEventListener('load', () => {
 });
 
 // ── Override sendCommMsg to use Firebase ──
-window.sendCommMsgFB = function(commId, userName, userInitials, text) {
+window.sendCommMsgFB = function(commId, userName, userInitials, text, userTier) {
   const now = new Date();
   const timeStr = now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
   return window.FB.sendMessage(commId, {
     from: userName,
     av: userInitials,
     text: text,
-    time: timeStr
+    time: timeStr,
+    tier: userTier || ''
   });
 };
 
@@ -1493,6 +1494,7 @@ function renderAdminBookingsFromFB(bookings){
     waBtn.className='ab-btn wa';
     waBtn.textContent='WhatsApp';
     waBtn.onclick=(function(svc){ return function(){
+      showToast('Opening WhatsApp...');
       window.open('https://wa.me/255692312366?text=Re:+'+encodeURIComponent(svc),'_blank');
     }; })(b.service||'booking');
     actions.appendChild(waBtn);
@@ -1971,7 +1973,7 @@ function removeBookingFB(fbKey){
       </div>
     </div>
     <div style="padding:14px;">
-      <a class="wa-btn" href="https://wa.me/255692312366?text=I+would+like+to+add+extras+to+my+transfer" target="_blank"><i class="ti ti-brand-whatsapp"></i>Add extras to my booking</a>
+      <a class="wa-btn" href="https://wa.me/255692312366?text=I+would+like+to+add+extras+to+my+transfer" target="_blank" onclick="showToast('Request sent — track it under My Bookings')"><i class="ti ti-brand-whatsapp"></i>Add extras to my booking</a>
     </div>
   </div>
 
@@ -1994,7 +1996,7 @@ function removeBookingFB(fbKey){
       </div>
 
       <div style="font-size:9px;color:var(--mt);line-height:1.8;margin-top:14px;">All payments confirmed via WhatsApp. A receipt is provided for every transaction.</div>
-      <a class="wa-btn" href="https://wa.me/255692312366?text=Hi%2C+I%27d+like+to+receive+payment+details+for+my+booking" target="_blank" style="margin-top:14px;"><i class="ti ti-brand-whatsapp"></i>Request payment details</a>
+      <a class="wa-btn" href="https://wa.me/255692312366?text=Hi%2C+I%27d+like+to+receive+payment+details+for+my+booking" target="_blank" style="margin-top:14px;" onclick="showToast('Request sent — track it under My Bookings')"><i class="ti ti-brand-whatsapp"></i>Request payment details</a>
     </div>
   </div>
 
@@ -2134,7 +2136,7 @@ function removeBookingFB(fbKey){
       <div class="tr-addon"><div class="tr-addon-ico"><i class="ti ti-camera"></i></div><div class="tr-addon-info"><div class="tr-addon-name">Yacht Photography</div><div class="tr-addon-desc">Professional photographer, edited gallery</div></div><div class="tr-addon-price">+$150</div></div>
       <div class="tr-addon"><div class="tr-addon-ico"><i class="ti ti-fish"></i></div><div class="tr-addon-info"><div class="tr-addon-name">Deep Sea Fishing</div><div class="tr-addon-desc">Equipment, bait, licensed guide</div></div><div class="tr-addon-price">+$180</div></div>
     </div>
-    <div style="margin-top:14px;"><a class="wa-btn" href="https://wa.me/255692312366?text=Yacht+add-on+enquiry" target="_blank"><i class="ti ti-brand-whatsapp"></i>Add extras to my charter</a></div>
+    <div style="margin-top:14px;"><a class="wa-btn" href="https://wa.me/255692312366?text=Yacht+add-on+enquiry" target="_blank" onclick="showToast('Request sent — track it under My Bookings')"><i class="ti ti-brand-whatsapp"></i>Add extras to my charter</a></div>
   </div>
   <div class="spacer"></div>
 </div>
@@ -2528,7 +2530,7 @@ function removeBookingFB(fbKey){
     <!-- FOOTER -->
     <div class="spa-footer">
       <div class="spa-footer-note">Arrive 15 minutes before your appointment · 24-hour cancellation policy · Gratuities at your discretion</div>
-      <a class="wa-btn" href="https://wa.me/255692312366?text=Spa+booking+enquiry" target="_blank"><i class="ti ti-brand-whatsapp"></i>Book via concierge</a>
+      <a class="wa-btn" href="https://wa.me/255692312366?text=Spa+booking+enquiry" target="_blank" onclick="showToast('Request sent — track it under My Bookings')"><i class="ti ti-brand-whatsapp"></i>Book via concierge</a>
     </div>
     <div class="spacer"></div>
   </div>
@@ -2577,7 +2579,7 @@ function removeBookingFB(fbKey){
     <div style="margin:0 14px 24px;border-top:0.5px solid var(--bd);padding-top:18px;">
       <div style="font-size:8px;letter-spacing:0.22em;color:var(--mt);text-transform:uppercase;margin-bottom:8px;">Suggest a property</div>
       <div style="font-size:11px;color:var(--mt);line-height:1.9;margin-bottom:12px;">Know a hidden gem we should feature? Tell your concierge and we'll vet it for the collection.</div>
-      <a class="wa-btn" href="https://wa.me/255692312366?text=Hidden+Gems+enquiry" target="_blank"><i class="ti ti-brand-whatsapp"></i>Enquire about a property</a>
+      <a class="wa-btn" href="https://wa.me/255692312366?text=Hidden+Gems+enquiry" target="_blank" onclick="showToast('Request sent — track it under My Bookings')"><i class="ti ti-brand-whatsapp"></i>Enquire about a property</a>
     </div>
     <div class="spacer"></div>
   </div>
@@ -2929,7 +2931,7 @@ function removeBookingFB(fbKey){
 
   <div style="padding:0 14px 14px;">
     <div class="info-box" style="font-size:10px;line-height:1.8;">All prices include park fees · Park fees included · Gratuities ~$30/day/guest · Single supplement $90/night · International flights excluded</div>
-    <a class="wa-btn" href="https://wa.me/255692312366?text=Equestrian+safari+enquiry" target="_blank" style="margin-top:8px;"><i class="ti ti-brand-whatsapp"></i>Book via your Barafu Luxe concierge</a>
+    <a class="wa-btn" href="https://wa.me/255692312366?text=Equestrian+safari+enquiry" target="_blank" style="margin-top:8px;" onclick="showToast('Request sent — track it under My Bookings')"><i class="ti ti-brand-whatsapp"></i>Book via your Barafu Luxe concierge</a>
   </div>
   <div class="spacer"></div>
 </div>
@@ -2983,7 +2985,7 @@ function removeBookingFB(fbKey){
   <div style="margin:0 14px 20px;border-top:0.5px solid var(--bd);padding-top:16px;">
     <div style="font-size:8px;letter-spacing:0.22em;color:var(--mt);text-transform:uppercase;margin-bottom:8px;">Private Request</div>
     <div style="font-size:11px;color:var(--mt);line-height:1.8;margin-bottom:12px;">Have a charter with spare seats? A private event to share? Tell your concierge and we'll post it to the Circle for you.</div>
-    <a class="wa-btn" href="https://wa.me/255692312366?text=I+have+something+to+share+with+the+Barafu+Circle" target="_blank"><i class="ti ti-brand-whatsapp"></i>Share with the Circle</a>
+    <a class="wa-btn" href="https://wa.me/255692312366?text=I+have+something+to+share+with+the+Barafu+Circle" target="_blank" onclick="showToast('Opening WhatsApp...')"><i class="ti ti-brand-whatsapp"></i>Share with the Circle</a>
   </div>
 
   <div class="spacer"></div>
@@ -3210,14 +3212,14 @@ function renderACLMenu(){
 
 
 var COMMUNITIES = [
-  {id:'golf',name:'Golf Club',icon:'⛳',color:'golf',desc:'Tee times, tournaments, handicap chat and course reviews across East Africa.',messages:[]},
-  {id:'fashion',name:'Fashion Circle',icon:'👗',color:'fashion',desc:'Luxury fashion, styling, trends and exclusive previews from East Africa and beyond.',messages:[]},
-  {id:'travel',name:'Travelers',icon:'✈️',color:'travel',desc:'Hidden gems, travel tips, destination reviews and members travel stories worldwide.',messages:[]},
-  {id:'wine',name:'Wine Society',icon:'🍷',color:'wine',desc:'Tasting notes, cellar talk, pairing ideas and exclusive member dinners.',messages:[]},
+  {id:'golf',name:'Golf Club',icon:'⛳',color:'golf',desc:'Tee times, tournaments, handicap chat and course reviews across East Africa.',messages:[],starter:'What course are you playing this week?'},
+  {id:'fashion',name:'Fashion Circle',icon:'👗',color:'fashion',desc:'Luxury fashion, styling, trends and exclusive previews from East Africa and beyond.',messages:[],starter:'Seen anything worth wearing this season?'},
+  {id:'travel',name:'Travelers',icon:'✈️',color:'travel',desc:'Hidden gems, travel tips, destination reviews and members travel stories worldwide.',messages:[],starter:'Where are you headed next?'},
+  {id:'wine',name:'Wine Society',icon:'🍷',color:'wine',desc:'Tasting notes, cellar talk, pairing ideas and exclusive member dinners.',messages:[],starter:"What's open on your table tonight?"},
   {id:'business',name:'Business Network',icon:'💼',color:'business',desc:'Deals, introductions, opportunities and business conversations among Barafu Luxe members.',messages:[]},
-  {id:'art',name:'Art & Culture',icon:'🎨',color:'art',desc:'Gallery openings, art collecting, cultural events and creative conversation.',messages:[]},
-  {id:'fitness',name:'Elite Fitness',icon:'🏋️',color:'fitness',desc:'High-performance fitness, wellness retreats, personal trainers and biohacking.',messages:[]},
-  {id:'food',name:'Culinary Society',icon:'🍽️',color:'food',desc:'Restaurant reviews, private chef experiences, recipe sharing and food events.',messages:[]},
+  {id:'art',name:'Art & Culture',icon:'🎨',color:'art',desc:'Gallery openings, art collecting, cultural events and creative conversation.',messages:[],starter:'Seen anything worth talking about lately?'},
+  {id:'fitness',name:'Elite Fitness',icon:'🏋️',color:'fitness',desc:'High-performance fitness, wellness retreats, personal trainers and biohacking.',messages:[],starter:"What's your training looking like this week?"},
+  {id:'food',name:'Culinary Society',icon:'🍽️',color:'food',desc:'Restaurant reviews, private chef experiences, recipe sharing and food events.',messages:[],starter:'Eaten anywhere lately worth mentioning?'},
 ];
 
 
@@ -3589,8 +3591,16 @@ function go(id){
     setTimeout(function(){ try{checkTrackedFlights();}catch(e){console.log('checkTrackedFlights err:',e);} },1200);
   }
   if(id==='s-rewards'){ setTimeout(function(){ try{renderRewardsScreen();}catch(e){console.log('renderRewardsScreen err:',e);} },100); }
-  if(id==='s-events'){ try{renderCalendar();}catch(e){} try{renderEvents();}catch(e){} setTimeout(function(){try{fetchLiveEvents();}catch(e){}},300); }
-  if(id==='s-emptylegs'){ setTimeout(function(){ try{fetchLiveEmptyLegs();}catch(e){}; },100); }
+  if(id==='s-events'){ try{renderCalendar();}catch(e){} try{renderEvents();}catch(e){} setTimeout(function(){try{fetchLiveEvents();}catch(e){}},300);
+    // Notification primer fires here (and from Empty Legs below) rather
+    // than on a blind timer after login - asking "want alerts for empty
+    // leg deals?" means something once someone's actually looking at
+    // empty legs, not as a cold popup before they've seen what that even is.
+    setTimeout(function(){ if(typeof maybeShowNotifPrimer==='function') maybeShowNotifPrimer(currentUser); },2000);
+  }
+  if(id==='s-emptylegs'){ setTimeout(function(){ try{fetchLiveEmptyLegs();}catch(e){}; },100);
+    setTimeout(function(){ if(typeof maybeShowNotifPrimer==='function') maybeShowNotifPrimer(currentUser); },2000);
+  }
   if(id==='s-transfers'){ setTimeout(function(){ try{buildRoutes();}catch(e){} },100); }
   if(id==='s-f1'){ setTimeout(function(){ try{buildF1();}catch(e){console.log('F1 err:',e);} setTimeout(function(){try{fetchF1Live();}catch(e){}},400); },100); }
   if(id==='s-yacht'){ setTimeout(function(){ try{buildGroupFleet();}catch(e){console.log('Fleet err:',e);} },100); setTimeout(function(){ try{renderWeatherWidget('weather-widget-yacht');}catch(e){} },150); }
@@ -3722,7 +3732,7 @@ function openModal(title,type){
       +(notes?'\nNotes: '+notes:'');
     submitForm(title);
     document.getElementById('modal-bg').classList.remove('open');
-    window.open('https://wa.me/255692312366?text='+encodeURIComponent(msg), '_blank');
+    handoffToWhatsApp('https://wa.me/255692312366?text='+encodeURIComponent(msg));
   };
   document.getElementById('modal-bg').classList.add('open');
 }
@@ -3775,7 +3785,7 @@ function openTransferBook(route, usd, tzs){
     bk.unshift({id:'b'+Date.now(),service:detail,client:name,detail:'App enquiry',price:'$'+usd,status:'pending',time:t});
     DB.set('bookings',bk);
     document.getElementById('modal-bg').classList.remove('open');
-    window.open('https://wa.me/255692312366?text='+encodeURIComponent(msg), '_blank');
+    handoffToWhatsApp('https://wa.me/255692312366?text='+encodeURIComponent(msg));
   };
   f.appendChild(btn);
   el.appendChild(f);
@@ -3888,7 +3898,7 @@ function submitHeliZanzibarEnquiry(){
     +(notes?'\nNotes: '+notes:'');
 
   if(typeof submitForm==='function') submitForm('Heli Transfer: '+zone, msg);
-  window.open('https://wa.me/255692312366?text='+encodeURIComponent(msg), '_blank');
+  handoffToWhatsApp('https://wa.me/255692312366?text='+encodeURIComponent(msg));
 }
 
 function openHeliBook(dep,price){
@@ -3915,7 +3925,7 @@ function openHeliBook(dep,price){
       +(notes?'\nNotes: '+notes:'');
     submitForm('Helicopter Picnic', msg);
     document.getElementById('modal-bg').classList.remove('open');
-    window.open('https://wa.me/255692312366?text='+encodeURIComponent(msg), '_blank');
+    handoffToWhatsApp('https://wa.me/255692312366?text='+encodeURIComponent(msg));
   };
   document.getElementById('modal-bg').classList.add('open');
 }
@@ -3969,7 +3979,7 @@ function openYachtBook(name, cap, half, full, live, two){
       +(notes?'\nNotes: '+notes:'');
     submitForm(name+' Charter | '+type+' | '+date+' | '+guests+' guests'+(occasion?' | '+occasion:'')+(notes?' | '+notes:''));
     document.getElementById('modal-bg').classList.remove('open');
-    window.open('https://wa.me/255692312366?text='+encodeURIComponent(msg), '_blank');
+    handoffToWhatsApp('https://wa.me/255692312366?text='+encodeURIComponent(msg));
   };
   f.appendChild(btn);
   el.appendChild(f);
@@ -3995,7 +4005,7 @@ function openF1Book(race,date,venue){
       +(notes?'\nNotes: '+notes:'');
     submitForm('F1: '+race, msg);
     document.getElementById('modal-bg').classList.remove('open');
-    window.open('https://wa.me/255692312366?text='+encodeURIComponent(msg), '_blank');
+    handoffToWhatsApp('https://wa.me/255692312366?text='+encodeURIComponent(msg));
   };
   document.getElementById('modal-bg').classList.add('open');
 }
@@ -4067,7 +4077,26 @@ function doLogin(){
   if(!user){
     if(window.FB && typeof window.FB.getMembers==='function'){
       if(errEl){ errEl.textContent='Checking credentials...'; errEl.classList.add('show'); }
+
+      // navigator.onLine only catches a fully dead connection - it says
+      // nothing about a technically-connected-but-painfully-slow one,
+      // which is exactly what members on remote lodges or satellite links
+      // actually experience. Without a timeout here, a Firebase call that
+      // never resolves leaves someone stuck on "Checking credentials..."
+      // indefinitely, with no way to tell a slow connection apart from a
+      // frozen app.
+      var loginSettled = false;
+      var loginTimeout = setTimeout(function(){
+        if(loginSettled) return;
+        loginSettled = true;
+        if(errEl){ errEl.textContent='Taking longer than expected — check your connection and try again.'; errEl.classList.add('show'); }
+      }, 12000);
+
       window.FB.getMembers(function(members){
+        if(loginSettled) return; // timeout already fired and told the member what's going on - don't silently overwrite that with a stale result if it resolves after all
+        loginSettled = true;
+        clearTimeout(loginTimeout);
+
         var found = null;
         for(var m=0; m<members.length; m++){
           var mem = members[m];
@@ -4121,7 +4150,7 @@ function doRequest(){
     DB.set('pending_requests', pending);
   }catch(e){}
 
-  window.open('https://wa.me/255692312366?text=New+access+request:%0AName:+'+encodeURIComponent(name)+'%0AEmail:+'+encodeURIComponent(email)+'%0APhone:+'+encodeURIComponent(phone),'_blank');
+  handoffToWhatsApp('https://wa.me/255692312366?text=New+access+request:%0AName:+'+encodeURIComponent(name)+'%0AEmail:+'+encodeURIComponent(email)+'%0APhone:+'+encodeURIComponent(phone), 'Access request sent — we\'ll be in touch shortly');
   var f=document.getElementById('lf-signup');
   if(f) f.innerHTML='<div style="text-align:center;padding:20px;color:var(--ow);"><div style="font-size:36px;margin-bottom:12px;">✓</div><div style="font-family:Cormorant Garamond,serif;font-size:22px;margin-bottom:8px;">Request Sent</div><div style="font-size:11px;color:var(--mt);line-height:1.7;">You will be contacted within 24 hours.</div></div>';
 }
@@ -4145,7 +4174,7 @@ function doForgot(){
   // than fake a "check your email" message that sends nothing, route to
   // the same real person who already handles everything else in this app.
   var msg = 'I need help resetting my password. My account email is: '+email;
-  window.open('https://wa.me/255692312366?text='+encodeURIComponent(msg), '_blank');
+  handoffToWhatsApp('https://wa.me/255692312366?text='+encodeURIComponent(msg));
 
   var el=document.getElementById('lf-forgot');
   if(el) el.innerHTML='<div style="text-align:center;padding:16px;color:var(--ow);"><div style="font-size:28px;margin-bottom:10px;">💬</div><div style="font-size:14px;margin-bottom:8px;">Message sent to WhatsApp</div><div style="font-size:11px;color:var(--mt);line-height:1.6;">Your concierge will verify your identity and help you back in — usually within 2 hours.</div><button class="login-ghost" style="margin-top:14px;" onclick="document.getElementById(\'lf-forgot\').style.display=\'none\';document.getElementById(\'lf-signin\').style.display=\'block\'">Back</button></div>';
@@ -4207,9 +4236,6 @@ function enterApp(user){
     setTimeout(function(){
       if(typeof maybeShowHowItWorks==='function') maybeShowHowItWorks(user);
     },5500);
-    setTimeout(function(){
-      if(typeof maybeShowNotifPrimer==='function') maybeShowNotifPrimer(user);
-    },9500);
   }
   // Apply tier styling to profile
   setTimeout(function(){
@@ -5351,6 +5377,7 @@ function showHowItWorks(){
 
     +'<div style="display:flex;gap:10px;margin-bottom:12px;"><span style="font-size:18px;flex-shrink:0;">💠</span><div style="font-size:11px;color:var(--mt);line-height:1.6;"><b style="color:var(--ow);">Carats</b> — earned automatically with confirmed bookings and referrals, redeemable in <b style="color:var(--ow);">Rewards</b> for real experiences, not points for their own sake.</div></div>'
     +'<div style="display:flex;gap:10px;margin-bottom:12px;"><span style="font-size:18px;flex-shrink:0;">✦</span><div style="font-size:11px;color:var(--mt);line-height:1.6;"><b style="color:var(--ow);">Silver, Gold, Obsidian</b> — each tier unlocks more. See exactly what, under <b style="color:var(--ow);">Compare Tiers</b> in Profile.</div></div>'
+    +'<div style="display:flex;gap:10px;margin-bottom:12px;"><span style="font-size:18px;flex-shrink:0;">✦</span><div style="font-size:11px;color:var(--mt);line-height:1.6;"><b style="color:var(--ow);">Discover</b> — drifts by on its own on the Home screen. Tap the heart as something catches your eye to save it, no need to chase it down mid-scroll.</div></div>'
     +'<div style="display:flex;gap:10px;margin-bottom:12px;"><span style="font-size:18px;flex-shrink:0;">👑</span><div style="font-size:11px;color:var(--mt);line-height:1.6;"><b style="color:var(--ow);">The Circle</b> — a private members\' network, separate from booking, for members who want to connect with each other.</div></div>'
     +'<div style="display:flex;gap:10px;margin-bottom:12px;"><span style="font-size:18px;flex-shrink:0;">🎗️</span><div style="font-size:11px;color:var(--mt);line-height:1.6;"><b style="color:var(--ow);">Invite a Friend</b> — in Profile. Earn Carats automatically when someone you refer is approved.</div></div>'
     +'<div style="display:flex;gap:10px;margin-bottom:12px;"><span style="font-size:18px;flex-shrink:0;">🛫</span><div style="font-size:11px;color:var(--mt);line-height:1.6;"><b style="color:var(--ow);">Flight Tracker</b> — track a specific flight and get notified when it lands.</div></div>'
@@ -6047,7 +6074,7 @@ function openGemstoneDetail(idx){
     var msg='Gemstone Sourcing Enquiry\nStone: '+c.name+' ('+c.origin+')\nPlease advise on availability, sizes, and pricing.';
     if(typeof submitForm==='function') submitForm('Gemstone Sourcing: '+c.name, msg);
     document.getElementById('modal-bg').classList.remove('open');
-    window.open('https://wa.me/255692312366?text='+encodeURIComponent(msg), '_blank');
+    handoffToWhatsApp('https://wa.me/255692312366?text='+encodeURIComponent(msg));
   };
   f.appendChild(btn);
   el.appendChild(f);
@@ -6070,7 +6097,7 @@ function submitGemstoneSourcing(){
     +(notes?'\nNotes: '+notes:'');
 
   if(typeof submitForm==='function') submitForm('Gemstone Sourcing: '+stone+' ('+form+')', msg);
-  window.open('https://wa.me/255692312366?text='+encodeURIComponent(msg), '_blank');
+  handoffToWhatsApp('https://wa.me/255692312366?text='+encodeURIComponent(msg));
 }
 
 // ════ OFF-MARKET VILLAS / REAL ESTATE CONCIERGE ════
@@ -6173,7 +6200,7 @@ function openRealEstateDetail(idx){
     var msg='Real Estate Introduction Request\nCategory: '+c.name+' ('+c.origin+')\nPlease introduce me to a licensed agent and legal counsel for this region.';
     if(typeof submitForm==='function') submitForm('Real Estate: '+c.name, msg);
     document.getElementById('modal-bg').classList.remove('open');
-    window.open('https://wa.me/255692312366?text='+encodeURIComponent(msg), '_blank');
+    handoffToWhatsApp('https://wa.me/255692312366?text='+encodeURIComponent(msg));
   };
   f.appendChild(btn);
   el.appendChild(f);
@@ -6196,7 +6223,7 @@ function submitRealEstateEnquiry(){
     +(notes?'\nNotes: '+notes:'');
 
   if(typeof submitForm==='function') submitForm('Real Estate: '+region+' ('+purpose+')', msg);
-  window.open('https://wa.me/255692312366?text='+encodeURIComponent(msg), '_blank');
+  handoffToWhatsApp('https://wa.me/255692312366?text='+encodeURIComponent(msg));
 }
 
 // ════ PRICE ENGINE ════
@@ -6522,8 +6549,14 @@ function openCommunity_BASE(id){
 // participation these rooms exist for. First name + last initial is enough
 // for familiarity without full-identity exposure. The underlying stored
 // data always keeps the true full name — this only affects what's shown.
-function displayNameForRoom(fullName, roomId){
+//
+// Admin is a special case on top of that: whenever a message is sent from
+// the admin account, it should read as "Admin" - not the real name, and
+// not shortened to "First L." either - regardless of which room it's
+// posted in. This overrides both rules above.
+function displayNameForRoom(fullName, roomId, tier){
   if(!fullName) return fullName;
+  if(tier === 'admin') return 'Admin';
   if(roomId === 'business') return fullName;
   var parts = fullName.trim().split(/\s+/);
   if(parts.length < 2) return fullName; // single-word name, nothing to shorten
@@ -6542,15 +6575,15 @@ function sendCommMsg(){
   var name=currentUser.name;
   var av=currentUser.initials||name.slice(0,2).toUpperCase();
   if(window.FB&&window.sendCommMsgFB){
-    window.sendCommMsgFB(currentComm.id,name,av,txt);
+    window.sendCommMsgFB(currentComm.id,name,av,txt,currentUser.tier);
   } else {
     var key='comm_msgs_'+currentComm.id;
     var stored=DB.get(key)||[];
-    stored.push({from:name,av,text:txt,time:timeStr});
+    stored.push({from:name,av,text:txt,time:timeStr,tier:currentUser.tier||''});
     DB.set(key,stored);
   }
   var msgs=document.getElementById('commchat-msgs');
-  var displayName=displayNameForRoom(name, currentComm.id);
+  var displayName=displayNameForRoom(name, currentComm.id, currentUser.tier);
   var safeAv=(av[0]||'?').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   var safeName=displayName.replace(/</g,'&lt;').replace(/>/g,'&gt;');
   var safeTxt=txt.replace(/</g,'&lt;').replace(/>/g,'&gt;');
@@ -6695,7 +6728,7 @@ function openSpaRetreatDetail(idx){
       +'\nGuests: '+guests;
     if(typeof submitForm==='function') submitForm('Wellness Retreat: '+r.name, msg);
     document.getElementById('modal-bg').classList.remove('open');
-    window.open('https://wa.me/255692312366?text='+encodeURIComponent(msg), '_blank');
+    handoffToWhatsApp('https://wa.me/255692312366?text='+encodeURIComponent(msg));
   };
   f.appendChild(btn);
   el.appendChild(f);
@@ -6856,7 +6889,7 @@ function openSpaDetail(id){
       +(notes?'\nHealth notes: '+notes:'');
     submitForm('Spa: '+t.name+' - '+blDisplay(t.base), msg);
     document.getElementById('modal-bg').classList.remove('open');
-    window.open('https://wa.me/255692312366?text='+encodeURIComponent(msg), '_blank');
+    handoffToWhatsApp('https://wa.me/255692312366?text='+encodeURIComponent(msg));
   };
   f.appendChild(btn);
   el.appendChild(f);
@@ -7056,7 +7089,7 @@ function openGemDetail(id){
     var msg='Hidden Gems Enquiry\nProperty: '+(g.name||'')+'\nLocation: '+(g.location||'');
     submitForm('Hidden Gems: '+g.name, msg);
     document.getElementById('modal-bg').classList.remove('open');
-    window.open('https://wa.me/255692312366?text='+encodeURIComponent(msg), '_blank');
+    handoffToWhatsApp('https://wa.me/255692312366?text='+encodeURIComponent(msg));
   };
   f.appendChild(btn);
   el.appendChild(f);
@@ -7145,7 +7178,7 @@ function openEvDetail(id){
       +(!full?'\nGuests: '+guests+(dietary?'\nDietary: '+dietary:''):'');
     submitForm(full?'Waitlist: '+ev.name:'RSVP: '+ev.name);
     document.getElementById('modal-bg').classList.remove('open');
-    window.open('https://wa.me/255692312366?text='+encodeURIComponent(msg), '_blank');
+    handoffToWhatsApp('https://wa.me/255692312366?text='+encodeURIComponent(msg));
   };
   f.appendChild(btn);
   el.appendChild(f);
@@ -7254,7 +7287,7 @@ function openELBook(routeOrEl,aircraft,datetime,price,was){
       +(phone?'\nWhatsApp: '+phone:'');
     submitForm('Empty Leg: '+route, msg);
     document.getElementById('modal-bg').classList.remove('open');
-    window.open('https://wa.me/255692312366?text='+encodeURIComponent(msg), '_blank');
+    handoffToWhatsApp('https://wa.me/255692312366?text='+encodeURIComponent(msg));
   };
   document.getElementById('modal-bg').classList.add('open');
 }
@@ -7929,7 +7962,7 @@ function openCommunityAfterAck(id, comm) {
     if(id==='business'){
       hUsers.slice(0,6).forEach(function(u){
         var tierClass = u.tier||'silver';
-        var fullDisplayName = u.name || u.email || 'Member'; // defensive: a malformed record must not throw here
+        var fullDisplayName = u.tier==='admin' ? 'Admin' : (u.name || u.email || 'Member'); // defensive: a malformed record must not throw here
         pillsHtml += '<div class="member-pill">'
           +'<div class="mp-avatar '+tierClass+'">'+((u.initials||fullDisplayName.slice(0,2))[0])+'</div>'
           +'<span class="mp-name">'+fullDisplayName+'</span>'
@@ -7965,19 +7998,25 @@ function openCommunityAfterAck(id, comm) {
 
     if(msgs){
       if(!storedMsgs.length) {
+        var starterHtml = comm.starter
+          ? '<div style="margin-top:18px;padding:12px 16px;border:0.5px solid var(--bd);border-radius:2px;display:inline-block;cursor:pointer;" onclick="var i=document.getElementById(\'commchat-inp\');if(i){i.value='+JSON.stringify(comm.starter)+';i.focus();}">'
+            +'<div style="font-size:8px;letter-spacing:0.16em;color:var(--gold);text-transform:uppercase;margin-bottom:6px;">A place to start</div>'
+            +'<div style="font-size:12px;color:var(--ow);font-style:italic;">"'+comm.starter+'"</div>'
+            +'</div>'
+          : '<div style="font-size:11px;color:var(--mt);margin-top:12px;">Be the first to start the conversation.</div>';
         msgs.innerHTML = '<div class="comm-divider">— '+today+' —</div>'
           +'<div style="text-align:center;padding:30px 20px;">'
           +'<div style="font-size:32px;margin-bottom:10px;">'+comm.icon+'</div>'
           +'<div style="font-family:Cormorant Garamond,serif;font-size:20px;color:var(--ow);margin-bottom:6px;">Welcome to '+comm.name+'</div>'
           +'<div style="font-size:11px;color:var(--mt);line-height:1.7;">'+comm.desc+'</div>'
-          +'<div style="font-size:11px;color:var(--mt);margin-top:12px;">Be the first to start the conversation.</div>'
+          +starterHtml
           +'</div>';
       } else {
         var mHtml = '<div class="comm-divider">— '+today+' —</div>';
         storedMsgs.forEach(function(m) {
           var isMe = currentUser && m.from===currentUser.name;
           var side = isMe?'me':'them';
-          var displayName = displayNameForRoom(m.from, id);
+          var displayName = displayNameForRoom(m.from, id, m.tier);
           mHtml += '<div class="cmsg '+side+'">'
             +'<div class="cmsg-av'+(isMe?' online-av':'')+'">'+( m.av||m.from||'?')[0]+'</div>'
             +'<div class="cmsg-body">'
@@ -8001,7 +8040,7 @@ function openCommunityAfterAck(id, comm) {
         if(!msgsEl || !window.currentComm || window.currentComm.id!==id) return;
         var isMe = currentUser && msg.from===currentUser.name;
         if(!isMe) {
-          var liveDisplayName = displayNameForRoom(msg.from, id);
+          var liveDisplayName = displayNameForRoom(msg.from, id, msg.tier);
           msgsEl.innerHTML += '<div class="cmsg them">'
             +'<div class="cmsg-av">'+((msg.av||msg.from||'?')[0])+'</div>'
             +'<div class="cmsg-body">'
@@ -8349,7 +8388,7 @@ function openDiningDetail(id){
       +(notes?'\nNotes: '+notes:'');
     submitForm('Dining: '+v.name, msg);
     document.getElementById('modal-bg').classList.remove('open');
-    window.open('https://wa.me/255692312366?text='+encodeURIComponent(msg), '_blank');
+    handoffToWhatsApp('https://wa.me/255692312366?text='+encodeURIComponent(msg));
   };
   document.getElementById('modal-bg').classList.add('open');
 }
@@ -8797,7 +8836,7 @@ function openACLReservation(){
       +(dietary?'\nDietary: '+dietary:'');
     submitForm('Dining: The Grill Room ACL', msg);
     document.getElementById('modal-bg').classList.remove('open');
-    window.open('https://wa.me/255692312366?text='+encodeURIComponent(msg), '_blank');
+    handoffToWhatsApp('https://wa.me/255692312366?text='+encodeURIComponent(msg));
   };
   document.getElementById('modal-bg').classList.add('open');
 }
@@ -8990,7 +9029,7 @@ function openEqBook(name, price) {
       +(notes?'\nNotes: '+notes:'');
     submitForm('Equestrian: '+window._eqService, msg);
     document.getElementById('modal-bg').classList.remove('open');
-    window.open('https://wa.me/255692312366?text='+encodeURIComponent(msg), '_blank');
+    handoffToWhatsApp('https://wa.me/255692312366?text='+encodeURIComponent(msg));
   };
   f.appendChild(btn);
 
@@ -9176,6 +9215,21 @@ function openUpgradeTier(){
   document.getElementById('modal-bg').classList.add('open');
 }
 
+// Every booking/enquiry exits the app straight into WhatsApp with nothing
+// left behind in the UI - members used to apps that confirm every action
+// immediately can reasonably wonder whether the tap actually did anything.
+// This shows a brief "request sent" toast right as the handoff happens, so
+// there's a visible moment of confirmation before attention shifts to
+// WhatsApp, and points them to My Bookings if they want to check back
+// later. Booking/enquiry flows should route through this instead of
+// calling window.open on a wa.me link directly; simple "open a chat"
+// shortcuts (e.g. the Profile page's direct WhatsApp Concierge link) are
+// fine as they are, since there's no request being submitted there to confirm.
+function handoffToWhatsApp(url, confirmMsg){
+  showToast(confirmMsg || 'Request sent — track it under My Bookings');
+  setTimeout(function(){ window.open(url, '_blank'); }, 400);
+}
+
 function showToast(msg){
   var t = document.getElementById('toast-msg');
   if(!t){
@@ -9277,7 +9331,7 @@ function openObsidianLounge(){
       +(desc?'\nDescription: '+desc:'');
     submitForm('Obsidian Circle: Introduction Request', msg);
     document.getElementById('modal-bg').classList.remove('open');
-    window.open('https://wa.me/255692312366?text='+encodeURIComponent(msg), '_blank');
+    handoffToWhatsApp('https://wa.me/255692312366?text='+encodeURIComponent(msg));
   };
   f.appendChild(btn);
   el.appendChild(f);
@@ -9491,7 +9545,7 @@ function showTierComparison(){
 function redeemCaratReward(threshold, name){
   if(!confirm('Redeem '+threshold+' Carats for "'+name+'"? Your concierge will confirm by WhatsApp.')) return;
   var msg = 'I would like to redeem '+threshold+' Carats for: '+name;
-  window.open('https://wa.me/255692312366?text='+encodeURIComponent(msg), '_blank');
+  handoffToWhatsApp('https://wa.me/255692312366?text='+encodeURIComponent(msg));
   // Deduct is handled by admin once the redemption is actually confirmed and
   // fulfilled — not automatically here, since "redeem" is a request, not a
   // guarantee, same as every other booking in this app.
