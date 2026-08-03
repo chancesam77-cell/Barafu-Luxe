@@ -458,9 +458,22 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="theme-color" content="#080808">
 <title>Barafu Luxe</title>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<!-- These two stylesheets used to be render-blocking (a plain <link> tag,
+     and an @import inside <style> - arguably worse, since @import can't be
+     made async on its own). A browser won't paint anything at all - not
+     even the inline-styled splash screen below - until every render-blocking
+     resource in <head> has finished loading, which on a slow connection to
+     these external CDNs is a very plausible cause of a blank white screen
+     on open. The media="print" trick loads each file without blocking
+     paint, then swaps it to apply once ready; the <noscript> fallback
+     covers the rare case JS is disabled. Since the splash screen fills the
+     whole viewport regardless, there's no visible downside to icons/fonts
+     finishing a moment later - only upside to something appearing at all. -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"></noscript>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Montserrat:wght@200;300;400;500;600&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Montserrat:wght@200;300;400;500;600&display=swap"></noscript>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Montserrat:wght@200;300;400;500;600&display=swap');
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 :root{
