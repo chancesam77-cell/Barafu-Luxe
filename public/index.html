@@ -449,6 +449,9 @@
 .offline-banner-dot{width:6px;height:6px;border-radius:50%;background:var(--gl);flex-shrink:0;animation:offlinePulse 1.6s ease-in-out infinite;}
 @keyframes offlinePulse{0%,100%{opacity:0.4;}50%{opacity:1;}}
 
+.bl-spinner{display:inline-block;width:12px;height:12px;border-radius:50%;border:1.5px solid rgba(184,137,42,0.25);border-top-color:var(--gold);animation:blSpin 0.7s linear infinite;flex-shrink:0;}
+@keyframes blSpin{to{transform:rotate(360deg);}}
+
 @media (prefers-reduced-motion: reduce){
   *,*::before,*::after{animation-duration:0.01ms!important;animation-iteration-count:1!important;transition-duration:0.01ms!important;scroll-behavior:auto!important;}
   .water-ripple{display:none!important;}
@@ -1461,6 +1464,15 @@ window.sendCommMsgFB = function(commId, userName, userInitials, text, userTier) 
       });
       if(changed) DB.set('users', local);
     }
+    // Marks that at least one real snapshot has arrived, so admin's member
+    // list (and anything else checking this) can tell "genuinely zero
+    // members" apart from "hasn't synced yet" - without this, an admin
+    // opening the member list in the first moment after a fresh page load
+    // could see a "No members yet" that's actually just still catching up.
+    window._blMembersSynced = true;
+    if(typeof renderAdminMembers === 'function' && document.getElementById('adm-members-list')){
+      try{ renderAdminMembers(); }catch(e){}
+    }
   });
 
 // ── Helper to update online count in chat header ──
@@ -2308,7 +2320,7 @@ function removeBookingFB(fbKey){
   </div>
   <div class="el-explain">
     <i class="ti ti-info-circle" style="color:var(--gold);font-size:16px;flex-shrink:0;"></i>
-    <div style="font-size:10px;color:var(--mt);line-height:1.8;">An <strong style="color:var(--ow);">empty leg</strong> is a repositioning flight — when a private jet flies without passengers to reach its next booking. Those seats become available at deep discounts.</div>
+    <div style="font-size:10px;color:var(--mt);line-height:1.8;">An <strong style="color:var(--ow);">empty leg</strong> is a repositioning flight — when a private jet flies without passengers to reach its next booking. Those seats become available at deep discounts. Availability shown is curated by your concierge and confirmed directly with the operator before booking.</div>
   </div>
   <div class="luxury-tabs">
     <button class="luxury-tab active" onclick="filterELTab('all',this)">All</button>
@@ -2360,7 +2372,7 @@ function removeBookingFB(fbKey){
   </div>
   <div style="padding:8px 14px 4px;display:flex;align-items:center;justify-content:space-between;">
     <span style="font-size:9px;color:var(--mt);">Airport schedule board</span>
-    <span id="ft-live-status" style="font-size:9px;color:var(--mt);"></span>
+    <span onclick="if(typeof fetchLiveFlights==='function')fetchLiveFlights(true);" style="cursor:pointer;display:inline-flex;align-items:center;gap:4px;" title="Tap to refresh"><i class="ti ti-refresh" style="font-size:11px;color:var(--mt);"></i><span id="ft-live-status" style="font-size:9px;color:var(--mt);"></span></span>
   </div>
   <div style="padding:0 14px;">
     <div class="ft-board-tabs">
@@ -3578,10 +3590,22 @@ function showTierGateModal(screenId){
   document.getElementById('modal-bg').classList.add('open');
 }
 
-function go(id){
+function go(id, fromPopstate){
   if(!meetsTierGate(id)){
     showTierGateModal(id);
     return;
+  }
+  // Wires screen navigation into browser history so Android's hardware
+  // back button moves back within the app's own screens instead of
+  // exiting the PWA entirely - a common, jarring PWA pitfall on Android
+  // specifically, since there was previously no history entry for the
+  // back button to land on other than "leave the app". fromPopstate is
+  // true only when this call originated from the popstate handler below
+  // (the user pressed back) - in that case the browser has already moved
+  // the history position itself, so pushing again here would create a
+  // loop.
+  if(!fromPopstate && typeof history!=='undefined' && history.pushState){
+    try{ history.pushState({blScreen:id}, '', '#'+id); }catch(e){}
   }
   // Clear presence if leaving community chat
   if(currentUser && id !== 's-commchat'){
@@ -4145,7 +4169,7 @@ function doRequest(){
   var email=(document.getElementById('su-email')||{}).value||'';
   var phone=(document.getElementById('su-phone')||{}).value||'';
   var ref2=(document.getElementById('su-ref')||{}).value||'';
-  if(!name||!email){alert('Please fill in your name and email.');return;}
+  if(!name||!email){showFormError('Please fill in your name and email.');return;}
 
   var reqObj = {name:name, email:email.trim().toLowerCase(), phone:phone, ref:ref2};
 
@@ -4488,7 +4512,9 @@ function renderAdminMembers(){
   el.innerHTML='';
 
   if(!us.length){
-    el.innerHTML='<div style="font-size:11px;color:var(--mt);padding:10px 0;">No members yet. Add one above.</div>';
+    el.innerHTML = window._blMembersSynced
+      ? '<div style="font-size:11px;color:var(--mt);padding:10px 0;">No members yet. Add one above.</div>'
+      : '<div style="font-size:11px;color:var(--mt);padding:10px 0;display:flex;align-items:center;gap:8px;"><span class="bl-spinner"></span>Syncing members...</div>';
     return;
   }
 
@@ -4567,7 +4593,7 @@ function renderAdminMembers(){
       var amount = prompt('Award how many Carats to '+u.name+'? (use a negative number to deduct)');
       if(amount===null || amount==='') return;
       var num = parseInt(amount, 10);
-      if(isNaN(num)) { alert('Please enter a number.'); return; }
+      if(isNaN(num)) { showFormError('Please enter a number.'); return; }
       var reason = prompt('Reason (shown in their Carats history):', num>0?'Bonus award':'Adjustment') || 'Manual adjustment';
       if(window.FB && typeof window.FB.awardCarats==='function'){
         window.FB.awardCarats(u.email, num, reason).then(function(newBalance){
@@ -4755,7 +4781,7 @@ function adminAddMember(){
   var pass = (document.getElementById('adm-new-pass')||{}).value||'BarafuMember2026';
 
   name = name.trim();
-  if(!name || !email){ alert('Please enter name and email.'); return; }
+  if(!name || !email){ showFormError('Please enter name and email.'); return; }
 
   // Always read from DB first, fall back to DEFAULT_USERS
   var existing = DB.get('users');
@@ -5650,6 +5676,19 @@ function sendBroadcastPush(title, body, url, tierFilter, callback){
 
 // Manifest is now a real static file at /manifest.json — see that file
 // for icons and install metadata. No injection needed here.
+
+// Handles the Android hardware back button (and desktop browser
+// back/forward) once a member has navigated to at least one screen via
+// go(). If there's nothing in e.state - meaning the user has backed all
+// the way out to before any in-app navigation happened - there's
+// deliberately nothing to do here, so the browser's own default behavior
+// (exiting the PWA) takes over, which is the expected outcome from the
+// app's root screen.
+window.addEventListener('popstate', function(e){
+  if(e.state && e.state.blScreen && typeof go==='function'){
+    go(e.state.blScreen, true);
+  }
+});
 
 document.addEventListener('DOMContentLoaded',function(){
   if(typeof applyOutdoorModeFromStorage==='function') applyOutdoorModeFromStorage();
@@ -7318,7 +7357,7 @@ function adminAddEmptyLeg(){
   var seats=parseInt((document.getElementById('adm-el-seats')||{}).value)||4;
   var was=parseInt((document.getElementById('adm-el-was')||{}).value)||0;
   var now2=parseInt((document.getElementById('adm-el-now')||{}).value)||0;
-  if(!route||!aircraft||!date||!was||!now2){alert('Please fill in all fields.');return;}
+  if(!route||!aircraft||!date||!was||!now2){showFormError('Please fill in all fields.');return;}
   var saving=Math.round((1-(now2/was))*100);
   var parts=route.split('→').map(function(s){return s.trim();});
   var newLeg={id:'el'+Date.now(),type:'jet',from:parts[0]||'DAR',to:parts[1]||'JRO',date,time:'',aircraft,seats,was,now:now2,saving,tags:[parts[0].toLowerCase()||'dar'],avail:true};
@@ -7341,7 +7380,7 @@ function adminAddSpa(){
   var dur=(document.getElementById('adm-spa-duration')||{}).value||'60 min';
   var desc=(document.getElementById('adm-spa-desc')||{}).value||'';
   var base=parseInt((document.getElementById('adm-spa-base')||{}).value)||0;
-  if(!name||!base){alert('Please fill in name and partner rate.');return;}
+  if(!name||!base){showFormError('Please fill in name and partner rate.');return;}
   SPA_DATA.push({id:'spa'+Date.now(),type:'treatment',cat,partner:'peaberries',name,desc,base,duration:dur});
   if((document.getElementById('spa-content') && document.getElementById('spa-content').style.display!=='none')) renderSpa(spaCatFilter,spaPartnerFilter);
   ['adm-spa-name','adm-spa-cat','adm-spa-duration','adm-spa-desc','adm-spa-base'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
@@ -7361,7 +7400,7 @@ function adminAddGem(){
   var desc=(document.getElementById('adm-gem-desc')||{}).value||'';
   var base=parseInt((document.getElementById('adm-gem-base')||{}).value)||0;
   var icon=(document.getElementById('adm-gem-icon')||{}).value||'🏡';
-  if(!name||!base){alert('Please fill in name and rate.');return;}
+  if(!name||!base){showFormError('Please fill in name and rate.');return;}
   GEMS.unshift({id:'gem'+Date.now(),type,name,location:loc,desc,base,per:'per night',features:[],icon,new:true});
   if((document.getElementById('gems-content') && document.getElementById('gems-content').style.display!=='none')) renderGems(gemFilter);
   ['adm-gem-name','adm-gem-type','adm-gem-location','adm-gem-desc','adm-gem-base','adm-gem-icon'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
@@ -7425,7 +7464,7 @@ function adminAddEvent(){
   var price=(document.getElementById('adm-ev-price')||{}).value||'Custom';
   var cap=parseInt((document.getElementById('adm-ev-capacity')||{}).value)||50;
   var desc=(document.getElementById('adm-ev-desc')||{}).value||'';
-  if(!name||!date||!venue){alert('Please fill in name, date and venue.');return;}
+  if(!name||!date||!venue){showFormError('Please fill in name, date and venue.');return;}
   var colMap={gala:'gold',golf:'green',wine:'purple',fashion:'purple',sports:'blue',travel:'gold',private:'gold'};
   var newEvent={id:'ev'+Date.now(),name,cat,color:colMap[cat]||'gold',date,time,venue,price,desc,attendees:0,capacity:cap,going:false,tags:[cat]};
   EVENTS_DATA.unshift(newEvent);
@@ -7503,7 +7542,7 @@ function adminAddDiscoverCard(){
   var sub=(document.getElementById('adm-disc-sub')||{}).value||'';
   var dest=(document.getElementById('adm-disc-dest')||{}).value||'s-events';
   var color=(document.getElementById('adm-disc-color')||{}).value||'var(--gold)';
-  if(!tag||!title||!sub){ alert('Please fill in tag, title and sub-line.'); return; }
+  if(!tag||!title||!sub){ showFormError('Please fill in tag, title and sub-line.'); return; }
 
   var card = { id:'disc'+Date.now(), tag:tag.toUpperCase(), title:title, sub:sub, action:"go('"+dest+"')", color:color };
 
@@ -7654,7 +7693,7 @@ function deriveShortPushText(message){
 function sendBroadcast(){
   var message=(document.getElementById('adm-bc-message')||{}).value||'';
   var tier=(document.getElementById('adm-bc-tier')||{}).value||'all';
-  if(!message){alert('Please write a message or choose a template first.');return;}
+  if(!message){showFormError('Please write a message or choose a template first.');return;}
   var users=(DB.get('users')||DEFAULT_USERS).filter(function(u){return u.tier!=='admin';});
   var filtered=tier==='all'?users:users.filter(function(u){return u.tier===tier;});
   var waUrl='https://wa.me/?text='+encodeURIComponent(message);
@@ -8287,7 +8326,7 @@ function updateHomeOnlineCount(){
 // These are currently locked behind Gold/Obsidian gate but visible in home service list
 // Add quick access buttons that respect tier
 function openSpaWithTierCheck(){
-  if(!currentUser){ alert('Please sign in first.'); return; }
+  if(!currentUser){ showFormError('Please sign in first.'); return; }
   var tier=currentUser.tier;
   if(tier==='gold'||tier==='obsidian'||tier==='admin'){
     go('s-spa');
@@ -8310,7 +8349,7 @@ function openSpaWithTierCheck(){
 }
 
 function openGemsWithTierCheck(){
-  if(!currentUser){ alert('Please sign in first.'); return; }
+  if(!currentUser){ showFormError('Please sign in first.'); return; }
   var tier=currentUser.tier;
   if(tier==='gold'||tier==='obsidian'||tier==='admin'){
     go('s-gems');
@@ -9251,6 +9290,27 @@ function showToast(msg){
     t.style.cssText = 'position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:rgba(184,137,42,0.95);color:#000;padding:10px 20px;border-radius:20px;font-size:11px;font-family:Montserrat,sans-serif;letter-spacing:0.1em;z-index:9999;transition:opacity 0.3s;';
     document.body.appendChild(t);
   }
+
+// Native alert() blocks the entire screen until dismissed and looks
+// nothing like the rest of the app - jarring in a brand this deliberate
+// about its own look. Used specifically for form validation messages
+// across admin and member forms; on-brand styling (warning-red, not the
+// gold used for success toasts), stays up longer than a normal toast
+// since an error needs to actually be read and acted on, not just
+// glanced at in passing.
+function showFormError(msg){
+  var t = document.getElementById('form-error-msg');
+  if(!t){
+    t = document.createElement('div');
+    t.id = 'form-error-msg';
+    t.style.cssText = 'position:fixed;bottom:90px;left:50%;transform:translateX(-50%);max-width:88%;background:rgba(204,85,85,0.97);color:#fff;padding:10px 18px;border-radius:20px;font-size:11px;font-family:Montserrat,sans-serif;letter-spacing:0.03em;z-index:9999;transition:opacity 0.3s;text-align:center;';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.opacity = '1';
+  clearTimeout(t._hideTimer);
+  t._hideTimer = setTimeout(function(){ t.style.opacity = '0'; }, 3800);
+}
   t.textContent = msg;
   t.style.opacity = '1';
   setTimeout(function(){ t.style.opacity = '0'; }, 2500);
@@ -10162,7 +10222,7 @@ function adminPostCircle(){
   var title = ((document.getElementById('adm-circle-title')||{}).value||'').trim();
   var body = ((document.getElementById('adm-circle-body')||{}).value||'').trim();
   var cta = ((document.getElementById('adm-circle-cta')||{}).value||'Enquire').trim();
-  if(!title||!body){ alert('Please fill headline and message.'); return; }
+  if(!title||!body){ showFormError('Please fill headline and message.'); return; }
   var tagMap = {event:'Exclusive Event',deal:'Flash Deal',insight:'Concierge Insight',charter:'Shared Charter'};
   var colorMap = {event:'gold',deal:'red',insight:'gold',charter:'teal'};
   var posts = [];
