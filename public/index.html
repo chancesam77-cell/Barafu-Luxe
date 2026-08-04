@@ -559,8 +559,39 @@ html,body{height:100%;background:var(--black);color:var(--ow);font-family:'Monts
 .qc.page-opening{animation:pageOpenJelly 0.5s cubic-bezier(0.34,1.56,0.64,1);box-shadow:-6px 4px 18px rgba(0,0,0,0.35);}
 .qc{background:var(--card);border:0.5px solid var(--bd);padding:14px;cursor:pointer;transition:border-color 0.15s,transform .15s cubic-bezier(0.34,1.56,0.64,1);border-radius:2px;transform-style:preserve-3d;transform-origin:left center;}
 .qc:active{background:var(--card2);transform:scale(0.9);}
-.discover-card{flex-shrink:0;width:200px;background:var(--card);border:0.5px solid var(--bd);border-radius:2px;padding:16px;cursor:pointer;position:relative;overflow:hidden;transition:transform .15s cubic-bezier(0.34,1.56,0.64,1),border-color .15s;}
+.discover-card{flex-shrink:0;background:var(--card);border:0.5px solid var(--bd);border-radius:2px;padding:16px;cursor:pointer;position:relative;overflow:hidden;transition:transform .15s cubic-bezier(0.34,1.56,0.64,1),border-color .15s;display:flex;flex-direction:column;justify-content:flex-end;}
 .discover-card:active{transform:scale(0.92);border-color:rgba(184,137,42,0.35);}
+.discover-card::before{content:'';position:absolute;inset:0;opacity:0.6;pointer-events:none;}
+.discover-card .save-heart{position:absolute;top:14px;right:14px;z-index:1;}
+
+/* Three sizes cycle as the row renders (see renderDiscoverFeed) so cards
+   read as a curated, editorial rhythm instead of a uniform grid wearing
+   a nice font - the single biggest thing separating "list" from "feels
+   alive". Sizing intentionally mirrors the doors grid's proportions so
+   Discover and the doors feel like one coherent world, not two designs
+   sharing a page. */
+.discover-card.ds{width:150px;height:160px;}
+.discover-card.ds .discover-card-title{font-size:16px;}
+.discover-card.dm{width:170px;height:200px;}
+.discover-card.dm .discover-card-title{font-size:19px;}
+.discover-card.dl{width:200px;height:240px;}
+.discover-card.dl .discover-card-title{font-size:24px;}
+.discover-card.dl .discover-card-tag{font-size:9px;}
+
+.discover-card-tag{font-size:8px;letter-spacing:0.16em;text-transform:uppercase;margin-bottom:8px;font-weight:500;position:relative;}
+.discover-card-title{font-family:'Cormorant Garamond',serif;line-height:1.15;color:var(--ow);position:relative;}
+.discover-card-sub{font-size:9px;color:var(--mt);margin-top:6px;position:relative;}
+
+.discover-featured-mark{position:absolute;top:14px;left:14px;font-size:8px;letter-spacing:0.12em;text-transform:uppercase;color:var(--gp);border:0.5px solid rgba(232,201,122,0.4);padding:3px 7px;border-radius:20px;z-index:1;}
+
+/* Cards emerge from and fade back into darkness at each edge rather than
+   being hard-cropped by the container - the detail that actually makes
+   this feel like looking out a window at something drifting past, versus
+   a mechanical ticker with a visible clipping edge. */
+.discover-window{position:relative;overflow:hidden;padding:4px 0 8px;}
+.discover-window::before,.discover-window::after{content:'';position:absolute;top:0;bottom:0;width:32px;z-index:2;pointer-events:none;}
+.discover-window::before{left:0;background:linear-gradient(to right,var(--black),transparent);}
+.discover-window::after{right:0;background:linear-gradient(to left,var(--black),transparent);}
 
 /* Discover highlights auto-scroll continuously to the left, like a slow
    ticker, so a member can watch cards drift by and tap the heart to save
@@ -569,12 +600,60 @@ html,body{height:100%;background:var(--black);color:var(--ow);font-family:'Monts
    renderDiscoverFeed) purely so the loop point at -50% lines up exactly
    with a full, seamless repeat instead of a visible jump/reset.
    Paused on touch/hover so a moving target isn't fighting for a tap. */
-.discover-track{display:flex;gap:10px;width:max-content;animation:discoverScroll linear infinite;animation-duration:var(--discover-scroll-duration,40s);}
+.discover-track{display:flex;align-items:flex-end;gap:12px;width:max-content;padding:0 14px;animation:discoverScroll linear infinite;animation-duration:var(--discover-scroll-duration,40s);}
 .discover-track:hover,.discover-track.touching{animation-play-state:paused;}
 @keyframes discoverScroll{
   from{transform:translateX(0);}
   to{transform:translateX(-50%);}
 }
+
+/* Home screen doors - six evocative entry points replacing what used to
+   be fourteen separate small tiles. Each carries a faint mood tint (the
+   same palette Discover's cards use above them) so a member recognizes
+   which door is which by color and shape before they've read a word -
+   "you'll know where to go just by looking" was the actual brief here. */
+.doors-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 14px;}
+.door{position:relative;border-radius:2px;padding:20px 16px;min-height:148px;display:flex;flex-direction:column;justify-content:flex-end;border:0.5px solid var(--bd);overflow:hidden;cursor:pointer;transition:transform .15s cubic-bezier(0.34,1.56,0.64,1),border-color .15s;}
+.door:active{transform:scale(0.96);border-color:rgba(184,137,42,0.35);}
+.door::before{content:'';position:absolute;inset:0;opacity:0.5;pointer-events:none;}
+.door-icon{position:absolute;top:16px;right:16px;font-size:15px;opacity:0.5;}
+.door-eyebrow{font-size:8px;letter-spacing:0.18em;text-transform:uppercase;margin-bottom:6px;position:relative;}
+.door-title{font-family:'Cormorant Garamond',serif;font-size:21px;font-weight:400;line-height:1.1;position:relative;color:var(--ow);}
+.door-sub{font-size:9px;color:var(--mt);margin-top:6px;position:relative;}
+
+.door-c1::before{background:radial-gradient(circle at 30% 20%,rgba(74,158,191,0.14),transparent 65%);}
+.door-c1 .door-eyebrow,.door-c1 .door-icon{color:var(--ocean-soft);}
+.door-c2::before{background:radial-gradient(circle at 70% 15%,rgba(184,137,42,0.16),transparent 65%);}
+.door-c2 .door-eyebrow,.door-c2 .door-icon{color:var(--gold);}
+.door-c3::before{background:radial-gradient(circle at 30% 15%,rgba(212,84,84,0.13),transparent 65%);}
+.door-c3 .door-eyebrow,.door-c3 .door-icon{color:#D45454;}
+.door-c4::before{background:radial-gradient(circle at 70% 20%,rgba(212,169,74,0.15),transparent 65%);}
+.door-c4 .door-eyebrow,.door-c4 .door-icon{color:var(--gl);}
+.door.door-c5{grid-column:span 2;min-height:114px;}
+.door-c5::before{background:linear-gradient(120deg,rgba(157,127,232,0.10),transparent 60%);}
+.door-c5 .door-eyebrow,.door-c5 .door-icon{color:#9D7FE8;}
+.door.door-c6{grid-column:span 2;min-height:114px;background:linear-gradient(120deg,#1a1408,var(--card));border-color:rgba(184,137,42,0.35);}
+.door-c6 .door-eyebrow,.door-c6 .door-icon{color:var(--gp);}
+.door-c6 .door-title{color:var(--gp);}
+
+.greet-eyebrow{font-size:9px;letter-spacing:0.24em;color:var(--gold);text-transform:uppercase;margin-bottom:8px;padding:0 14px;}
+.greet-h1{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:400;line-height:1.15;color:var(--ow);padding:0 14px;}
+.greet-h1 em{font-style:italic;color:var(--gl);}
+.greet-sub{font-size:11px;color:var(--mt);margin-top:8px;line-height:1.6;padding:0 14px;}
+
+/* Door submenu screen - the hero carries the door's own identity (mood
+   tint, a large soft watermark icon, eyebrow/title) through from the
+   home screen door that led here, and the item tiles below pick up the
+   same tint at low intensity so the whole page reads as one considered
+   space rather than a nice header sitting on top of a generic list. */
+.door-detail-hero{padding:26px 14px 22px;position:relative;overflow:hidden;}
+.door-detail-hero::before{content:'';position:absolute;inset:0;opacity:0.6;pointer-events:none;}
+.door-detail-watermark{position:absolute;top:-10px;right:-6px;font-size:100px;opacity:0.06;pointer-events:none;line-height:1;}
+.door-detail-rule{width:32px;height:1px;background:var(--gold);opacity:0.5;margin-top:16px;position:relative;}
+
+.door-detail-item{position:relative;overflow:hidden;}
+.door-detail-item::before{content:'';position:absolute;inset:0;opacity:0.5;pointer-events:none;}
+.door-detail-item > *{position:relative;}
 
 /* App-wide jellybean press feedback — every tappable element gets a soft
    squish on press. .ni, .qc, .luxury-tab and .discover-card already have
@@ -1620,7 +1699,10 @@ function removeBookingFB(fbKey){
   </div>
   <div class="login-form on" id="lf-signin">
     <input class="login-inp" id="li-email" type="email" placeholder="Email address" autocomplete="email">
-    <input class="login-inp" id="li-pass" type="password" placeholder="Password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+    <div style="position:relative;">
+      <input class="login-inp" id="li-pass" type="password" placeholder="Password" autocomplete="current-password" style="padding-right:42px;" onkeydown="if(event.key==='Enter')doLogin()">
+      <i class="ti ti-eye" id="li-pass-eye" onclick="togglePasswordVisibility('li-pass','li-pass-eye')" style="position:absolute;right:14px;top:13px;color:var(--mt);cursor:pointer;font-size:16px;"></i>
+    </div>
     <div class="login-err" id="li-err">Incorrect email or password</div>
     <button class="login-btn" onclick="doLogin()">Enter</button>
     <button class="login-ghost" onclick="document.getElementById('lf-signin').style.display='none';document.getElementById('lf-forgot').style.display='block';">Forgot password</button>
@@ -1870,49 +1952,53 @@ function removeBookingFB(fbKey){
     <button class="install-btn" onclick="installApp()">Install</button>
     <button class="install-close" onclick="dismissInstallBanner()" aria-label="Dismiss"><i class="ti ti-x"></i></button>
   </div>
-  <div class="hero-card">
-    <div class="hc-corner tl"></div><div class="hc-corner tr"></div>
-    <div class="hc-corner bl"></div><div class="hc-corner br"></div>
-    <img class="hc-logo" src="/login-logo.png" alt="Barafu Luxe">
-    <div class="hc-ey">Private Concierge · Arusha, Tanzania</div>
-    <h1 class="hc-h1">The Extraordinary,<br><em>Arranged.</em></h1>
-    <div class="hc-rule"></div>
-    <div class="hc-sub">Transfers · Helicopter · Yacht · F1 · Safari</div>
+
+  <div style="padding:8px 0 22px;">
+    <div class="greet-eyebrow" id="home-greet-eyebrow">Good evening</div>
+    <h1 class="greet-h1">Where to,<br><em id="home-greet-name">there?</em></h1>
+    <div class="greet-sub">Six doors below. Or see what's new tonight, drifting past.</div>
   </div>
-  <div class="info-strip">
+
+  <div id="coming-up-section" style="display:none;">
+    <div class="sec"><div class="slbl">Coming Up</div></div>
+    <div id="coming-up-list" style="padding:0 14px 14px;display:grid;gap:8px;"></div>
+  </div>
+
+  <div class="sec"><div class="slbl">Discover</div></div>
+  <div style="padding-bottom:14px;" id="discover-feed"></div>
+
+  <div class="sec"><div class="slbl">Six doors</div></div>
+  <div class="doors-grid">
+    <div class="door door-c1" onclick="openWithPageFlip(this,'openDoorSubmenu(\'transport\')')"><i class="ti ti-plane-tilt door-icon"></i><div class="door-eyebrow">Transport</div><div class="door-title">Take<br>Flight</div><div class="door-sub">Air, road & sea</div></div>
+    <div class="door door-c2" onclick="openWithPageFlip(this,'openGemsWithTierCheck()')"><i class="ti ti-building-estate door-icon"></i><div class="door-eyebrow">Stays</div><div class="door-title">Your<br>Sanctuary</div><div class="door-sub">Hidden gems, chosen for you</div></div>
+    <div class="door door-c3" onclick="openWithPageFlip(this,'openDoorSubmenu(\'dining\')')"><i class="ti ti-sparkles door-icon"></i><div class="door-eyebrow">Dining & Wellness</div><div class="door-title">Nourish</div><div class="door-sub">Spa & private tables</div></div>
+    <div class="door door-c4" onclick="openWithPageFlip(this,'openDoorSubmenu(\'experiences\')')"><i class="ti ti-ticket door-icon"></i><div class="door-eyebrow">Experiences</div><div class="door-title">Live It</div><div class="door-sub">Events, F1 & safaris</div></div>
+    <div class="door door-c5" onclick="openWithPageFlip(this,'openDoorSubmenu(\'vault\')')"><i class="ti ti-diamond door-icon"></i><div class="door-eyebrow">The Vault</div><div class="door-title">Rare Acquisitions</div><div class="door-sub">Tanzanite & off-market villas</div></div>
+    <div class="door door-c6" onclick="openWithPageFlip(this,'go(\'s-circle\')')"><i class="ti ti-crown door-icon"></i><div class="door-eyebrow">Members Only</div><div class="door-title">The Circle</div><div class="door-sub" id="circle-member-count">A private network, just for members</div></div>
+  </div>
+
+  <div class="info-strip" style="margin-top:22px;">
     <div class="is-cell"><div class="is-val">24/7</div><div class="is-lbl">Concierge</div></div>
     <div class="is-cell"><div class="is-val">10+</div><div class="is-lbl">Vessels</div></div>
     <div class="is-cell"><div class="is-val">14</div><div class="is-lbl">F1 Races</div></div>
     <div class="is-cell"><div class="is-val">DSM</div><div class="is-lbl">+ Zanzibar</div></div>
   </div>
-  <div id="coming-up-section" style="display:none;">
-    <div class="sec"><div class="slbl">Coming Up</div></div>
-    <div id="coming-up-list" style="padding:0 14px 14px;display:grid;gap:8px;"></div>
-  </div>
-  <div class="sec"><div class="slbl">Quick request</div></div>
-  <div class="qgrid">
-    <div class="qc" onclick="openWithPageFlip(this,'go(\'s-transfers\')')"><span class="qc-ico" style="color:var(--gold)"><i class="ti ti-car"></i></span><div class="qc-name">Transfer</div><div class="qc-sub">From $60</div></div>
-    <div class="qc" onclick="openWithPageFlip(this,'go(\'s-yacht\')')"><span class="qc-ico" style="color:var(--ocean-soft)"><i class="ti ti-sailboat"></i></span><div class="qc-name">Yacht</div><div class="qc-sub">From $2,000</div></div>
-    <div class="qc" onclick="openWithPageFlip(this,'go(\'s-dining\')')"><span class="qc-ico">🍽️</span><div class="qc-name">Private Dining</div><div class="qc-sub">ACL Grill · Gran Meliá</div></div>
-    <div class="qc" onclick="openWithPageFlip(this,'go(\'s-emptylegs\')')"><span class="qc-ico" style="color:var(--gold)"><i class="ti ti-plane-tilt"></i></span><div class="qc-name">Empty Legs</div><div class="qc-sub">Up to 75% off</div></div>
+</div>
 
-    <div class="qc" onclick="openWithPageFlip(this,'go(\'s-events\')')"><span class="qc-ico" style="color:#9C27B0"><i class="ti ti-calendar-event"></i></span><div class="qc-name">Events</div><div class="qc-sub">Galas & more</div></div>
-    <div class="qc" onclick="openWithPageFlip(this,'go(\'s-equestrian\')')"><span class="qc-ico">🐎</span><div class="qc-name">Equestrian</div><div class="qc-sub">Safari rides</div></div>
-    <div class="qc" onclick="openWithPageFlip(this,'go(\'s-flights\')')"><span class="qc-ico" style="color:var(--mt)"><i class="ti ti-radar"></i></span><div class="qc-name">Flight Tracker</div><div class="qc-sub">JRO · ARK · DAR</div></div>
-    <div class="qc" onclick="openWithPageFlip(this,'go(\'s-circle\')')"><span class="qc-ico" style="color:#D4AF37"><i class="ti ti-crown"></i></span><div class="qc-name">The Circle</div><div class="qc-sub" id="circle-member-count">Private network</div></div>
+<!-- ════════════════════ DOOR SUBMENU ════════════════════ -->
+<div class="screen" id="s-door-detail">
+  <div class="topbar">
+    <button class="tb-back" onclick="go('s-home')"><i class="ti ti-arrow-left"></i></button>
+    <span class="tb-title" id="door-detail-title">&nbsp;</span>
   </div>
-  <div class="divider"></div>
-  <div class="sec"><div class="slbl">Discover</div></div>
-  <div style="padding:0 14px 14px;overflow:hidden;" id="discover-feed"></div>
-  <div class="sec" style="padding-top:4px;"><div class="slbl">Exclusive Access</div></div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 14px 14px;">
-    <div class="qc" onclick="openWithPageFlip(this,'go(\'s-heli\')')"><span class="qc-ico" style="color:var(--gold)"><i class="ti ti-helicopter"></i></span><div class="qc-name">Helicopter</div><div class="qc-sub">From $8,930</div></div>
-    <div class="qc" onclick="openWithPageFlip(this,'go(\'s-gemstones\')')"><span class="qc-ico" style="color:#7C4DFF"><i class="ti ti-diamond"></i></span><div class="qc-name">Gemstone Sourcing</div><div class="qc-sub">Tanzanite & more</div></div>
-    <div class="qc" onclick="openWithPageFlip(this,'openSpaWithTierCheck()')"><span class="qc-ico" style="color:var(--gold)"><i class="ti ti-sparkles"></i></span><div class="qc-name">Spa & Wellness</div><div class="qc-sub">Peaberries · Siringit</div></div>
-    <div class="qc" onclick="openWithPageFlip(this,'openGemsWithTierCheck()')"><span class="qc-ico" style="color:var(--ocean-soft)"><i class="ti ti-diamond"></i></span><div class="qc-name">Hidden Gems</div><div class="qc-sub">Exclusive stays</div></div>
-    <div class="qc" onclick="openWithPageFlip(this,'go(\'s-f1\')')"><span class="qc-ico" style="color:var(--red)"><i class="ti ti-steering-wheel"></i></span><div class="qc-name">F1 Hospitality</div><div class="qc-sub">14 races</div></div>
-    <div class="qc" onclick="openWithPageFlip(this,'go(\'s-realestate\')')"><span class="qc-ico" style="color:var(--gold)"><i class="ti ti-building-estate"></i></span><div class="qc-name">Off-Market Villas</div><div class="qc-sub">Real estate concierge</div></div>
+  <div class="door-detail-hero" id="door-detail-hero">
+    <i class="ti door-detail-watermark" id="door-detail-watermark" aria-hidden="true"></i>
+    <div class="door-eyebrow" id="door-detail-eyebrow" style="position:relative;"></div>
+    <h1 style="font-family:Cormorant Garamond,serif;font-size:28px;font-weight:400;color:var(--ow);position:relative;" id="door-detail-heading"></h1>
+    <div style="font-size:11px;color:var(--mt);margin-top:6px;position:relative;" id="door-detail-sub"></div>
+    <div class="door-detail-rule"></div>
   </div>
+  <div class="qgrid" id="door-detail-items" style="padding-top:16px;"></div>
 </div>
 
 <!-- ════════════════════ TRANSFERS ════════════════════ -->
@@ -3183,6 +3269,47 @@ var DISCOVER_FEED = [
   {tag:'REAL ESTATE',title:'Property, Off the Market.',sub:'Off-market introductions · Licensed counsel',action:"go('s-realestate')",color:'var(--gold)'},
 ];
 
+// Home screen "doors" - each one groups several of the app's existing
+// destination screens under a single evocative entry point instead of
+// showing all fourteen as separate tiles. Stays (Hidden Gems alone) and
+// The Circle are single destinations and skip the submenu entirely,
+// navigating straight there - see the doors grid HTML and
+// openDoorSubmenu() below.
+var DOOR_GROUPS = {
+  transport: {
+    eyebrow:'Transport', title:'Take Flight', sub:'Air, road & sea', colorClass:'door-c1', icon:'ti-plane-tilt', accent:'var(--ocean-soft)',
+    items:[
+      {label:'Transfer', sub:'From $60', icon:'ti-car', action:"go('s-transfers')"},
+      {label:'Yacht', sub:'From $2,000', icon:'ti-sailboat', action:"go('s-yacht')"},
+      {label:'Helicopter', sub:'From $8,930', icon:'ti-helicopter', action:"go('s-heli')"},
+      {label:'Empty Legs', sub:'Up to 75% off', icon:'ti-plane-tilt', action:"go('s-emptylegs')"},
+      {label:'Flight Tracker', sub:'JRO · ARK · DAR', icon:'ti-radar', action:"go('s-flights')"}
+    ]
+  },
+  dining: {
+    eyebrow:'Dining & Wellness', title:'Nourish', sub:'Spa & private tables', colorClass:'door-c3', icon:'ti-sparkles', accent:'#D45454',
+    items:[
+      {label:'Private Dining', sub:'ACL Grill · Gran Meliá', icon:'ti-tools-kitchen-2', action:"go('s-dining')"},
+      {label:'Spa & Wellness', sub:'Peaberries · Siringit', icon:'ti-sparkles', action:'openSpaWithTierCheck()'}
+    ]
+  },
+  experiences: {
+    eyebrow:'Experiences', title:'Live It', sub:'Events, F1 & safaris', colorClass:'door-c4', icon:'ti-ticket', accent:'var(--gl)',
+    items:[
+      {label:'Events', sub:'Galas & more', icon:'ti-calendar-event', action:"go('s-events')"},
+      {label:'F1 Hospitality', sub:'14 races', icon:'ti-steering-wheel', action:"go('s-f1')"},
+      {label:'Equestrian', sub:'Safari rides', icon:'ti-horse', action:"go('s-equestrian')"}
+    ]
+  },
+  vault: {
+    eyebrow:'The Vault', title:'Rare Acquisitions', sub:'Tanzanite & off-market villas', colorClass:'door-c5', icon:'ti-diamond', accent:'#9D7FE8',
+    items:[
+      {label:'Gemstone Sourcing', sub:'Tanzanite & more', icon:'ti-diamond', action:"go('s-gemstones')"},
+      {label:'Off-Market Villas', sub:'Real estate concierge', icon:'ti-building-estate', action:"go('s-realestate')"}
+    ]
+  }
+};
+
 var DINING_VENUES = [
   {id:'acl-grill',name:'The Grill Room',location:'Arusha Coffee Lodge · Elewana Collection',desc:'An intimate candlelit grill nestled within the coffee plantation. Contemporary African grill cuisine in one of Arusha\'s most celebrated settings.',cuisine:'Contemporary African Grill',dress:'Smart casual to formal',hours:'Lunch 12:00–15:00 · Dinner 19:00–22:30',note:'Full seasonal set menu — updated July 2026.',icon:'🍽️',hasMenu:true,verified:true},
   {id:'gran-melia-grill',name:'The Grill',location:'Gran Meliá Arusha',desc:'A signature steakhouse experience on the hotel\'s top floor, known for premium cuts and sweeping views toward Mount Meru.',cuisine:'Steakhouse · Premium Grill',dress:'Smart casual to formal',hours:'Dinner · hours confirmed at booking',note:'Full menu coming soon — reservations already available through your concierge.',icon:'🥩',hasMenu:false,verified:true},
@@ -3590,6 +3717,44 @@ function showTierGateModal(screenId){
   document.getElementById('modal-bg').classList.add('open');
 }
 
+// Populates the generic door submenu screen from DOOR_GROUPS and
+// navigates to it. Only called for doors with more than one destination
+// (Transport, Dining & Wellness, Experiences, Vault) - Stays and The
+// Circle are single destinations and navigate directly from the home
+// screen instead of routing through here.
+function openDoorSubmenu(key){
+  var doorData = DOOR_GROUPS[key];
+  if(!doorData) return;
+
+  var titleEl = document.getElementById('door-detail-title');
+  var eyebrowEl = document.getElementById('door-detail-eyebrow');
+  var headingEl = document.getElementById('door-detail-heading');
+  var subEl = document.getElementById('door-detail-sub');
+  var heroEl = document.getElementById('door-detail-hero');
+  var watermarkEl = document.getElementById('door-detail-watermark');
+  var itemsEl = document.getElementById('door-detail-items');
+  if(!titleEl || !itemsEl) return;
+
+  titleEl.textContent = doorData.eyebrow;
+  if(eyebrowEl) eyebrowEl.textContent = doorData.eyebrow;
+  if(headingEl) headingEl.textContent = doorData.title;
+  if(subEl) subEl.textContent = doorData.sub;
+  if(heroEl) heroEl.className = 'door-detail-hero ' + doorData.colorClass;
+  if(watermarkEl) watermarkEl.className = 'ti door-detail-watermark ' + doorData.icon;
+
+  var html = '';
+  doorData.items.forEach(function(item){
+    html += '<div class="qc door-detail-item '+doorData.colorClass+'" onclick="'+item.action+'">'
+      + '<span class="qc-ico" style="color:'+doorData.accent+'"><i class="ti '+item.icon+'"></i></span>'
+      + '<div class="qc-name">'+item.label+'</div>'
+      + '<div class="qc-sub">'+item.sub+'</div>'
+      + '</div>';
+  });
+  itemsEl.innerHTML = html;
+
+  go('s-door-detail');
+}
+
 function go(id, fromPopstate){
   if(!meetsTierGate(id)){
     showTierGateModal(id);
@@ -3699,7 +3864,7 @@ document.addEventListener('click', function(e){
   setTimeout(function(){ if(ripple.parentNode) ripple.parentNode.removeChild(ripple); }, 750);
 }, true);
 
-var JELLYBEAN_SELECTOR = '.ni,.qc,.luxury-tab,.discover-card,.ab-btn,.admin-close,'
+var JELLYBEAN_SELECTOR = '.ni,.qc,.luxury-tab,.discover-card,.door,.ab-btn,.admin-close,'
   +'.admin-submit,.apt-tab,.chat-room-send,.chat-send,.circle-tab,.cmsg-rx,.comm-card,'
   +'.el-book-btn,.el-card,.el-filter,.ev-book-btn,.ev-card,.ev-day,.ev-filter,.ev-nav-btn,'
   +'.ev-rsvp-btn,.f1-book-btn,.f1-btn,.f1-hospitality-btn,.f1-tab,.fchk,.ft-board-tab,'
@@ -4067,6 +4232,18 @@ function switchLogin(tab,btn){
   if(el) el.classList.add('on');
 }
 
+function togglePasswordVisibility(inputId, iconId){
+  var input = document.getElementById(inputId);
+  var icon = document.getElementById(iconId);
+  if(!input) return;
+  var showing = input.type === 'text';
+  input.type = showing ? 'password' : 'text';
+  if(icon){
+    icon.classList.toggle('ti-eye', showing);
+    icon.classList.toggle('ti-eye-off', !showing);
+  }
+}
+
 function doLogin(){
   var emailEl = document.getElementById('li-email');
   var passEl  = document.getElementById('li-pass');
@@ -4217,9 +4394,32 @@ function doForgot(){
   if(el) el.innerHTML='<div style="text-align:center;padding:16px;color:var(--ow);"><div style="font-size:28px;margin-bottom:10px;">💬</div><div style="font-size:14px;margin-bottom:8px;">Message sent to WhatsApp</div><div style="font-size:11px;color:var(--mt);line-height:1.6;">Your concierge will verify your identity and help you back in — usually within 2 hours.</div><button class="login-ghost" style="margin-top:14px;" onclick="document.getElementById(\'lf-forgot\').style.display=\'none\';document.getElementById(\'lf-signin\').style.display=\'block\'">Back</button></div>';
 }
 
+// Time-of-day + first-name greeting on the home screen. Deliberately
+// keeps the sub-line static rather than also trying to vary by time -
+// varying two things at once risks landing on an odd combination
+// ("Good morning... see what's new tonight"); one dynamic element reads
+// as considered, several starts to feel like a template filling in blanks.
+function renderHomeGreeting(user){
+  var eyebrowEl = document.getElementById('home-greet-eyebrow');
+  var nameEl = document.getElementById('home-greet-name');
+  if(!eyebrowEl && !nameEl) return;
+
+  var hour = new Date().getHours();
+  var timeGreeting = hour < 5 ? 'Good evening'
+    : hour < 12 ? 'Good morning'
+    : hour < 17 ? 'Good afternoon'
+    : 'Good evening';
+
+  var firstName = (user && user.name) ? user.name.split(' ')[0] : 'there';
+
+  if(eyebrowEl) eyebrowEl.textContent = timeGreeting;
+  if(nameEl) nameEl.textContent = firstName + '?';
+}
+
 function enterApp(user){
   var shell=document.getElementById('login-shell');
   if(shell) shell.classList.add('hidden');
+  if(typeof renderHomeGreeting==='function') renderHomeGreeting(user);
   var pn=document.getElementById('profile-name');
   var pt=document.getElementById('profile-tier');
   var pa=document.getElementById('profile-av');
@@ -8456,14 +8656,32 @@ function renderDiscoverFeed(){
   function paint(cards){
     if(!cards.length){ el.innerHTML=''; return; }
 
+    // Three sizes cycle through by position so the row reads as a
+    // considered edit rather than a uniform grid - every 4th card (0, 4,
+    // 8...) gets the large "featured" treatment, the rest alternate
+    // small/medium. Only the very first card in the whole set gets the
+    // "This week" mark - since admin-added cards are prepended ahead of
+    // the static set, that's naturally whatever was most recently
+    // curated, not an arbitrary pick.
+    var sizeCycle = ['dl','ds','dm','ds'];
+
     var cardsHtml='';
-    cards.forEach(function(item){
+    cards.forEach(function(item, i){
       var itemId = 'disc_'+item.title.replace(/[^a-zA-Z0-9]/g,'').toLowerCase();
-      cardsHtml+='<div class="discover-card" onclick="'+item.action+'">'
+      var sizeClass = sizeCycle[i % sizeCycle.length];
+      var isFeatured = (i === 0);
+      // color-mix derives a faint background wash from the item's own
+      // existing color field - no new admin input needed, and it's what
+      // lets Discover's cards read as belonging to the same categories
+      // (and the same visual language) as the doors below them.
+      var tintStyle = 'background:radial-gradient(circle at 30% 80%, color-mix(in srgb, '+item.color+' 16%, transparent), transparent 65%);';
+      cardsHtml+='<div class="discover-card '+sizeClass+'" onclick="'+item.action+'">'
+        +'<div style="'+tintStyle+'position:absolute;inset:0;opacity:0.6;pointer-events:none;"></div>'
+        +(isFeatured ? '<span class="discover-featured-mark">This week</span>' : '')
         +'<span class="save-heart'+(isItemSaved(itemId)?' saved':'')+'" data-item-id="'+itemId+'" onclick="event.stopPropagation();toggleSaveItem(this,\'discover\',\''+itemId+'\',\''+item.title.replace(/'/g,"\\'")+'\',\''+item.sub.replace(/'/g,"\\'")+'\',\'✦\',\''+item.action.replace(/'/g,"\\'")+'\')">'+(isItemSaved(itemId)?'❤️':'🤍')+'</span>'
-        +'<div style="font-size:8px;letter-spacing:0.18em;color:'+item.color+';text-transform:uppercase;margin-bottom:8px;font-weight:500;">'+item.tag+'</div>'
-        +'<div style="font-family:Cormorant Garamond,serif;font-size:18px;color:var(--ow);line-height:1.2;margin-bottom:6px;">'+item.title+'</div>'
-        +'<div style="font-size:10px;color:var(--mt);">'+item.sub+'</div>'
+        +'<div class="discover-card-tag" style="color:'+item.color+';'+(isFeatured?'margin-top:22px;':'')+'">'+item.tag+'</div>'
+        +'<div class="discover-card-title">'+item.title+'</div>'
+        +'<div class="discover-card-sub">'+item.sub+'</div>'
         +'</div>';
     });
 
@@ -8473,12 +8691,12 @@ function renderDiscoverFeed(){
     // same (a comfortable, readable ~28px/second) whether there are 4
     // cards or 14, rather than a fixed duration that'd race by with a
     // lot of cards or crawl with only a couple.
-    var approxSetWidth = cards.length * 210; // 200px card + 10px gap
+    var approxSetWidth = cards.length * 190; // blended average across the three card sizes
     var durationSeconds = Math.max(18, Math.round(approxSetWidth / 28));
 
-    el.innerHTML = '<div class="discover-track" style="--discover-scroll-duration:'+durationSeconds+'s;">'
+    el.innerHTML = '<div class="discover-window"><div class="discover-track" style="--discover-scroll-duration:'+durationSeconds+'s;">'
       + cardsHtml + cardsHtml
-      + '</div>';
+      + '</div></div>';
 
     var track = el.querySelector('.discover-track');
     if(track){
