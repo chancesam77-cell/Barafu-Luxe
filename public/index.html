@@ -522,6 +522,8 @@ html,body{height:100%;background:var(--black);color:var(--ow);font-family:'Monts
 .tb-logo{width:36px;height:36px;object-fit:contain;}
 .ph-av-cam{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.5);text-align:center;font-size:9px;color:#fff;padding:2px;letter-spacing:0.06em;}
 .tb-title{font-family:'Cormorant Garamond',serif;font-size:17px;color:var(--gl);letter-spacing:0.06em;font-weight:400;}
+.tb-title-brand{color:var(--ow);}
+.tb-title-brand em{font-style:italic;color:var(--gl);}
 .tb-icon{font-size:20px;color:var(--mt);cursor:pointer;padding:11px;background:none;border:none;}
 .tb-back{font-size:20px;color:var(--mt);cursor:pointer;padding:4px;background:none;border:none;}
 
@@ -1648,6 +1650,10 @@ function removeBookingFB(fbKey){
     style="width:150px;height:auto;opacity:0;transform:scale(0.88);animation:blLogoReveal 1.1s cubic-bezier(.19,1,.22,1) 0.15s forwards;filter:drop-shadow(0 0 0 rgba(184,137,42,0));" 
     alt="Barafu Luxe">
   <div style="
+    margin-top:18px;font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:300;color:var(--ow);
+    opacity:0;transform:translateY(6px);animation:blWordmarkReveal 0.9s cubic-bezier(.19,1,.22,1) 0.5s forwards;
+  ">Barafu <em style="font-style:italic;color:var(--gl);">Luxe</em></div>
+  <div style="
     margin-top:26px;width:40px;height:1px;
     background:linear-gradient(to right,transparent,rgba(184,137,42,0.55),transparent);
     opacity:0;transform:scaleX(0);transform-origin:center;
@@ -1657,13 +1663,17 @@ function removeBookingFB(fbKey){
     margin-top:14px;font-size:8px;letter-spacing:0.15em;color:rgba(184,137,42,0.6);
     font-family:Montserrat,sans-serif;text-transform:uppercase;
     opacity:0;animation:blTextReveal 0.9s cubic-bezier(.4,0,.2,1) 1.1s forwards;
-  ">Private Concierge</div>
+  ">Private Concierge · Arusha</div>
 </div>
 <style>
 @keyframes blLogoReveal{
   0%{opacity:0;transform:scale(0.88);filter:drop-shadow(0 0 0 rgba(184,137,42,0));}
   55%{opacity:1;transform:scale(1.015);filter:drop-shadow(0 0 14px rgba(184,137,42,0.35));}
   100%{opacity:1;transform:scale(1);filter:drop-shadow(0 0 0 rgba(184,137,42,0));}
+}
+@keyframes blWordmarkReveal{
+  0%{opacity:0;transform:translateY(6px);}
+  100%{opacity:1;transform:translateY(0);}
 }
 @keyframes blLineDraw{
   0%{opacity:0;transform:scaleX(0);}
@@ -1946,7 +1956,7 @@ function removeBookingFB(fbKey){
 <div class="screen active" id="s-home">
   <div class="topbar">
     <img class="tb-logo" src="/topbar-logo.png" alt="BL">
-    <span class="tb-title">Barafu Luxe</span>
+    <span class="tb-title tb-title-brand">Barafu <em>Luxe</em></span>
     <div style="display:flex;align-items:center;gap:2px;">
       <button class="tb-icon" onclick="openSearch()"><i class="ti ti-search"></i></button>
       <button class="tb-icon" style="position:relative;" onclick="openNotifications()"><i class="ti ti-bell"></i><span class="notif" id="notif-dot" style="display:none;"></span></button>
