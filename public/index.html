@@ -497,6 +497,16 @@ body.outdoor-mode .tb-logo{
   filter:contrast(1.35) brightness(1.15) saturate(1.1);
 }
 
+/* Scales the whole rendered app uniformly - text, spacing, icons all
+   together - rather than rewriting every individual hardcoded font-size
+   declaration throughout the app, which given the scale of this
+   codebase would be its own large, separate undertaking. One toggle
+   that works the same way regardless of whether someone finds the type
+   too small to read comfortably or just prefers it larger. */
+body.large-text{
+  zoom:1.18;
+}
+
 html,body{height:100%;background:var(--black);color:var(--ow);font-family:'Montserrat',sans-serif;font-weight:300;overflow:hidden;-webkit-tap-highlight-color:transparent;}
 
 /* ── SHELL ── */
@@ -2370,6 +2380,12 @@ function removeBookingFB(fbKey){
         <span class="bl-switch-track"></span>
       </label>
     </div>
+    <div class="pli" style="cursor:default;"><i class="ti ti-text-size pli-ico" style="color:var(--gold);"></i><div><div class="pli-name">Larger Text</div><div class="pli-sub">Scales up text throughout the app</div></div>
+      <label class="bl-switch">
+        <input type="checkbox" id="large-text-toggle" onchange="toggleLargeText(this.checked)">
+        <span class="bl-switch-track"></span>
+      </label>
+    </div>
     <div class="pli" style="cursor:default;"><i class="ti ti-language pli-ico" style="color:var(--gold);"></i><div><div class="pli-name">Preferred Language</div><div class="pli-sub">Your concierge replies in this language</div></div>
       <select id="preferred-language-select" onchange="setPreferredLanguage(this.value)" style="background:var(--soft);color:var(--ow);border:0.5px solid var(--bd);border-radius:2px;padding:6px 10px;font-size:11px;">
         <option value="English">English</option>
@@ -3825,6 +3841,7 @@ function go(id, fromPopstate){
   if(id==='s-profile' && currentUser){
     updateProfileForTier(currentUser);
     if(typeof applyOutdoorModeFromStorage==='function') applyOutdoorModeFromStorage();
+    if(typeof applyLargeTextFromStorage==='function') applyLargeTextFromStorage();
     if(typeof loadPreferredLanguage==='function') loadPreferredLanguage();
     var alreadyInstalledNow = window.navigator.standalone===true || (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
     var installItem = document.getElementById('profile-install-item');
@@ -5370,6 +5387,27 @@ function applyOutdoorModeFromStorage(){
   if(toggle) toggle.checked = enabled;
 }
 
+// The app uses small, deliberate type sizes throughout as part of its
+// visual identity - elegant at a glance, but genuinely hard to read for
+// members with presbyopia or other vision differences, which skews
+// relevant given the membership. Rather than rewrite thousands of
+// individual hardcoded font-size declarations (a rewrite that size
+// would be its own large, risky project), this scales the whole
+// rendered app uniformly via zoom - a single, low-risk toggle that
+// works identically whether someone's dealing with tiny text (far/long
+// sighted) or just wants things bigger, rather than a separate control
+// for each case; one adjustable setting standard for all sight needs.
+function toggleLargeText(enabled){
+  document.body.classList.toggle('large-text', enabled);
+  DB.set('large_text', enabled);
+}
+function applyLargeTextFromStorage(){
+  var enabled = !!DB.get('large_text'); // default OFF - this is an opt-in preference, not a default like Outdoor Mode
+  document.body.classList.toggle('large-text', enabled);
+  var toggle = document.getElementById('large-text-toggle');
+  if(toggle) toggle.checked = enabled;
+}
+
 function setPreferredLanguage(lang){
   if(!currentUser || !currentUser.email) return;
   currentUser.language = lang;
@@ -5892,6 +5930,7 @@ window.addEventListener('popstate', function(e){
 
 document.addEventListener('DOMContentLoaded',function(){
   if(typeof applyOutdoorModeFromStorage==='function') applyOutdoorModeFromStorage();
+  if(typeof applyLargeTextFromStorage==='function') applyLargeTextFromStorage();
 
   // Offline banner — calm, not alarming. Doesn't block anything, just
   // explains why fresh data might not be showing, since a blank/stale
