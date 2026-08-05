@@ -845,6 +845,7 @@ html,body{height:100%;background:var(--black);color:var(--ow);font-family:'Monts
 body.outdoor-mode .tier-c.active-tier{border-color:rgba(184,137,42,0.85);background:rgba(184,137,42,0.22);}
 .tier-n{font-size:9px;letter-spacing:0.16em;color:var(--mt);text-transform:uppercase;margin-bottom:5px;}
 .tier-name{font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--ow);margin-bottom:6px;}
+.tier-price{font-size:11px;color:var(--gl);font-weight:500;margin-bottom:6px;}
 .tier-f{font-size:9px;color:var(--mt);line-height:1.6;}
 
 /* ── MODAL ── */
@@ -2336,8 +2337,8 @@ function removeBookingFB(fbKey){
   </div>
   <div class="chat-wrap">
     <div class="chat-msgs" id="chat-msgs">
-      <div class="msg them"><div class="msg-b">Karibu. I'm your Barafu Luxe concierge. Type your request below and we'll connect you instantly on WhatsApp. How can I help you today?</div><div class="msg-t">Barafu Luxe · Now</div></div>
-      <div class="msg them"><div class="msg-b">You can request a transfer, helicopter charter, yacht, F1 hospitality, safari — or anything else. Just type and tap Send. ✦</div><div class="msg-t">Barafu Luxe · Now</div></div>
+      <div class="msg them"><div class="msg-b">Karibu. I'm your concierge — here for whatever you need, arranged quietly, any hour.</div><div class="msg-t">Barafu Luxe · Now</div></div>
+      <div class="msg them"><div class="msg-b">A car, a table, a flight at short notice — or something that doesn't have a name yet. Type below, and we'll continue on WhatsApp. ✦</div><div class="msg-t">Barafu Luxe · Now</div></div>
     </div>
     <div class="chat-bar">
       <input class="chat-inp" id="chat-inp" placeholder="Type your request and we'll connect on WhatsApp..." onkeydown="if(event.key==='Enter')sendMsg()">
@@ -2361,8 +2362,8 @@ function removeBookingFB(fbKey){
   <div class="sec" style="padding-bottom:8px;"><div class="slbl">Membership tiers</div></div>
   <div class="tier-cards">
     <div class="tier-c" data-tier="silver"><div class="tier-n">Tier 1</div><div class="tier-name">Silver</div><div class="tier-f">All services<br>Booking history<br>App access</div></div>
-    <div class="tier-c" data-tier="gold"><div class="tier-n">Tier 2</div><div class="tier-name">Gold ✦</div><div class="tier-f">Priority booking<br>Dedicated concierge<br>10% loyalty</div></div>
-    <div class="tier-c" data-tier="obsidian" onclick="openUpgradeTier()" style="cursor:pointer;"><div class="tier-n">Tier 3</div><div class="tier-name">Obsidian</div><div class="tier-f">24/7 personal<br>First access<br>Annual experience</div></div>
+    <div class="tier-c" data-tier="gold"><div class="tier-n">Tier 2</div><div class="tier-name">Gold ✦</div><div class="tier-price">$200/year</div><div class="tier-f">Priority booking<br>Dedicated concierge<br>10% loyalty</div></div>
+    <div class="tier-c" data-tier="obsidian" onclick="openUpgradeTier()" style="cursor:pointer;"><div class="tier-n">Tier 3</div><div class="tier-name">Obsidian</div><div class="tier-price">$650/year</div><div class="tier-f">24/7 personal<br>First access<br>Annual experience</div></div>
   </div>
   <div id="upgrade-banner" style="margin:0 14px 4px;background:linear-gradient(135deg,#0a0a08,#141208);border:0.5px solid rgba(184,137,42,0.25);border-radius:2px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;">
     <div style="font-size:11px;color:var(--mt);">Upgrade your membership</div>
@@ -3712,6 +3713,11 @@ function buildGroupFleet(){
 // Access cards, Discover, Search, admin pushes, and deep-links from push
 // notifications can ALL reach a screen via go(id) directly, so gating any
 // single entry point individually would leave the others as a bypass.
+// Single source of truth for tier pricing - referenced by the upgrade
+// modals below so the price only needs to change in one place if it
+// ever does. Silver has no fee (entry-level, included by default).
+var TIER_PRICES = { gold: '$200/year', obsidian: '$650/year' };
+
 var SCREEN_TIER_GATES = {
   's-heli': 'gold',
   's-gemstones': 'gold',
@@ -3732,13 +3738,15 @@ function meetsTierGate(screenId){
 function showTierGateModal(screenId){
   var required = SCREEN_TIER_GATES[screenId];
   var requiredLabel = required.charAt(0).toUpperCase()+required.slice(1);
+  var priceLabel = TIER_PRICES[required] || '';
   var names = {'s-heli':'Helicopter Experiences','s-gemstones':'Tanzanite & Gemstone Sourcing','s-f1':'F1 Hospitality','s-realestate':'Real Estate'};
   var icons = {'s-heli':'🚁','s-gemstones':'💠','s-f1':'🏎️','s-realestate':'🏛️'};
   document.getElementById('modal-ttl').textContent = requiredLabel+' Members Only';
   document.getElementById('modal-body').innerHTML = '<div class="fwrap"><div style="text-align:center;padding:20px 0;">'
     +'<div style="font-size:44px;margin-bottom:12px;">'+(icons[screenId]||'✦')+'</div>'
     +'<div style="font-family:Cormorant Garamond,serif;font-size:22px;color:var(--ow);margin-bottom:8px;">'+(names[screenId]||'This experience')+'</div>'
-    +'<div style="font-size:11px;color:var(--mt);line-height:1.7;margin-bottom:16px;">This is available for '+requiredLabel+' members'+(required==='gold'?' and above':'')+'. Upgrade to unlock it.</div>'
+    +'<div style="font-size:11px;color:var(--mt);line-height:1.7;margin-bottom:4px;">This is available for '+requiredLabel+' members'+(required==='gold'?' and above':'')+'.</div>'
+    +(priceLabel?'<div style="font-size:13px;color:var(--gl);font-weight:500;margin-bottom:16px;">'+requiredLabel+' membership — '+priceLabel+'</div>':'<div style="margin-bottom:16px;"></div>')
     +'</div><button class="gbtn" onclick="closeModalNow();window.open(\'https://wa.me/255692312366?text=I+would+like+to+upgrade+to+'+requiredLabel+'+membership\',\'_blank\')">Upgrade to '+requiredLabel+' — Contact concierge</button><button class="gghst" onclick="closeModalNow()">Close</button></div>';
   document.getElementById('modal-bg').classList.add('open');
 }
@@ -8108,6 +8116,7 @@ function showTierUpgradeAlert(commId) {
   var required = COMM_TIER_ACCESS[commId]||'all';
   var tierName = required==='gold'?'Gold':'Obsidian';
   var tierColor = required==='gold'?'var(--gold)':'#CE93D8';
+  var priceLabel = TIER_PRICES[required] || '';
   var icon = comm ? comm.icon : '🔒';
   var name = comm ? comm.name : 'Community';
   // Store tier for the upgrade button
@@ -8117,9 +8126,9 @@ function showTierUpgradeAlert(commId) {
     +'<div style="text-align:center;padding:20px 0;">'
     +'<div style="font-size:44px;margin-bottom:12px;">'+icon+'</div>'
     +'<div style="font-family:Cormorant Garamond,serif;font-size:22px;color:var(--ow);margin-bottom:8px;">'+name+'</div>'
-    +'<div style="font-size:11px;color:var(--mt);line-height:1.7;margin-bottom:16px;">'
-    +'This community is exclusive to <strong style="color:'+tierColor+';">'+tierName+' members</strong>.'
-    +'<br>Upgrade your membership to gain access.</div>'
+    +'<div style="font-size:11px;color:var(--mt);line-height:1.7;margin-bottom:4px;">'
+    +'This community is exclusive to <strong style="color:'+tierColor+';">'+tierName+' members</strong>.</div>'
+    +(priceLabel?'<div style="font-size:13px;color:var(--gl);font-weight:500;margin-bottom:16px;">'+tierName+' membership — '+priceLabel+'</div>':'<div style="margin-bottom:16px;"></div>')
     +'</div>'
     +'<button class="gbtn" onclick="closeModalNow();openUpgradeWhatsApp()">Upgrade to '+tierName+' — Contact concierge</button>'
     +'<button class="gghst" onclick="closeModalNow()">Close</button>'
