@@ -1724,10 +1724,6 @@ function removeBookingFB(fbKey){
 
 <!-- ════ LOGIN SCREEN ════ -->
 <div class="login-shell" id="login-shell">
-  <img class="login-logo" src="/login-logo.png" alt="Barafu Luxe">
-  <div class="login-title">Barafu <em>Luxe</em></div>
-  <div class="login-sub">Private Concierge · Arusha</div>
-  <div class="login-rule"></div>
   <div class="login-tabs">
     <button class="login-tab on" onclick="switchLogin('signin',this)">Sign In</button>
     <button class="login-tab" onclick="switchLogin('signup',this)">Request Access</button>
@@ -8624,16 +8620,19 @@ function openGemsWithTierCheck(){
   if(!currentUser){ showFormError('Please sign in first.'); return; }
   var tier=currentUser.tier;
   if(tier==='gold'||tier==='obsidian'||tier==='admin'){
+    // Tier already confirmed above, so there's nothing to gate here -
+    // set the content visible before navigating rather than after, so
+    // the screen is already correct the instant it appears instead of
+    // showing the locked gate first and swapping it out a moment later
+    // (which is what caused a visible flash/stack effect on open).
+    var gate=document.getElementById('gems-gate');
+    var content=document.getElementById('gems-content');
+    if(gate&&content){
+      gate.style.display='none';
+      content.style.display='block';
+      renderGems('all');
+    }
     go('s-gems');
-    setTimeout(function(){
-      var gate=document.getElementById('gems-gate');
-      var content=document.getElementById('gems-content');
-      if(gate&&content){
-        gate.style.display='none';
-        content.style.display='block';
-        renderGems('all');
-      }
-    },300);
   } else {
     document.getElementById('modal-ttl').textContent='Gold Members Only';
     document.getElementById('modal-body').innerHTML='<div class="fwrap"><div style="text-align:center;padding:20px 0;"><div style="font-size:44px;margin-bottom:12px;">🗝️</div><div style="font-family:Cormorant Garamond,serif;font-size:22px;color:var(--ow);margin-bottom:8px;">Hidden Gems</div><div style="font-size:11px;color:var(--mt);line-height:1.7;margin-bottom:16px;">Exclusive stays and private residences are available for Gold and Obsidian members only.</div></div><button class="gbtn" onclick="closeModalNow();window.open(\'https://wa.me/255692312366?text=I+would+like+to+upgrade+to+Gold+membership\',\'_blank\')">Upgrade to Gold — Contact concierge</button><button class="gghst" onclick="closeModalNow()">Close</button></div>';
