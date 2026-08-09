@@ -152,6 +152,14 @@
 .spa-section-rule{display:flex;align-items:center;gap:12px;padding:16px 16px 8px;}
 .spa-rule-line{flex:1;height:0.5px;background:var(--bd);}
 .spa-rule-lbl{font-size:8px;letter-spacing:0.22em;color:var(--mt);text-transform:uppercase;}
+/* Info / spec rows — Cuisine, Hours, Dress code, pricing breakdowns, etc. */
+.pc-row{display:flex;align-items:baseline;justify-content:space-between;gap:14px;padding:9px 0;border-bottom:0.5px solid var(--bd);}
+.pc-row:last-child{border-bottom:none;}
+.pc-label{font-family:Montserrat,sans-serif;font-size:9px;letter-spacing:0.16em;text-transform:uppercase;color:var(--gold);flex-shrink:0;}
+.pc-val{font-family:'Cormorant Garamond',serif;font-size:15px;color:var(--ow);text-align:right;line-height:1.4;}
+/* Hidden Gems — group headers (Villas / Lodges / …) */
+.gem-group-head{font-family:'Cormorant Garamond',serif;font-size:14px;font-weight:300;letter-spacing:0.08em;color:var(--gold);text-transform:uppercase;padding:20px 14px 10px;margin-top:4px;border-top:0.5px solid var(--bd);}
+.gem-group-head:first-child{border-top:none;margin-top:0;padding-top:6px;}
 .menu-dish{padding:12px 2px;border-bottom:0.5px solid rgba(255,255,255,0.04);}
 .menu-dish:last-child{border-bottom:none;}
 .menu-dish-name{font-family:'Cormorant Garamond',serif;font-size:17px;color:var(--ow);display:flex;align-items:center;gap:6px;}
@@ -1931,7 +1939,7 @@ function removeBookingFB(fbKey){
       <div class="admin-sec-title">Add Hidden Gem property</div>
       <div class="admin-add-form">
         <input class="admin-inp" id="adm-gem-name" placeholder="Property name">
-        <input class="admin-inp" id="adm-gem-type" placeholder="Type: safari / villa / camp / residence / retreat">
+        <input class="admin-inp" id="adm-gem-type" placeholder="Type: lodge / villa / camp / residence / retreat">
         <input class="admin-inp" id="adm-gem-location" placeholder="Location">
         <input class="admin-inp" id="adm-gem-desc" placeholder="Description">
         <input class="admin-inp" id="adm-gem-base" type="number" placeholder="Partner rate per night ($)">
@@ -4631,11 +4639,38 @@ var DEFAULT_BOOKINGS=[
 ];
 
 function openAdmin(){
+  // This used to have no access check at all — the "Admin Dashboard" menu
+  // item was only hidden via CSS for non-admins, but openAdmin() itself was
+  // callable by anyone (any logged-in member, any tier, straight from the
+  // browser console) and would happily render full revenue figures, every
+  // member's contact info and tier, and every booking. That's the real
+  // gate now — the hidden menu item is just a convenience shortcut on top.
+  if(!currentUser || currentUser.tier!=='admin'){
+    if(typeof showFormError==='function') showFormError('Admin access only.');
+    return;
+  }
   var s=document.getElementById('admin-shell');
   if(s) s.classList.add('open');
   renderAdminStats();
-  if(window._fbBookings&&window._fbBookings.length>0) renderAdminBookingsFromFB(window._fbBookings);
-  else renderAdminBookings();
+  // This used to fall back to renderAdminBookings(), which shows hardcoded
+  // DEFAULT_BOOKINGS demo data ("Demo Member", made-up dollar amounts) with
+  // nothing distinguishing it from real bookings — and it did that both
+  // before Firebase's first snapshot arrived AND whenever bookings were
+  // genuinely, correctly empty (the `.length>0` check treated a real empty
+  // array the same as "not loaded yet"). An admin glancing at the dashboard
+  // during a slow connection could easily mistake fake data for real
+  // activity. renderAdminBookingsFromFB already has a proper "No bookings
+  // yet." empty state, so it's safe to use for any loaded array, empty or
+  // not — only the genuinely-not-loaded-yet case needs its own message, and
+  // the live window.FB.listenBookings subscription (set up on page load)
+  // already re-renders this list the moment real data arrives while admin
+  // is open, so no extra fetch is needed here.
+  if(Array.isArray(window._fbBookings)){
+    renderAdminBookingsFromFB(window._fbBookings);
+  } else {
+    var bkListEl = document.getElementById('adm-bookings-list');
+    if(bkListEl) bkListEl.innerHTML = '<div style="font-size:11px;color:var(--mt);padding:10px 0;">Loading bookings…</div>';
+  }
   if(typeof renderAdminEvents==='function') renderAdminEvents();
   if(typeof renderDiscoverManageList==='function') renderDiscoverManageList();
 
@@ -6354,7 +6389,7 @@ var GEMS = [
   // Real gallery photos supplied by Chance (Aug 2026) — see
   // /images/gems/acl-lodge/. Rates still on request; pricing intentionally
   // left unset rather than guessed.
-  {id:'acl-lodge',type:'safari',name:'Arusha Coffee Lodge',location:'Arusha, Tanzania',
+  {id:'acl-lodge',type:'lodge',name:'Arusha Coffee Lodge',location:'Arusha, Tanzania',
    desc:'Thirty Plantation Houses set among a working coffee estate at the foot of Mt Meru — a bean-to-cup tour runs right through the fields. On the grounds, Traders Walk gathers five boutiques and a Tanzanite jeweller, alongside Shanga, a social enterprise where Tanzanian artisans with disabilities turn recycled glass into jewellery and glassware. Ten minutes from Arusha Airport, and the natural first or last stop on any Northern Circuit safari.',
    base:null,per:'per person/night — rates on request',
    features:['30 Plantation Houses (18 rooms, 12 suites)','Bean-to-cup coffee tour','Shanga social enterprise','Traders Walk & Tanzanite jeweller','Restaurant, bistro & wood-fired pizza oven','10 min from Arusha Airport'],
@@ -6367,33 +6402,84 @@ var GEMS = [
      {src:'/images/gems/acl-lodge/5.jpg',cap:'Ensuite Bathroom'}
    ]},
   // ── Tarangire Treetops — Elewana Collection partner ──
-  // No real photos or rates supplied yet — Chance to provide both.
-  {id:'tar-treetops',type:'safari',name:'Tarangire Treetops',location:'Tarangire, Tanzania',
+  // No real rates supplied yet — Chance to provide.
+  {id:'tar-treetops',type:'lodge',name:'Tarangire Treetops',location:'Tarangire, Tanzania',
    desc:'Twenty rooms built into a canopy of baobab and marula trees, on raised platforms that feel closer to treehouse than tent. The camp sits alone inside a 312km² private wildlife area on the path of an annual elephant migration — Tarangire holds over 3,000 in the dry season alone. Elewana is one of the largest contributors to the Randilen WMA conservation project that protects this land, and guided bush walks bring it closer still.',
    base:null,per:'per person/night — rates on request',
    features:['20 elevated Treetops rooms','Set in baobab & marula canopy','312km² private wildlife area','On an elephant migration path','Guided bush walks','20 min flight to Kuro Airstrip'],
    icon:'🌳',new:true,verified:true,
-   gallery:[]},
+   gallery:[
+     {src:'/images/gems/tar-treetops/1.jpg',cap:'Main House Beneath the Baobab'},
+     {src:'/images/gems/tar-treetops/2.jpg',cap:'Treehouse Suite Exterior'},
+     {src:'/images/gems/tar-treetops/3.jpg',cap:'Treehouse at First Light'},
+     {src:'/images/gems/tar-treetops/4.jpg',cap:'Suite Bedroom Interior'},
+     {src:'/images/gems/tar-treetops/5.jpg',cap:'Treetop Room & Lounge'},
+     {src:'/images/gems/tar-treetops/6.jpg',cap:'Deck Lounge & Infinity Pool'},
+     {src:'/images/gems/tar-treetops/7.jpg',cap:'Poolside Dining at Sunset'},
+     {src:'/images/gems/tar-treetops/8.jpg',cap:'Sundowner Over the Plains'},
+     {src:'/images/gems/tar-treetops/9.jpg',cap:'Private Bush Dinner'},
+     {src:'/images/gems/tar-treetops/10.jpg',cap:'Boma Dinner Under the Baobab'},
+     {src:'/images/gems/tar-treetops/11.jpg',cap:'Bush Breakfast Setup'},
+     {src:'/images/gems/tar-treetops/12.jpg',cap:'Bush Breakfast Table'},
+     {src:'/images/gems/tar-treetops/13.jpg',cap:'Bush Lunch Spread'},
+     {src:'/images/gems/tar-treetops/14.jpg',cap:'Signature Cocktail'},
+     {src:'/images/gems/tar-treetops/15.jpg',cap:'Spa Massage on the Balcony'},
+     {src:'/images/gems/tar-treetops/16.jpg',cap:'Elephants at the Waterhole'}
+   ]},
   // ── Kilindi Zanzibar — Elewana Collection partner ──
-  // No real photos or rates supplied yet — Chance to provide both.
+  // No real rates supplied yet — Chance to provide.
   {id:'kilindi-znz',type:'villa',name:'Kilindi Zanzibar',location:'Zanzibar, Tanzania',
    desc:'Fifteen domed, pavilion-style villas — each with a private plunge pool — set across 50 acres of garden on a private beach, looking out over a bay traversed by traditional dhows. Originally designed for ABBA\'s Benny Andersson, it\'s built for romance: a favoured honeymoon setting with its own spa, international-Swahili dining prepared to order, and Stone Town, Jozani Forest, and the spice plantations all within reach. About 75 minutes from Zanzibar\'s airport.',
    base:null,per:'per person/night — rates on request',
    features:['15 domed pavilion villas & plunge pools','50 acres of private garden','Originally designed for ABBA\'s Benny Andersson','Private spa & beachfront setting','Diving, spice tours & Stone Town nearby','75 min from Zanzibar Airport'],
    icon:'🏝️',new:true,verified:true,
-   gallery:[]},
+   gallery:[
+     {src:'/images/gems/kilindi-znz/1.jpg',cap:'Villa Exterior at Sunset'},
+     {src:'/images/gems/kilindi-znz/2.jpg',cap:'Domed Villas & Plunge Pools From Above'},
+     {src:'/images/gems/kilindi-znz/3.jpg',cap:'Beach Villa Bedroom'},
+     {src:'/images/gems/kilindi-znz/4.jpg',cap:'Garden Villa Bathroom'},
+     {src:'/images/gems/kilindi-znz/5.jpg',cap:'Private Plunge Pool & Floating Breakfast'},
+     {src:'/images/gems/kilindi-znz/6.jpg',cap:'Restaurant Pathway'},
+     {src:'/images/gems/kilindi-znz/7.jpg',cap:'Aerial Beach Panorama'},
+     {src:'/images/gems/kilindi-znz/8.jpg',cap:'Sunset Dinner on the Beach'},
+     {src:'/images/gems/kilindi-znz/9.jpg',cap:'Spa Massage Under the Palms'},
+     {src:'/images/gems/kilindi-znz/10.jpg',cap:'Infinity Pool at Sunset'},
+     {src:'/images/gems/kilindi-znz/11.jpg',cap:'Infinity Pool at Sunset — Wide View'},
+     {src:'/images/gems/kilindi-znz/12.jpg',cap:'Poolside Daybeds'},
+     {src:'/images/gems/kilindi-znz/13.jpg',cap:'Pool Deck Lounge'},
+     {src:'/images/gems/kilindi-znz/14.jpg',cap:'Rose Petal Bath'},
+     {src:'/images/gems/kilindi-znz/15.jpg',cap:'Hot Stone Massage'},
+     {src:'/images/gems/kilindi-znz/16.jpg',cap:'Spa Treatment Room'}
+   ]},
   // ── Serengeti Explorer — Elewana Collection partner ──
   // Built from the original full Elewana brochure (pages 58-63) rather
-  // than a separate fact sheet - no real photos or rates supplied yet.
-  {id:'serengeti-explorer',type:'safari',name:'Serengeti Explorer',location:'Serengeti, Tanzania',
+  // than a separate fact sheet - no real rates supplied yet.
+  {id:'serengeti-explorer',type:'lodge',name:'Serengeti Explorer',location:'Serengeti, Tanzania',
    desc:'A contemporary read on safari, set high in the Nyaboro Hills with sweeping views over the Serengeti. Sixty-eight rooms and six suites lean into natural colour and texture rather than traditional safari décor, with an outdoor cinema, a star-gazing deck with a trained astronomer, and a full art gallery on site. Less structured than a classic camp — built for travellers who\'d rather explore on their own terms.',
    base:null,per:'per person/night — rates on request',
    features:['68 rooms & 6 suites','Nyaboro Hills, Serengeti views','Star-gazing deck with astronomer','Outdoor cinema & art gallery','Photography studio & lessons','Private wine cellar & chef\'s table'],
    icon:'🔭',new:true,verified:true,
-   gallery:[]},
+   gallery:[
+     {src:'/images/gems/serengeti-explorer/1.jpg',cap:'Aerial View Over the Plains'},
+     {src:'/images/gems/serengeti-explorer/2.jpg',cap:'Lodge & Waterhole From Above'},
+     {src:'/images/gems/serengeti-explorer/3.jpg',cap:'Reception'},
+     {src:'/images/gems/serengeti-explorer/4.jpg',cap:'King Savannah Suite'},
+     {src:'/images/gems/serengeti-explorer/5.jpg',cap:'Suite Bedroom'},
+     {src:'/images/gems/serengeti-explorer/6.jpg',cap:'Suite Bedroom & Private Deck'},
+     {src:'/images/gems/serengeti-explorer/7.jpg',cap:'Ensuite Bathroom'},
+     {src:'/images/gems/serengeti-explorer/8.jpg',cap:'Room Entrance'},
+     {src:'/images/gems/serengeti-explorer/9.jpg',cap:'Fire Pit Lounge at Sunrise'},
+     {src:'/images/gems/serengeti-explorer/10.jpg',cap:'Gym'},
+     {src:'/images/gems/serengeti-explorer/11.jpg',cap:'Path to the Bush Hide'},
+     {src:'/images/gems/serengeti-explorer/12.jpg',cap:'Lounge & Bar at First Light'},
+     {src:'/images/gems/serengeti-explorer/13.jpg',cap:'Lounge & Bar by Night'},
+     {src:'/images/gems/serengeti-explorer/14.jpg',cap:'Breakfast Table at Sunrise'},
+     {src:'/images/gems/serengeti-explorer/15.jpg',cap:'Breakfast Spread — Cold Cuts & Fruit'},
+     {src:'/images/gems/serengeti-explorer/16.jpg',cap:'Breakfast Cheese Selection'}
+   ]},
 ];
 var gemFilter='all';
-var gemTypeLabels={safari:'Safari Lodge',villa:'Beach Villa',camp:'Tented Camp',residence:'Private Residence',retreat:'Wellness Retreat'};
+var gemTypeLabels={lodge:'Lodge',villa:'Villa',camp:'Tented Camp',residence:'Private Residence',retreat:'Wellness Retreat'};
 
 // Educational categories, not live inventory — Barafu Luxe sources on
 // request through licensed Arusha dealers rather than holding fixed stock.
@@ -7609,78 +7695,36 @@ function openEvDetail(id){
 }
 function openAddEventAlert(){
   document.getElementById('modal-ttl').textContent='Event Notifications';
-  document.getElementById('modal-body').innerHTML='     <div class="fwrap">       <div class="info-box" style="margin:0 0 14px;">Get notified when new events are added.</div>       <div class="fgrp"><label class="flbl">Name</label><input class="finp" placeholder="Your name"></div>       <div class="fgrp"><label class="flbl">WhatsApp</label><input class="finp" placeholder="+255 ..."></div>       <button class="gbtn" onclick="submitForm(\'Event Alert Registration\')">Register for alerts</button>     </div>';
+  document.getElementById('modal-body').innerHTML='<div class="fwrap">'
+    +'<div class="info-box" style="margin:0 0 14px;">Get notified when new events are added.</div>'
+    +'<div class="fgrp"><label class="flbl">Name</label><input class="finp" id="eva-name" placeholder="Your name"></div>'
+    +'<div class="fgrp"><label class="flbl">WhatsApp</label><input class="finp" id="eva-phone" placeholder="+255 ..."></div>'
+    +'<button class="gbtn" id="eva-confirm-btn"><i class="ti ti-brand-whatsapp"></i> Register for alerts</button>'
+    +'</div>';
+  var evaBtn = document.getElementById('eva-confirm-btn');
+  if(evaBtn) evaBtn.onclick = function(){
+    var name = (document.getElementById('eva-name')||{}).value||'';
+    var phone = (document.getElementById('eva-phone')||{}).value||'';
+    if(!name || !phone){ showFormError('Please enter your name and WhatsApp number.'); return; }
+    var msg = 'Event Alert Registration\nName: '+name+'\nWhatsApp: '+phone;
+    submitForm('Event Alert Registration', msg);
+    document.getElementById('modal-bg').classList.remove('open');
+    handoffToWhatsApp('https://wa.me/255692312366?text='+encodeURIComponent(msg));
+  };
   document.getElementById('modal-bg').classList.add('open');
 }
 
 // ════ EMPTY LEGS ════
-function renderEL(filter){
-  filter=filter||'all';
-  if(typeof EMPTY_LEGS==='undefined'||!Array.isArray(EMPTY_LEGS)){var _gEl=document.getElementById('el-available');if(_gEl)_gEl.innerHTML='<div class="info-box">Loading deals...</div>';return;}
-  // Auto-load curated if EMPTY_LEGS is empty
-  if(EMPTY_LEGS.length===0&&typeof BFL_CURATED_LEGS!=='undefined'){
-    BFL_CURATED_LEGS.forEach(function(leg){EMPTY_LEGS.push(leg);});
-  }
-  // Robust safety guard
-  if(!EMPTY_LEGS || !Array.isArray(EMPTY_LEGS)) return;
-  if(window._fbLegs && Array.isArray(window._fbLegs) && window._fbLegs.length>0){
-    window._fbLegs.forEach(function(fl){
-      if(fl && fl.fbKey && !EMPTY_LEGS.find(function(l){return l.fbKey===fl.fbKey;})) EMPTY_LEGS.unshift(fl);
-    });
-  }
-  var avail=EMPTY_LEGS.filter(function(e){return e && e.avail && (filter==='all'||e.type===filter||(Array.isArray(e.tags)&&e.tags.includes(filter)));});
-  var filled=(EMPTY_LEGS||[]).filter(function(e){return !e.avail;});
-  var aEl=document.getElementById('el-available');
-  var fEl=document.getElementById('el-filled');
-  if(!aEl) return;
-  var elHtml='';
-  avail.forEach(function(e){
-    elHtml+='<div class="el-card avail"'
-      +' data-route="'+e.from+' to '+e.to+'"'
-      +' data-aircraft="'+e.aircraft+'"'
-      +' data-datetime="'+e.date+' '+(e.time||'')+'"'
-      +' data-price="$'+e.now.toLocaleString()+'"'
-      +' data-was="$'+e.was.toLocaleString()+'">'
-      +'<div class="el-head">'
-      +'<div class="el-top">'
-      +'<div class="el-route">'+e.from+' &rarr; '+e.to+'</div>'
-      +'<span class="el-type-badge '+e.type+'">'+(e.type==='jet'?'&#x2708; Jet':'&#x1F681; Heli')+'</span>'
-      +'</div>'
-      +'<div class="el-meta">'
-      +'<div class="el-meta-item"><div class="el-meta-val">'+e.date+'</div><div class="el-meta-lbl">Date</div></div>'
-      +'<div class="el-meta-item"><div class="el-meta-val">'+(e.time||'TBC')+'</div><div class="el-meta-lbl">Departs</div></div>'
-      +'<div class="el-meta-item"><div class="el-meta-val">'+e.seats+'</div><div class="el-meta-lbl">Seats</div></div>'
-      +'</div>'
-      +'<div style="font-size:10px;color:var(--mt);margin-bottom:10px;">'+e.aircraft+'</div>'
-      +'<div class="el-price-row">'
-      +'<div><div class="el-was">Was $'+e.was.toLocaleString()+'</div><div class="el-now">$'+e.now.toLocaleString()+'</div></div>'
-      +'<div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">'
-      +'<span class="el-save">Save '+e.saving+'%</span>'
-      +'<button class="el-book-btn" onclick="openELBook(this)">Reserve now</button>'
-      +'</div></div>'
-      +'</div></div>';
-  });
-  aEl.innerHTML=avail.length?elHtml:'<div class="info-box" style="text-align:center;">No empty legs available right now.<br>Register for alerts to be notified instantly.</div>';
-  if(fEl){
-    var filledHtml='';
-    filled.forEach(function(e){
-      filledHtml+='<div class="el-card sold">'
-        +'<div class="el-head">'
-        +'<div class="el-top"><div class="el-route">'+e.from+' &rarr; '+e.to+'</div></div>'
-        +'<div style="font-size:10px;color:var(--mt);margin-bottom:8px;">'+e.aircraft+' · '+e.date+'</div>'
-        +'<div class="el-price-row"><div class="el-was">Was $'+e.was.toLocaleString()+'</div><span class="el-sold-tag">Filled</span></div>'
-        +'</div></div>';
-    });
-    fEl.innerHTML=filledHtml;
-  }
-}
 function filterEL(btn,filter){
   document.querySelectorAll('.el-filter').forEach(function(b){b.classList.remove('on');});
   btn.classList.add('on');
   renderEL(filter);
 }
 function openELBook(routeOrEl,aircraft,datetime,price,was){
-  // Support both direct call and button click
+  // Support three calling styles: a DOM element (button click, reads
+  // data-* attributes off the parent card), a leg object (passed directly
+  // by renderEL's live "Book this leg" handler), or explicit
+  // route/aircraft/datetime/price/was string args.
   var route=routeOrEl;
   if(routeOrEl && routeOrEl.tagName){
     // Called from button click - find parent card data
@@ -7691,6 +7735,16 @@ function openELBook(routeOrEl,aircraft,datetime,price,was){
     datetime=card.dataset.datetime||'';
     price=card.dataset.price||'';
     was=card.dataset.was||'';
+  } else if(routeOrEl && typeof routeOrEl==='object' && routeOrEl.from && routeOrEl.to){
+    // Called with a leg object straight from renderEL — without this branch
+    // the whole object was stringified into the route field and every other
+    // field (aircraft/datetime/price/was) came through as undefined.
+    var leg=routeOrEl;
+    route=leg.from+' → '+leg.to;
+    aircraft=leg.aircraft||'';
+    datetime=leg.date+(leg.time?' '+leg.time:'');
+    price='$'+(leg.now!=null?leg.now.toLocaleString():'');
+    was='$'+(leg.was!=null?leg.was.toLocaleString():'');
   }
   document.getElementById('modal-ttl').textContent='Empty Leg · '+route;
   document.getElementById('modal-body').innerHTML='     <div class="fwrap">       <div style="background:rgba(184,137,42,0.06);border:0.5px solid rgba(184,137,42,0.25);padding:12px 14px;margin-bottom:14px;border-radius:2px;">         <div style="font-family:\'Cormorant Garamond\',serif;font-size:24px;color:var(--gl);">'+(route)+'</div>         <div style="font-size:10px;color:var(--mt);margin-top:2px;">'+(aircraft)+' · '+(datetime)+'</div>         <div style="display:flex;align-items:center;gap:10px;margin-top:8px;">           <span style="font-size:11px;color:var(--mt);text-decoration:line-through;">'+(was)+'</span>           <span style="font-family:\'Cormorant Garamond\',serif;font-size:26px;color:var(--gl);">'+(price)+'</span>         </div>       </div>       <div class="fgrp"><label class="flbl">Full name (for manifest)</label><input class="finp" id="el-name" placeholder="Full name"></div>       <div class="fgrp"><label class="flbl">Passport / ID number</label><input class="finp" id="el-passport" placeholder="Required for private aviation"></div>       <div class="fgrp"><label class="flbl">Passengers</label><select class="fsel" id="el-pax"><option>1</option><option>2</option><option>3</option><option>4</option><option>5+</option></select></div>       <div class="fgrp"><label class="flbl">WhatsApp number</label><input class="finp" id="el-phone" placeholder="+255 ..."></div>       <button class="gbtn" id="el-confirm-btn"><i class="ti ti-brand-whatsapp"></i> Reserve this leg now</button>     </div>';
@@ -7716,7 +7770,31 @@ function openELBook(routeOrEl,aircraft,datetime,price,was){
 }
 function openNotifyAlert(){
   document.getElementById('modal-ttl').textContent='Empty Leg Alerts';
-  document.getElementById('modal-body').innerHTML='     <div class="fwrap">       <div class="info-box" style="margin:0 0 14px;">Be first when a new empty leg is posted on your preferred routes.</div>       <div class="fgrp"><label class="flbl">Your name</label><input class="finp" placeholder="Full name"></div>       <div class="fgrp"><label class="flbl">WhatsApp number</label><input class="finp" placeholder="+255 ..."></div>       <div class="fgrp"><label class="flbl">Preferred routes</label>         <label class="fchk"><input type="checkbox" checked><span class="fchk-name">DAR ↔ JRO</span></label>         <label class="fchk"><input type="checkbox" checked><span class="fchk-name">ARK ↔ ZNZ</span></label>         <label class="fchk"><input type="checkbox"><span class="fchk-name">Any domestic route</span></label>       </div>       <button class="gbtn" onclick="submitForm(\'Empty Leg Alert Registration\')">Register for alerts</button>     </div>';
+  document.getElementById('modal-body').innerHTML='<div class="fwrap">'
+    +'<div class="info-box" style="margin:0 0 14px;">Be first when a new empty leg is posted on your preferred routes.</div>'
+    +'<div class="fgrp"><label class="flbl">Your name</label><input class="finp" id="ela-name" placeholder="Full name"></div>'
+    +'<div class="fgrp"><label class="flbl">WhatsApp number</label><input class="finp" id="ela-phone" placeholder="+255 ..."></div>'
+    +'<div class="fgrp"><label class="flbl">Preferred routes</label>'
+    +'<label class="fchk"><input type="checkbox" id="ela-r1" checked><span class="fchk-name">DAR ↔ JRO</span></label>'
+    +'<label class="fchk"><input type="checkbox" id="ela-r2" checked><span class="fchk-name">ARK ↔ ZNZ</span></label>'
+    +'<label class="fchk"><input type="checkbox" id="ela-r3"><span class="fchk-name">Any domestic route</span></label>'
+    +'</div>'
+    +'<button class="gbtn" id="ela-confirm-btn"><i class="ti ti-brand-whatsapp"></i> Register for alerts</button>'
+    +'</div>';
+  var elaBtn = document.getElementById('ela-confirm-btn');
+  if(elaBtn) elaBtn.onclick = function(){
+    var name = (document.getElementById('ela-name')||{}).value||'';
+    var phone = (document.getElementById('ela-phone')||{}).value||'';
+    if(!name || !phone){ showFormError('Please enter your name and WhatsApp number.'); return; }
+    var routes=[];
+    if((document.getElementById('ela-r1')||{}).checked) routes.push('DAR ↔ JRO');
+    if((document.getElementById('ela-r2')||{}).checked) routes.push('ARK ↔ ZNZ');
+    if((document.getElementById('ela-r3')||{}).checked) routes.push('Any domestic route');
+    var msg = 'Empty Leg Alert Registration\nName: '+name+'\nWhatsApp: '+phone+'\nRoutes: '+(routes.length?routes.join(', '):'None selected');
+    submitForm('Empty Leg Alert Registration', msg);
+    document.getElementById('modal-bg').classList.remove('open');
+    handoffToWhatsApp('https://wa.me/255692312366?text='+encodeURIComponent(msg));
+  };
   document.getElementById('modal-bg').classList.add('open');
 }
 
@@ -7766,7 +7844,7 @@ function adminAddSpa(){
 }
 function adminAddGem(){
   var name=(document.getElementById('adm-gem-name')||{}).value||'';
-  var type=(document.getElementById('adm-gem-type')||{}).value||'safari';
+  var type=(document.getElementById('adm-gem-type')||{}).value||'lodge';
   var loc=(document.getElementById('adm-gem-location')||{}).value||'';
   var desc=(document.getElementById('adm-gem-desc')||{}).value||'';
   var base=parseInt((document.getElementById('adm-gem-base')||{}).value)||0;
@@ -8791,9 +8869,9 @@ function openDiningDetail(id){
     +'</div>'
     +'<div style="font-size:11px;color:var(--mt);line-height:1.7;margin-bottom:12px;">'+v.desc+'</div>'
     +'<div style="background:var(--card);border:0.5px solid var(--bd);padding:12px 14px;border-radius:2px;margin-bottom:14px;">'
-    +'<div class="pc-row"><span class="pc-label">Cuisine</span><span style="font-size:11px;color:var(--ow);">'+v.cuisine+'</span></div>'
-    +'<div class="pc-row"><span class="pc-label">Hours</span><span style="font-size:11px;color:var(--ow);">'+v.hours+'</span></div>'
-    +'<div class="pc-row"><span class="pc-label">Dress code</span><span style="font-size:11px;color:var(--ow);">'+v.dress+'</span></div>'
+    +'<div class="pc-row"><span class="pc-label">Cuisine</span><span class="pc-val" style="font-size:13px;">'+v.cuisine+'</span></div>'
+    +'<div class="pc-row"><span class="pc-label">Hours</span><span class="pc-val" style="font-size:13px;">'+v.hours+'</span></div>'
+    +'<div class="pc-row"><span class="pc-label">Dress code</span><span class="pc-val" style="font-size:13px;">'+v.dress+'</span></div>'
     +'</div>'
     +'<div style="font-size:10px;color:var(--gold);margin-bottom:14px;letter-spacing:0.03em;line-height:1.6;">'+v.note+'</div>'
     +(v.hasMenu ? '<button class="gghst" style="width:100%;margin-bottom:14px;" onclick="document.getElementById(\'modal-bg\').classList.remove(\'open\');go(\'s-acl-menu\');">View full menu</button>' : '')
@@ -9681,15 +9759,6 @@ function handoffToWhatsApp(url, confirmMsg){
   setTimeout(function(){ window.open(url, '_blank'); }, 400);
 }
 
-function showToast(msg){
-  var t = document.getElementById('toast-msg');
-  if(!t){
-    t = document.createElement('div');
-    t.id = 'toast-msg';
-    t.style.cssText = 'position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:rgba(184,137,42,0.95);color:#000;padding:10px 20px;border-radius:20px;font-size:11px;font-family:Montserrat,sans-serif;letter-spacing:0.1em;z-index:9999;transition:opacity 0.3s;';
-    document.body.appendChild(t);
-  }
-
 // Native alert() blocks the entire screen until dismissed and looks
 // nothing like the rest of the app - jarring in a brand this deliberate
 // about its own look. Used specifically for form validation messages
@@ -9697,6 +9766,12 @@ function showToast(msg){
 // gold used for success toasts), stays up longer than a normal toast
 // since an error needs to actually be read and acted on, not just
 // glanced at in passing.
+//
+// NOTE: this used to be nested inside a corrupted copy of showToast(),
+// which meant it was never actually defined in the global scope despite
+// being called from a dozen places throughout the app (every one of
+// those calls would have thrown "showFormError is not defined"). Pulled
+// out to its own top-level function so it actually exists at runtime.
 function showFormError(msg){
   var t = document.getElementById('form-error-msg');
   if(!t){
@@ -9710,13 +9785,27 @@ function showFormError(msg){
   clearTimeout(t._hideTimer);
   t._hideTimer = setTimeout(function(){ t.style.opacity = '0'; }, 3800);
 }
-  t.textContent = msg;
-  t.style.opacity = '1';
-  setTimeout(function(){ t.style.opacity = '0'; }, 2500);
-}
 
 
 function unlockSection(gateId, contentId){
+  // Tier check lives HERE now, not only in the openSpaWithTierCheck()/
+  // openGemsWithTierCheck() wrappers that normally lead here. Those wrappers
+  // check tier before navigating to the screen, but the in-screen "Enter"
+  // button on the gate itself called this function directly with no check
+  // of its own — so any path that reached the gate screen without going
+  // through a wrapper (direct go('s-gems')/go('s-spa') navigation, a future
+  // button, the console) could unlock Gold/Obsidian-only content as a
+  // Silver member with a single click.
+  var GATED_TIERS = {'gems-content':'gold', 'spa-content':'gold'};
+  var required = GATED_TIERS[contentId];
+  if(required){
+    var tier = currentUser ? currentUser.tier : null;
+    var allowed = tier==='gold' || tier==='obsidian' || tier==='admin';
+    if(!allowed){
+      if(typeof showFormError==='function') showFormError('This section is available for Gold and Obsidian members.');
+      return;
+    }
+  }
   var gate = document.getElementById(gateId);
   var content = document.getElementById(contentId);
   if(gate) gate.style.display = 'none';
@@ -9758,10 +9847,6 @@ function bookFleet(btn){var n=(btn.dataset.vn||'Yacht');var c=(btn.dataset.vc||'
 
 
 
-function bookTrackedFlight(){
-  var fn = window._trackedFlight || 'Flight';
-  openTransferBook(fn + ' Arrival Transfer', '', 'TZS');
-}
 
 
 function openObsidianLounge(){
@@ -9810,66 +9895,6 @@ function openObsidianLounge(){
   document.getElementById('modal-bg').classList.add('open');
 }
 
-// ════ PROFILE FUNCTIONS ════
-
-function openProfileSettings(){
-  document.getElementById('modal-ttl').textContent = 'Account Settings';
-  var el = document.getElementById('modal-body');
-  el.innerHTML = '';
-  var f = document.createElement('div');
-  f.className = 'fwrap';
-
-  var u = currentUser || {};
-  f.innerHTML =
-    '<div style="text-align:center;padding-bottom:14px;">'
-    +'<div style="font-size:28px;margin-bottom:6px;">'+(u.tier==='obsidian'?'💎':u.tier==='gold'?'✦':'◈')+'</div>'
-    +'<div style="font-family:Cormorant Garamond,serif;font-size:18px;color:var(--ow);">'+(u.name||'Member')+'</div>'
-    +'<div style="font-size:10px;color:var(--mt);">'+(u.email||'')+'</div>'
-    +'</div>'
-    +'<div class="fgrp"><label class="flbl">Display name</label>'
-    +'<input class="finp" id="settings-name" value="'+(u.name||'')+'" placeholder="Your full name"></div>'
-    +'<div class="fgrp"><label class="flbl">WhatsApp number</label>'
-    +'<input class="finp" id="settings-wa" value="'+(u.wa||u.phone||'')+'" placeholder="+255 ..."></div>'
-    +'<div class="fgrp"><label class="flbl">Nationality / Passport country</label>'
-    +'<input class="finp" id="settings-nationality" value="'+(u.nationality||'')+'" placeholder="e.g. Tanzanian, British, American"></div>'
-    +'<div class="fgrp"><label class="flbl">Dietary preferences</label>'
-    +'<input class="finp" id="settings-dietary" value="'+(u.dietary||'')+'" placeholder="e.g. halal, vegetarian, none"></div>'
-    +'<div class="fgrp"><label class="flbl">Special notes for concierge</label>'
-    +'<textarea class="ftxt" id="settings-notes" placeholder="Anniversary dates, preferences, allergies...">'+(u.notes||'')+'</textarea></div>';
-
-  var btn = document.createElement('button');
-  btn.className = 'gbtn';
-  btn.textContent = 'Save changes';
-  btn.onclick = function(){
-    var name = document.getElementById('settings-name').value.trim();
-    var wa = document.getElementById('settings-wa').value.trim();
-    var nationality = document.getElementById('settings-nationality').value.trim();
-    var dietary = document.getElementById('settings-dietary').value.trim();
-    var notes = document.getElementById('settings-notes').value.trim();
-    if(name && currentUser){
-      currentUser.name = name;
-      currentUser.wa = wa;
-      currentUser.nationality = nationality;
-      currentUser.dietary = dietary;
-      currentUser.notes = notes;
-      DB.set('user_'+currentUser.email, JSON.stringify(currentUser));
-      document.getElementById('profile-name').textContent = name;
-      showToast('Settings saved ✓');
-      document.getElementById('modal-bg').classList.remove('open');
-    }
-  };
-  f.appendChild(btn);
-
-  var logoutBtn = document.createElement('button');
-  logoutBtn.className = 'gghst';
-  logoutBtn.style.cssText = 'color:#CC5555;border-color:rgba(204,0,0,0.2);margin-top:6px;';
-  logoutBtn.textContent = 'Sign out';
-  logoutBtn.onclick = function(){ document.getElementById('modal-bg').classList.remove('open'); doLogout(); };
-  f.appendChild(logoutBtn);
-
-  el.appendChild(f);
-  document.getElementById('modal-bg').classList.add('open');
-}
 
 // ── CARATS REWARDS ──
 var CARAT_REWARDS = [
@@ -10017,6 +10042,12 @@ function showTierComparison(){
 function redeemCaratReward(threshold, name){
   if(!confirm('Redeem '+threshold+' Carats for "'+name+'"? Your concierge will confirm by WhatsApp.')) return;
   var msg = 'I would like to redeem '+threshold+' Carats for: '+name;
+  // This used to only hand off to WhatsApp — it never reached Firebase, so
+  // admin had no record a redemption was even requested, despite the app
+  // assuming admin would see and process it (see the deduction note below).
+  // Same fix pattern as every other booking flow: submitForm() first, so it
+  // shows up in the admin bookings list with a Confirm/Decline button.
+  submitForm('Carat Redemption: '+name, msg);
   handoffToWhatsApp('https://wa.me/255692312366?text='+encodeURIComponent(msg));
   // Deduct is handled by admin once the redemption is actually confirmed and
   // fulfilled — not automatically here, since "redeem" is a request, not a
@@ -10241,49 +10272,6 @@ function openMyBookings(){
   }
 }
 
-function openUpgradeTier(){
-  var tier = currentUser ? currentUser.tier : 'silver';
-  if(tier === 'obsidian'){
-    showToast('You are already at Obsidian — the highest tier 💎');
-    return;
-  }
-  document.getElementById('modal-ttl').textContent = 'Upgrade Membership';
-  var el = document.getElementById('modal-body');
-  el.innerHTML = '';
-  var f = document.createElement('div');
-  f.className = 'fwrap';
-
-  var nextTier = tier === 'silver' ? 'Gold' : 'Obsidian';
-  var nextIcon = tier === 'silver' ? '✦' : '💎';
-  var nextColor = tier === 'silver' ? 'var(--gold)' : '#CE93D8';
-  var nextBenefits = tier === 'silver'
-    ? ['Priority booking on all services','Spa & Wellness access (Peaberries + Siringit)','Hidden Gems exclusive stays','10% loyalty credit on all bookings','Dedicated Gold member concierge line']
-    : ['24/7 personal concierge — your own dedicated line','Obsidian Private Lounge in The Barafu Circle','First access to limited experiences','Annual bespoke experience curated for you','Helicopter and yacht priority allocation'];
-
-  var benefitsHtml = nextBenefits.map(function(b){ return '<li style="padding:4px 0;font-size:11px;color:var(--mt);">'+b+'</li>'; }).join('');
-
-  f.innerHTML =
-    '<div style="text-align:center;padding:16px 0 20px;">'
-    +'<div style="font-size:36px;margin-bottom:8px;">'+nextIcon+'</div>'
-    +'<div style="font-family:Cormorant Garamond,serif;font-size:24px;color:'+nextColor+';margin-bottom:4px;">'+nextTier+'</div>'
-    +'<div style="font-size:10px;color:var(--mt);">Upgrade from '+(tier.charAt(0).toUpperCase()+tier.slice(1))+'</div>'
-    +'</div>'
-    +'<ul style="list-style:none;margin-bottom:16px;">'+benefitsHtml+'</ul>'
-    +'<div style="background:rgba(184,137,42,0.04);border:0.5px solid rgba(184,137,42,0.15);padding:12px 14px;border-radius:2px;font-size:10px;color:var(--mt);line-height:1.8;margin-bottom:14px;">'
-    +'Upgrade is handled personally by your concierge. Contact us and we will walk you through the process.</div>';
-
-  var btn = document.createElement('button');
-  btn.className = 'gbtn';
-  btn.textContent = 'Request '+nextTier+' upgrade';
-  btn.onclick = function(){
-    document.getElementById('modal-bg').classList.remove('open');
-    window.open('https://wa.me/255692312366?text=I+would+like+to+upgrade+to+'+nextTier+'+membership', '_blank');
-  };
-  f.appendChild(btn);
-
-  el.appendChild(f);
-  document.getElementById('modal-bg').classList.add('open');
-}
 
 function showToast(msg){
   var t = document.getElementById('toast-msg');
@@ -10299,32 +10287,6 @@ function showToast(msg){
 }
 
 
-function unlockSection(gateId, contentId){
-  var gate = document.getElementById(gateId);
-  var content = document.getElementById(contentId);
-  if(gate) gate.style.display = 'none';
-  if(content) content.style.display = 'block';
-  if(contentId === 'spa-content'){ buildSpaPartnerTabs(); renderSpa('all','all'); }
-  if(contentId === 'gems-content'){ renderGems('all'); }
-}
-
-
-function highlightPartner(partner){
-  window._spaPartner = partner;
-  var pbLine = document.getElementById('pb-line');
-  var sgLine = document.getElementById('sg-line');
-  var pbCard = document.getElementById('spa-partner-peaberries');
-  var sgCard = document.getElementById('spa-partner-siringit');
-  if(pbLine) pbLine.style.width = partner==='peaberries'?'40px':'20px';
-  if(sgLine) sgLine.style.width = partner==='siringit'?'40px':'20px';
-  if(pbCard) pbCard.style.background = partner==='peaberries'?'rgba(184,137,42,0.06)':'var(--soft)';
-  if(sgCard) sgCard.style.background = partner==='siringit'?'rgba(74,158,127,0.06)':'var(--soft)';
-}
-
-
-function bookRoute(btn){var n=(btn.dataset.rn||'Transfer');var usd=(btn.dataset.usd||'');var tzs=(btn.dataset.tzs||'');openTransferBook(n,usd,tzs);}
-function bookF1Route(btn){var n=(btn.dataset.rn||'F1');var d=(btn.dataset.rd||'');var v=(btn.dataset.rv||'');openF1Book(n,d,v);}
-function bookFleet(btn){var n=(btn.dataset.vn||'Yacht');var c=(btn.dataset.vc||'');openYachtBook(n,c,'','','','');}
 
 
 
@@ -10897,11 +10859,55 @@ function showConciergeReply(text){
 }
 
 
-function filterGemsTab(type, btn){
-  document.querySelectorAll('#s-gems .luxury-tab').forEach(function(b){ b.classList.remove('active'); });
-  if(btn) btn.classList.add('active');
-  renderGems(type);
+
+function buildGemPropCard(g, i){
+  var card = document.createElement('div');
+  card.className = 'gem-prop-card';
+  card.dataset.gid = g.id;
+
+  var num = String(i+1).padStart(2,'0');
+  var priceFrom = g.seasons && g.seasons.low ? g.seasons.low.bb
+    : g.seasons && g.seasons.mid ? g.seasons.mid.bb
+    : g.base || 0;
+  var priceDisplay = priceFrom > 0 ? ('$'+priceFrom) : 'On request';
+  var perLabel = g.per || 'per person / night';
+
+  var featsHtml = (g.features||[]).slice(0,5).map(function(f){
+    return '<span class="gem-feat-tag">'+f+'</span>';
+  }).join('');
+
+  card.innerHTML =
+    '<div class="gem-prop-inner">'
+    +'<span class="save-heart'+(isItemSaved(g.id)?' saved':'')+'" data-item-id="'+g.id+'">'+(isItemSaved(g.id)?'❤️':'🤍')+'</span>'
+    +(g.new ? '<div class="gem-new-badge">New ✦</div>' : '')
+    +'<div class="gem-prop-num">'+num+'</div>'
+    +'<div class="gem-prop-icon">'+(g.icon||'🏡')+'</div>'
+    +'<div class="gem-prop-name">'+(g.name||'')+'</div>'
+    +'<div class="gem-prop-loc"><i class="ti ti-map-pin" style="font-size:11px;color:var(--gold);opacity:0.5;"></i>'+(g.location||'')+(g.verified?' &nbsp;<span class="verified-badge"><i class="ti ti-check"></i>Verified Partner</span>':'')+'</div>'
+    +'<div class="gem-prop-desc">'+(g.desc||'')+'</div>'
+    +'<div class="gem-prop-feats">'+featsHtml+'</div>'
+    +'<div class="gem-prop-bottom">'
+    +'<div>'
+    +'<div class="gem-prop-from">From</div>'
+    +'<div class="gem-prop-price">'+priceDisplay+'</div>'
+    +'<div class="gem-prop-per">'+perLabel+'</div>'
+    +'</div>'
+    +'<button class="gem-enquire-btn">View rates</button>'
+    +'</div>'
+    +'</div>';
+
+  var btn = card.querySelector('.gem-enquire-btn');
+  if(btn) btn.onclick = function(e){ e.stopPropagation(); openGemDetail(g.id); };
+  var heart = card.querySelector('.save-heart');
+  if(heart) heart.onclick = function(e){ e.stopPropagation(); toggleSaveItem(this, 'gem', g.id, g.name, g.location, g.icon||'🏡'); };
+  card.onclick = function(){ openGemDetail(this.dataset.gid); };
+  return card;
 }
+
+// Display order + headings for the grouped "All" view — villas first, then
+// lodges, then any other categories that gain properties later.
+var GEM_GROUP_ORDER = ['villa','lodge','camp','residence','retreat'];
+var GEM_GROUP_LABELS = {villa:'Villas',lodge:'Lodges',camp:'Camps',residence:'Residences',retreat:'Retreats'};
 
 function renderGems(filter){
   var el = document.getElementById('gems-list');
@@ -10922,49 +10928,32 @@ function renderGems(filter){
     return;
   }
 
-  filtered.forEach(function(g, i){
-    var card = document.createElement('div');
-    card.className = 'gem-prop-card';
-    card.dataset.gid = g.id;
-
-    var num = String(i+1).padStart(2,'0');
-    var priceFrom = g.seasons && g.seasons.low ? g.seasons.low.bb
-      : g.seasons && g.seasons.mid ? g.seasons.mid.bb
-      : g.base || 0;
-    var priceDisplay = priceFrom > 0 ? ('$'+priceFrom) : 'On request';
-    var perLabel = g.per || 'per person / night';
-
-    var featsHtml = (g.features||[]).slice(0,5).map(function(f){
-      return '<span class="gem-feat-tag">'+f+'</span>';
-    }).join('');
-
-    card.innerHTML =
-      '<div class="gem-prop-inner">'
-      +'<span class="save-heart'+(isItemSaved(g.id)?' saved':'')+'" data-item-id="'+g.id+'">'+(isItemSaved(g.id)?'❤️':'🤍')+'</span>'
-      +(g.new ? '<div class="gem-new-badge">New ✦</div>' : '')
-      +'<div class="gem-prop-num">'+num+'</div>'
-      +'<div class="gem-prop-icon">'+(g.icon||'🏡')+'</div>'
-      +'<div class="gem-prop-name">'+(g.name||'')+'</div>'
-      +'<div class="gem-prop-loc"><i class="ti ti-map-pin" style="font-size:11px;color:var(--gold);opacity:0.5;"></i>'+(g.location||'')+(g.verified?' &nbsp;<span class="verified-badge"><i class="ti ti-check"></i>Verified Partner</span>':'')+'</div>'
-      +'<div class="gem-prop-desc">'+(g.desc||'')+'</div>'
-      +'<div class="gem-prop-feats">'+featsHtml+'</div>'
-      +'<div class="gem-prop-bottom">'
-      +'<div>'
-      +'<div class="gem-prop-from">From</div>'
-      +'<div class="gem-prop-price">'+priceDisplay+'</div>'
-      +'<div class="gem-prop-per">'+perLabel+'</div>'
-      +'</div>'
-      +'<button class="gem-enquire-btn">View rates</button>'
-      +'</div>'
-      +'</div>';
-
-    var btn = card.querySelector('.gem-enquire-btn');
-    if(btn) btn.onclick = function(e){ e.stopPropagation(); openGemDetail(g.id); };
-    var heart = card.querySelector('.save-heart');
-    if(heart) heart.onclick = function(e){ e.stopPropagation(); toggleSaveItem(this, 'gem', g.id, g.name, g.location, g.icon||'🏡'); };
-    card.onclick = function(){ openGemDetail(this.dataset.gid); };
-    el.appendChild(card);
-  });
+  if(!filter || filter==='all'){
+    // Grouped view: a heading per category (Villas, Lodges, …), in a fixed order.
+    var counter = 0;
+    var usedTypes = {};
+    GEM_GROUP_ORDER.forEach(function(t){
+      var items = filtered.filter(function(g){ return g.type===t; });
+      if(!items.length) return;
+      usedTypes[t] = true;
+      var head = document.createElement('div');
+      head.className = 'gem-group-head';
+      head.textContent = GEM_GROUP_LABELS[t] || t;
+      el.appendChild(head);
+      items.forEach(function(g){ el.appendChild(buildGemPropCard(g, counter)); counter++; });
+    });
+    // Safety net for any type not covered above, so nothing silently disappears.
+    var leftover = filtered.filter(function(g){ return !usedTypes[g.type]; });
+    if(leftover.length){
+      var head2 = document.createElement('div');
+      head2.className = 'gem-group-head';
+      head2.textContent = 'More';
+      el.appendChild(head2);
+      leftover.forEach(function(g){ el.appendChild(buildGemPropCard(g, counter)); counter++; });
+    }
+  } else {
+    filtered.forEach(function(g, i){ el.appendChild(buildGemPropCard(g, i)); });
+  }
 }
 
 
