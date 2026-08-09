@@ -2433,7 +2433,7 @@ function removeBookingFB(fbKey){
     <div style="font-size:11px;color:var(--mt);">Upgrade your membership</div>
     <button onclick="openUpgradeTier()" style="background:rgba(184,137,42,0.1);border:0.5px solid rgba(184,137,42,0.3);color:var(--gold);padding:5px 12px;border-radius:2px;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;font-family:Montserrat,sans-serif;cursor:pointer;">Upgrade ↗</button>
   </div>
-  <div class="plist"><div class="pli" id="profile-spa-access" onclick="openSpaWithTierCheck()" style="display:none;"><i class="ti ti-sparkles pli-ico" style="color:var(--gold);"></i><div><div class="pli-name">Spa & Wellness</div><div class="pli-sub">Peaberries · Siringit · Book treatment</div></div><i class="ti ti-chevron-right pli-arr"></i></div><div class="pli" id="profile-gems-access" onclick="openGemsWithTierCheck()" style="display:none;"><i class="ti ti-diamond pli-ico" style="color:var(--ocean-soft);"></i><div><div class="pli-name">Hidden Gems</div><div class="pli-sub">Exclusive stays · Members only</div></div><i class="ti ti-chevron-right pli-arr"></i></div>
+  <div class="plist">
     <div class="pli" onclick="openMyBookings()"><i class="ti ti-file-invoice pli-ico"></i><div><div class="pli-name">My Bookings</div><div class="pli-sub">View confirmed and pending</div></div><i class="ti ti-chevron-right pli-arr"></i></div>
     <div class="pli" onclick="openPaymentDetails()"><i class="ti ti-credit-card pli-ico"></i><div><div class="pli-name">Payment Details</div><div class="pli-sub">Bank · Airtel Money · M-Pesa</div></div><i class="ti ti-chevron-right pli-arr"></i></div>
     <div class="pli" onclick="openSavedItems()"><span class="pli-ico" style="color:#e57373;">🤍</span><div><div class="pli-name">Saved</div><div class="pli-sub">Villas, dining & experiences you've saved</div></div><i class="ti ti-chevron-right pli-arr"></i></div>
@@ -6436,11 +6436,11 @@ var GEMS = [
   // Real gallery photos supplied by Chance (Aug 2026) — see
   // /images/gems/acl-lodge/. Rates still on request; pricing intentionally
   // left unset rather than guessed.
-  {id:'acl-lodge',type:'lodge',name:'Arusha Coffee Lodge',location:'Arusha, Tanzania · Elewana Collection',
+  {id:'acl-lodge',type:'lodge',name:'Arusha Coffee Lodge',location:'Arusha, Tanzania',
    desc:'Thirty Plantation Houses set among a working coffee estate at the foot of Mt Meru — a bean-to-cup tour runs right through the fields. On the grounds, Traders Walk gathers five boutiques and a Tanzanite jeweller, alongside Shanga, a social enterprise where Tanzanian artisans with disabilities turn recycled glass into jewellery and glassware. Ten minutes from Arusha Airport, and the natural first or last stop on any Northern Circuit safari.',
    base:null,per:'per person/night — rates on request',
    features:['30 Plantation Houses (18 rooms, 12 suites)','Bean-to-cup coffee tour','Shanga social enterprise','Traders Walk & Tanzanite jeweller','Restaurant, bistro & wood-fired pizza oven','10 min from Arusha Airport'],
-   icon:'☕',new:true,verified:true,elewana:true,
+   icon:'☕',new:true,verified:true,
    gallery:[
      {src:'/images/gems/acl-lodge/1.jpg',cap:'Plantation House Exterior'},
      {src:'/images/gems/acl-lodge/2.jpg',cap:'Plantation House at Sunrise'},
@@ -6450,11 +6450,11 @@ var GEMS = [
    ]},
   // ── Tarangire Treetops — Elewana Collection partner ──
   // No real rates supplied yet — Chance to provide.
-  {id:'tar-treetops',type:'lodge',name:'Tarangire Treetops',location:'Tarangire, Tanzania · Elewana Collection',
+  {id:'tar-treetops',type:'lodge',name:'Tarangire Treetops',location:'Tarangire, Tanzania',
    desc:'Twenty rooms built into a canopy of baobab and marula trees, on raised platforms that feel closer to treehouse than tent. The camp sits alone inside a 312km² private wildlife area on the path of an annual elephant migration — Tarangire holds over 3,000 in the dry season alone. Elewana is one of the largest contributors to the Randilen WMA conservation project that protects this land, and guided bush walks bring it closer still.',
    base:null,per:'per person/night — rates on request',
    features:['20 elevated Treetops rooms','Set in baobab & marula canopy','312km² private wildlife area','On an elephant migration path','Guided bush walks','20 min flight to Kuro Airstrip'],
-   icon:'🌳',new:true,verified:true,elewana:true,
+   icon:'🌳',new:true,verified:true,
    gallery:[
      {src:'/images/gems/tar-treetops/1.jpg',cap:'Main House Beneath the Baobab'},
      {src:'/images/gems/tar-treetops/2.jpg',cap:'Treehouse Suite Exterior'},
@@ -6475,11 +6475,11 @@ var GEMS = [
    ]},
   // ── Kilindi Zanzibar — Elewana Collection partner ──
   // No real rates supplied yet — Chance to provide.
-  {id:'kilindi-znz',type:'villa',name:'Kilindi Zanzibar',location:'Zanzibar, Tanzania · Elewana Collection',
+  {id:'kilindi-znz',type:'villa',name:'Kilindi Zanzibar',location:'Zanzibar, Tanzania',
    desc:'Fifteen domed, pavilion-style villas — each with a private plunge pool — set across 50 acres of garden on a private beach, looking out over a bay traversed by traditional dhows. Originally designed for ABBA\'s Benny Andersson, it\'s built for romance: a favoured honeymoon setting with its own spa, international-Swahili dining prepared to order, and Stone Town, Jozani Forest, and the spice plantations all within reach. About 75 minutes from Zanzibar\'s airport.',
    base:null,per:'per person/night — rates on request',
    features:['15 domed pavilion villas & plunge pools','50 acres of private garden','Originally designed for ABBA\'s Benny Andersson','Private spa & beachfront setting','Diving, spice tours & Stone Town nearby','75 min from Zanzibar Airport'],
-   icon:'🏝️',new:true,verified:true,elewana:true,
+   icon:'🏝️',new:true,verified:true,
    gallery:[
      {src:'/images/gems/kilindi-znz/1.jpg',cap:'Villa Exterior at Sunset'},
      {src:'/images/gems/kilindi-znz/2.jpg',cap:'Domed Villas & Plunge Pools From Above'},
@@ -6501,11 +6501,11 @@ var GEMS = [
   // ── Serengeti Explorer — Elewana Collection partner ──
   // Built from the original full Elewana brochure (pages 58-63) rather
   // than a separate fact sheet - no real rates supplied yet.
-  {id:'serengeti-explorer',type:'lodge',name:'Serengeti Explorer',location:'Serengeti, Tanzania · Elewana Collection',
+  {id:'serengeti-explorer',type:'lodge',name:'Serengeti Explorer',location:'Serengeti, Tanzania',
    desc:'A contemporary read on safari, set high in the Nyaboro Hills with sweeping views over the Serengeti. Sixty-eight rooms and six suites lean into natural colour and texture rather than traditional safari décor, with an outdoor cinema, a star-gazing deck with a trained astronomer, and a full art gallery on site. Less structured than a classic camp — built for travellers who\'d rather explore on their own terms.',
    base:null,per:'per person/night — rates on request',
    features:['68 rooms & 6 suites','Nyaboro Hills, Serengeti views','Star-gazing deck with astronomer','Outdoor cinema & art gallery','Photography studio & lessons','Private wine cellar & chef\'s table'],
-   icon:'🔭',new:true,verified:true,elewana:true,
+   icon:'🔭',new:true,verified:true,
    gallery:[
      {src:'/images/gems/serengeti-explorer/1.jpg',cap:'Aerial View Over the Plains'},
      {src:'/images/gems/serengeti-explorer/2.jpg',cap:'Lodge & Waterhole From Above'},
@@ -6525,11 +6525,6 @@ var GEMS = [
      {src:'/images/gems/serengeti-explorer/16.jpg',cap:'Breakfast Cheese Selection'}
    ]},
 ];
-// Shared live availability calendar for every Elewana Collection property —
-// one portfolio-wide ResRequest booking engine covers all Elewana lodges/camps,
-// rather than a separate calendar per property. Members select the specific
-// property inside the calendar itself.
-var ELEWANA_AVAILABILITY_URL='https://elewana.resrequest.com/page/public/availabilitycalendar';
 var gemFilter='all';
 var gemTypeLabels={lodge:'Lodge',villa:'Villa',camp:'Tented Camp',residence:'Private Residence',retreat:'Wellness Retreat'};
 
@@ -7646,9 +7641,7 @@ function openGemDetail(id){
     +'<div style="margin-bottom:14px;">'+featsHtml+'</div>'
     +seasonHtml
     +((!g.seasons && g.base)?'<div class="price-calc"><div class="pc-total"><span class="pc-total-lbl">From per night</span><span class="pc-total-val">$'+g.base+'</span></div></div>':'')
-    +((!g.seasons && !g.base)?'<div class="price-calc"><div class="pc-total"><span class="pc-total-lbl">Rates</span><span class="pc-total-val" style="font-size:14px;">On request</span></div></div>':'')
-    +(g.elewana?('<a href="'+ELEWANA_AVAILABILITY_URL+'" target="_blank" rel="noopener noreferrer" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;box-sizing:border-box;padding:12px;margin-top:14px;background:transparent;border:0.5px solid var(--gold);color:var(--gold);font-size:10px;letter-spacing:0.16em;text-transform:uppercase;border-radius:2px;text-decoration:none;font-family:Montserrat,sans-serif;font-weight:500;"><i class="ti ti-calendar-event"></i> Check Live Availability</a>'
-      +'<div style="font-size:9px;color:var(--mt);text-align:center;margin-top:6px;line-height:1.6;">Opens the Elewana Collection booking calendar — select '+(g.name||'this property')+' to see open dates</div>'):'');
+    +((!g.seasons && !g.base)?'<div class="price-calc"><div class="pc-total"><span class="pc-total-lbl">Rates</span><span class="pc-total-val" style="font-size:14px;">On request</span></div></div>':'');
 
   var btn=document.createElement('button');
   btn.className='gbtn';
@@ -8302,12 +8295,6 @@ function updateProfileForTier(user) {
 
   // Perks list
   if(tierPerks) { var pk=''; config.perks.forEach(function(p){pk+='<li>'+p+'</li>';}); tierPerks.innerHTML=pk; }
-
-  // Show/hide spa & gems for gold+
-  var spaAccess = document.getElementById('profile-spa-access');
-  var gemsAccess = document.getElementById('profile-gems-access');
-  if(spaAccess) spaAccess.style.display = (tier==='gold'||tier==='obsidian'||tier==='admin') ? 'flex' : 'none';
-  if(gemsAccess) gemsAccess.style.display = (tier==='gold'||tier==='obsidian'||tier==='admin') ? 'flex' : 'none';
 
   // Obsidian — add special concierge number
   var waItem = document.querySelector('.pli .ti-brand-whatsapp');
