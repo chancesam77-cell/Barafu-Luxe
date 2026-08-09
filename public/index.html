@@ -1715,9 +1715,9 @@ function removeBookingFB(fbKey){
   z-index:99999;
   transition:opacity 0.5s ease;
 ">
-  <img src="/splash-logo.png" 
-    style="width:150px;height:auto;opacity:0;transform:scale(0.88);animation:blLogoReveal 1.1s cubic-bezier(.19,1,.22,1) 0.15s forwards;filter:drop-shadow(0 0 0 rgba(184,137,42,0));" 
-    alt="Barafu Luxe">
+  <img src="/splash-logo.png"
+    style="width:150px;height:auto;opacity:0;transform:scale(0.88);animation:blLogoReveal 1.1s cubic-bezier(.19,1,.22,1) 0.15s forwards;filter:drop-shadow(0 0 0 rgba(184,137,42,0));"
+    alt="Barafu Luxe" onerror="this.style.display='none';">
   <div style="
     margin-top:18px;font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:300;color:var(--ow);
     opacity:0;transform:translateY(6px);animation:blWordmarkReveal 0.9s cubic-bezier(.19,1,.22,1) 0.5s forwards;
@@ -2020,7 +2020,7 @@ function removeBookingFB(fbKey){
 <!-- ════════════════════ HOME ════════════════════ -->
 <div class="screen active" id="s-home">
   <div class="topbar">
-    <img class="tb-logo" src="/topbar-logo.png" alt="BL">
+    <img class="tb-logo" src="/topbar-logo.png" alt="BL" onerror="this.style.display='none';">
     <span class="tb-title tb-title-brand">Barafu <em>Luxe</em></span>
     <div style="display:flex;align-items:center;gap:2px;">
       <button class="tb-icon" onclick="openSearch()"><i class="ti ti-search"></i></button>
@@ -2401,8 +2401,8 @@ function removeBookingFB(fbKey){
   </div>
   <div class="chat-wrap">
     <div class="chat-msgs" id="chat-msgs">
-      <div class="msg them"><div class="msg-row"><img class="msg-avatar" src="/topbar-logo.png" alt="Barafu Luxe"><div class="msg-b">Karibu. I'm your concierge — here for whatever you need, arranged quietly, any hour.</div></div><div class="msg-t">Barafu Luxe · Now</div></div>
-      <div class="msg them"><div class="msg-row"><img class="msg-avatar" src="/topbar-logo.png" alt="Barafu Luxe"><div class="msg-b">A car, a table, a flight at short notice — or something that doesn't have a name yet. Type below, and we'll continue on WhatsApp. ✦</div></div><div class="msg-t">Barafu Luxe · Now</div></div>
+      <div class="msg them"><div class="msg-row"><img class="msg-avatar" src="/topbar-logo.png" alt="Barafu Luxe" onerror="this.style.display='none';"><div class="msg-b">Karibu. I'm your concierge — here for whatever you need, arranged quietly, any hour.</div></div><div class="msg-t">Barafu Luxe · Now</div></div>
+      <div class="msg them"><div class="msg-row"><img class="msg-avatar" src="/topbar-logo.png" alt="Barafu Luxe" onerror="this.style.display='none';"><div class="msg-b">A car, a table, a flight at short notice — or something that doesn't have a name yet. Type below, and we'll continue on WhatsApp. ✦</div></div><div class="msg-t">Barafu Luxe · Now</div></div>
     </div>
     <div class="chat-bar">
       <input class="chat-inp" id="chat-inp" placeholder="Type your request and we'll connect on WhatsApp..." onkeydown="if(event.key==='Enter')sendMsg()">
@@ -4033,13 +4033,14 @@ function tr(head){
 // ── MODAL ──
 function openModal(title,type){
   document.getElementById('modal-ttl').textContent=title;
-  document.getElementById('modal-body').innerHTML='     <div class="fwrap">       <div class="fgrp"><label class="flbl">Your name</label><input class="finp" id="om-name" placeholder="Full name"></div>       <div class="fgrp"><label class="flbl">Date</label><input class="finp" id="om-date" type="date" style="color-scheme:dark"></div>       <div class="fgrp"><label class="flbl">Guests</label><input class="finp" id="om-guests" type="number" placeholder="Number of guests"></div>       <div class="fgrp"><label class="flbl">Special requests</label><textarea class="ftxt" id="om-notes" placeholder="Tell us more..."></textarea></div>       <button class="gbtn" id="om-confirm-btn"><i class="ti ti-brand-whatsapp"></i> Send request</button>     </div>';
+  document.getElementById('modal-body').innerHTML='     <div class="fwrap">       <div class="fgrp"><label class="flbl">Your name</label><input class="finp" id="om-name" placeholder="Full name"></div>       <div class="fgrp"><label class="flbl">Date</label><input class="finp" id="om-date" type="date" min="'+todayISODate()+'" style="color-scheme:dark"></div>       <div class="fgrp"><label class="flbl">Guests</label><input class="finp" id="om-guests" type="number" placeholder="Number of guests"></div>       <div class="fgrp"><label class="flbl">Special requests</label><textarea class="ftxt" id="om-notes" placeholder="Tell us more..."></textarea></div>       <button class="gbtn" id="om-confirm-btn"><i class="ti ti-brand-whatsapp"></i> Send request</button>     </div>';
   var btn = document.getElementById('om-confirm-btn');
   if(btn) btn.onclick = function(){
     var name = (document.getElementById('om-name')||{}).value||'';
     var date = (document.getElementById('om-date')||{}).value||'';
     var guests = (document.getElementById('om-guests')||{}).value||'';
     var notes = (document.getElementById('om-notes')||{}).value||'';
+    if(!name){ showFormError('Please enter your name.'); return; }
     var msg = title+' enquiry\n'
       +'Name: '+(name||'Guest')+'\n'
       +'Date: '+(date||'Not specified')+'\n'
@@ -4064,7 +4065,7 @@ function openTransferBook(route, usd, tzs){
     +'<div class="pbox" style="flex:1;"><div class="pbox-val">$'+usd+'</div><div class="pbox-lbl">USD</div></div>'
     +'<div class="pbox" style="flex:1;"><div class="pbox-val">'+tzs+'</div><div class="pbox-lbl">TZS</div></div>'
     +'</div>'
-    +'<div class="fgrp"><label class="flbl">Date</label><input class="finp" id="tr-date" type="date"></div>'
+    +'<div class="fgrp"><label class="flbl">Date</label><input class="finp" id="tr-date" type="date" min="'+todayISODate()+'"></div>'
     +'<div class="fgrp"><label class="flbl">Pick-up time</label><input class="finp" id="tr-time" type="time"></div>'
     +'<div class="fgrp"><label class="flbl">Pick-up location</label><input class="finp" id="tr-pickup" placeholder="Hotel name or address"></div>'
     +'<div class="fgrp"><label class="flbl">Passengers</label><select class="fsel" id="tr-pax"><option>1</option><option>2</option><option>3</option><option>4</option><option>5+</option></select></div>'
@@ -4081,6 +4082,7 @@ function openTransferBook(route, usd, tzs){
     var pax = (document.getElementById('tr-pax')||{}).value||'1';
     var notes = (document.getElementById('tr-notes')||{}).value||'';
     var fastTrack = (document.getElementById('tr-fasttrack')||{}).checked||false;
+    if(!date || !pickup){ showFormError('Please enter a date and pick-up location.'); return; }
     var detail = route + ' | $'+usd+' | '+date+' '+time+' | '+pax+' pax | Pickup: '+pickup+(fastTrack?' | +Fast-Track':'')+(notes?' | '+notes:'');
     var name = currentUser?currentUser.name:'Guest';
     var msg = 'New Transfer Booking\n'
@@ -4217,6 +4219,8 @@ function submitHeliZanzibarEnquiry(){
   var guests=(document.getElementById('hz-guests')||{}).value||'1';
   var notes=(document.getElementById('hz-notes')||{}).value||'';
 
+  if(!name || !date){ showFormError('Please enter your name and a preferred date.'); return; }
+
   var msg='Zanzibar/Pemba Helicopter Transfer Enquiry\n'
     +'Name: '+(name||'Guest')+'\n'
     +'Destination: '+zone+'\n'
@@ -4230,7 +4234,7 @@ function submitHeliZanzibarEnquiry(){
 
 function openHeliBook(dep,price){
   document.getElementById('modal-ttl').textContent='Helicopter Enquiry';
-  document.getElementById('modal-body').innerHTML='     <div class="fwrap">       <div class="fgrp"><label class="flbl">Your name</label><input class="finp" id="hb-name" placeholder="Full name"></div>       <div class="fgrp"><label class="flbl">Preferred date</label><input class="finp" id="hb-date" type="date" style="color-scheme:dark"></div>       <div class="fgrp"><label class="flbl">Departure point</label><select class="fsel" id="hb-dep"><option '+(dep==='Tropic Base'?'selected':'')+'>Tropic Base, Dolly — $8,930</option><option '+(dep==='Arusha Area'?'selected':'')+'>Arusha Area — $9,065</option><option '+(dep==='JRO Airport'?'selected':'')+'>Kilimanjaro Airport — $9,255</option><option '+(dep==='Legendary Lodge'?'selected':'')+'>Legendary Lodge — Custom quote</option></select></div>       <div class="fgrp"><label class="flbl">Guests (max 4 landing, 6 without landing)</label><select class="fsel" id="hb-guests"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select></div>       <div class="flbl" style="margin-bottom:7px;">Upgrades</div>       <label class="fchk"><input type="checkbox" id="hb-up1"><span class="fchk-name">Mountain picnic breakfast</span><span class="fchk-price">+$55/pp</span></label>       <label class="fchk"><input type="checkbox" id="hb-up2"><span class="fchk-name">Sundowner add-on (Rhino Point)</span><span class="fchk-price">+$35/pp</span></label>       <label class="fchk"><input type="checkbox" id="hb-up3"><span class="fchk-name">Nomad Caviar experience</span><span class="fchk-price">Custom</span></label>       <label class="fchk"><input type="checkbox" id="hb-up4"><span class="fchk-name">Champagne upgrade</span><span class="fchk-price">On request</span></label>       <div class="fgrp" style="margin-top:10px;"><label class="flbl">Special requests / occasion</label><textarea class="ftxt" id="hb-notes" placeholder="Anniversary, corporate, specific experience..."></textarea></div>       <button class="gbtn" id="hb-confirm-btn"><i class="ti ti-brand-whatsapp"></i> Send enquiry</button>     </div>';
+  document.getElementById('modal-body').innerHTML='     <div class="fwrap">       <div class="fgrp"><label class="flbl">Your name</label><input class="finp" id="hb-name" placeholder="Full name"></div>       <div class="fgrp"><label class="flbl">Preferred date</label><input class="finp" id="hb-date" type="date" min="'+todayISODate()+'" style="color-scheme:dark"></div>       <div class="fgrp"><label class="flbl">Departure point</label><select class="fsel" id="hb-dep"><option '+(dep==='Tropic Base'?'selected':'')+'>Tropic Base, Dolly — $8,930</option><option '+(dep==='Arusha Area'?'selected':'')+'>Arusha Area — $9,065</option><option '+(dep==='JRO Airport'?'selected':'')+'>Kilimanjaro Airport — $9,255</option><option '+(dep==='Legendary Lodge'?'selected':'')+'>Legendary Lodge — Custom quote</option></select></div>       <div class="fgrp"><label class="flbl">Guests (max 4 landing, 6 without landing)</label><select class="fsel" id="hb-guests"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select></div>       <div class="flbl" style="margin-bottom:7px;">Upgrades</div>       <label class="fchk"><input type="checkbox" id="hb-up1"><span class="fchk-name">Mountain picnic breakfast</span><span class="fchk-price">+$55/pp</span></label>       <label class="fchk"><input type="checkbox" id="hb-up2"><span class="fchk-name">Sundowner add-on (Rhino Point)</span><span class="fchk-price">+$35/pp</span></label>       <label class="fchk"><input type="checkbox" id="hb-up3"><span class="fchk-name">Nomad Caviar experience</span><span class="fchk-price">Custom</span></label>       <label class="fchk"><input type="checkbox" id="hb-up4"><span class="fchk-name">Champagne upgrade</span><span class="fchk-price">On request</span></label>       <div class="fgrp" style="margin-top:10px;"><label class="flbl">Special requests / occasion</label><textarea class="ftxt" id="hb-notes" placeholder="Anniversary, corporate, specific experience..."></textarea></div>       <button class="gbtn" id="hb-confirm-btn"><i class="ti ti-brand-whatsapp"></i> Send enquiry</button>     </div>';
   var btn = document.getElementById('hb-confirm-btn');
   if(btn) btn.onclick = function(){
     var name = (document.getElementById('hb-name')||{}).value||'';
@@ -4243,6 +4247,7 @@ function openHeliBook(dep,price){
     if((document.getElementById('hb-up2')||{}).checked) ups.push('Sundowner add-on (Rhino Point)');
     if((document.getElementById('hb-up3')||{}).checked) ups.push('Nomad Caviar experience');
     if((document.getElementById('hb-up4')||{}).checked) ups.push('Champagne upgrade');
+    if(!name || !date){ showFormError('Please enter your name and a preferred date.'); return; }
     var msg = 'Helicopter Picnic Enquiry\n'
       +'Name: '+(name||'Guest')+'\n'
       +'Date: '+(date||'Not specified')+'\n'
@@ -4273,7 +4278,7 @@ function openYachtBook(name, cap, half, full, live, two){
   f.innerHTML = '<div style="font-family:Cormorant Garamond,serif;font-size:18px;color:var(--ow);margin-bottom:4px;">'+name+'</div>'
     +'<div style="font-size:10px;color:var(--mt);margin-bottom:14px;">'+(cap||'')+'</div>'
     + priceHtml
-    +'<div class="fgrp"><label class="flbl">Charter date</label><input class="finp" id="yt-date" type="date"></div>'
+    +'<div class="fgrp"><label class="flbl">Charter date</label><input class="finp" id="yt-date" type="date" min="'+todayISODate()+'"></div>'
     +'<div class="fgrp"><label class="flbl">Charter type</label>'
     +'<select class="fsel" id="yt-type">'
     +'<option value="half">Half Day (6hrs) — '+(half||'')+'</option>'
@@ -4297,6 +4302,7 @@ function openYachtBook(name, cap, half, full, live, two){
     var guests = (document.getElementById('yt-guests')||{}).value||'';
     var occasion = (document.getElementById('yt-occasion')||{}).value||'';
     var notes = (document.getElementById('yt-notes')||{}).value||'';
+    if(!date){ showFormError('Please choose a charter date.'); return; }
     var msg = 'Yacht Charter Enquiry\n'
       +'Vessel: '+name+'\n'
       +'Type: '+type+'\n'
@@ -4322,6 +4328,7 @@ function openF1Book(race,date,venue){
     var pkg = (document.getElementById('f1b-package')||{}).value||'';
     var from = (document.getElementById('f1b-from')||{}).value||'';
     var notes = (document.getElementById('f1b-notes')||{}).value||'';
+    if(!name){ showFormError('Please enter your name.'); return; }
     var msg = 'F1 Hospitality Enquiry\n'
       +'Race: '+race+'\n'
       +'Dates: '+date+' · '+venue+'\n'
@@ -4369,6 +4376,29 @@ function togglePasswordVisibility(inputId, iconId){
   }
 }
 
+// Simple client-side login rate-limiting. This is not a substitute for
+// server-side throttling (a determined attacker can just clear localStorage
+// or use another browser), but it stops the common case of someone sitting
+// there guessing passwords in the UI.
+function getLoginAttempts(){
+  try{ return JSON.parse(localStorage.getItem('bl_login_attempts')||'{}'); }catch(e){ return {}; }
+}
+function recordFailedLogin(){
+  var a = getLoginAttempts();
+  a.count = (a.count||0)+1;
+  if(a.count>=5){ a.lockedUntil = Date.now() + 5*60*1000; }
+  try{ localStorage.setItem('bl_login_attempts', JSON.stringify(a)); }catch(e){}
+  return a;
+}
+function clearLoginAttempts(){
+  try{ localStorage.removeItem('bl_login_attempts'); }catch(e){}
+}
+function loginLockoutRemaining(){
+  var a = getLoginAttempts();
+  if(a.lockedUntil && a.lockedUntil>Date.now()){ return Math.ceil((a.lockedUntil-Date.now())/1000); }
+  return 0;
+}
+
 function doLogin(){
   var emailEl = document.getElementById('li-email');
   var passEl  = document.getElementById('li-pass');
@@ -4377,6 +4407,13 @@ function doLogin(){
   var pass    = passEl ? passEl.value : '';
 
   if(errEl) errEl.classList.remove('show');
+
+  var lockRemain = loginLockoutRemaining();
+  if(lockRemain>0){
+    if(errEl){ errEl.textContent='Too many failed attempts. Please try again in '+Math.ceil(lockRemain/60)+' minute(s).'; errEl.classList.add('show'); }
+    return;
+  }
+
   if(!email || !pass){
     if(errEl){ errEl.textContent='Please enter email and password.'; errEl.classList.add('show'); }
     return;
@@ -4447,14 +4484,17 @@ function doLogin(){
           if(!found.tier) found.tier='silver';
           if(!found.name) found.name=email.split('@')[0];
           if(!found.initials) found.initials=found.name.slice(0,2).toUpperCase();
+          clearLoginAttempts();
           setSession(found);
           enterApp(found);
         } else {
+          recordFailedLogin();
           if(errEl){ errEl.textContent='Incorrect email or password. Contact your concierge if you need help.'; errEl.classList.add('show'); }
         }
       });
       return;
     }
+    recordFailedLogin();
     if(errEl){ errEl.textContent='Incorrect email or password. Contact your concierge if you need help.'; errEl.classList.add('show'); }
     return;
   }
@@ -4462,6 +4502,7 @@ function doLogin(){
   if(!user.tier) user.tier='silver';
   if(!user.name) user.name=email.split('@')[0];
   if(!user.initials) user.initials=user.name.slice(0,2).toUpperCase();
+  clearLoginAttempts();
   setSession(user);
   enterApp(user);
 }
@@ -5219,6 +5260,14 @@ function copyMemberDetails(name,email,pass){
 
 
 
+// Today's date as YYYY-MM-DD, for use as a `min` attribute on `type="date"`
+// inputs so booking forms can't be submitted with a date already in the
+// past — none of them enforced this before.
+function todayISODate(){
+  var d = new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+
 function submitForm(service, detail){
   var now=new Date();
   var t=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
@@ -5956,8 +6005,6 @@ function sendPushToMember(email, title, body, url, callback){
               action: targetScreen ? ("go('"+targetScreen+"')") : null,
               createdAt: Date.now(),
               read: false
-            }).then(function(){
-              console.log('Notification history saved for', email);
             }).catch(function(err){
               // This was previously console-only — completely invisible.
               // If Firebase security rules are blocking this specific write
@@ -6389,11 +6436,11 @@ var GEMS = [
   // Real gallery photos supplied by Chance (Aug 2026) — see
   // /images/gems/acl-lodge/. Rates still on request; pricing intentionally
   // left unset rather than guessed.
-  {id:'acl-lodge',type:'lodge',name:'Arusha Coffee Lodge',location:'Arusha, Tanzania',
+  {id:'acl-lodge',type:'lodge',name:'Arusha Coffee Lodge',location:'Arusha, Tanzania · Elewana Collection',
    desc:'Thirty Plantation Houses set among a working coffee estate at the foot of Mt Meru — a bean-to-cup tour runs right through the fields. On the grounds, Traders Walk gathers five boutiques and a Tanzanite jeweller, alongside Shanga, a social enterprise where Tanzanian artisans with disabilities turn recycled glass into jewellery and glassware. Ten minutes from Arusha Airport, and the natural first or last stop on any Northern Circuit safari.',
    base:null,per:'per person/night — rates on request',
    features:['30 Plantation Houses (18 rooms, 12 suites)','Bean-to-cup coffee tour','Shanga social enterprise','Traders Walk & Tanzanite jeweller','Restaurant, bistro & wood-fired pizza oven','10 min from Arusha Airport'],
-   icon:'☕',new:true,verified:true,
+   icon:'☕',new:true,verified:true,elewana:true,
    gallery:[
      {src:'/images/gems/acl-lodge/1.jpg',cap:'Plantation House Exterior'},
      {src:'/images/gems/acl-lodge/2.jpg',cap:'Plantation House at Sunrise'},
@@ -6403,11 +6450,11 @@ var GEMS = [
    ]},
   // ── Tarangire Treetops — Elewana Collection partner ──
   // No real rates supplied yet — Chance to provide.
-  {id:'tar-treetops',type:'lodge',name:'Tarangire Treetops',location:'Tarangire, Tanzania',
+  {id:'tar-treetops',type:'lodge',name:'Tarangire Treetops',location:'Tarangire, Tanzania · Elewana Collection',
    desc:'Twenty rooms built into a canopy of baobab and marula trees, on raised platforms that feel closer to treehouse than tent. The camp sits alone inside a 312km² private wildlife area on the path of an annual elephant migration — Tarangire holds over 3,000 in the dry season alone. Elewana is one of the largest contributors to the Randilen WMA conservation project that protects this land, and guided bush walks bring it closer still.',
    base:null,per:'per person/night — rates on request',
    features:['20 elevated Treetops rooms','Set in baobab & marula canopy','312km² private wildlife area','On an elephant migration path','Guided bush walks','20 min flight to Kuro Airstrip'],
-   icon:'🌳',new:true,verified:true,
+   icon:'🌳',new:true,verified:true,elewana:true,
    gallery:[
      {src:'/images/gems/tar-treetops/1.jpg',cap:'Main House Beneath the Baobab'},
      {src:'/images/gems/tar-treetops/2.jpg',cap:'Treehouse Suite Exterior'},
@@ -6428,11 +6475,11 @@ var GEMS = [
    ]},
   // ── Kilindi Zanzibar — Elewana Collection partner ──
   // No real rates supplied yet — Chance to provide.
-  {id:'kilindi-znz',type:'villa',name:'Kilindi Zanzibar',location:'Zanzibar, Tanzania',
+  {id:'kilindi-znz',type:'villa',name:'Kilindi Zanzibar',location:'Zanzibar, Tanzania · Elewana Collection',
    desc:'Fifteen domed, pavilion-style villas — each with a private plunge pool — set across 50 acres of garden on a private beach, looking out over a bay traversed by traditional dhows. Originally designed for ABBA\'s Benny Andersson, it\'s built for romance: a favoured honeymoon setting with its own spa, international-Swahili dining prepared to order, and Stone Town, Jozani Forest, and the spice plantations all within reach. About 75 minutes from Zanzibar\'s airport.',
    base:null,per:'per person/night — rates on request',
    features:['15 domed pavilion villas & plunge pools','50 acres of private garden','Originally designed for ABBA\'s Benny Andersson','Private spa & beachfront setting','Diving, spice tours & Stone Town nearby','75 min from Zanzibar Airport'],
-   icon:'🏝️',new:true,verified:true,
+   icon:'🏝️',new:true,verified:true,elewana:true,
    gallery:[
      {src:'/images/gems/kilindi-znz/1.jpg',cap:'Villa Exterior at Sunset'},
      {src:'/images/gems/kilindi-znz/2.jpg',cap:'Domed Villas & Plunge Pools From Above'},
@@ -6454,11 +6501,11 @@ var GEMS = [
   // ── Serengeti Explorer — Elewana Collection partner ──
   // Built from the original full Elewana brochure (pages 58-63) rather
   // than a separate fact sheet - no real rates supplied yet.
-  {id:'serengeti-explorer',type:'lodge',name:'Serengeti Explorer',location:'Serengeti, Tanzania',
+  {id:'serengeti-explorer',type:'lodge',name:'Serengeti Explorer',location:'Serengeti, Tanzania · Elewana Collection',
    desc:'A contemporary read on safari, set high in the Nyaboro Hills with sweeping views over the Serengeti. Sixty-eight rooms and six suites lean into natural colour and texture rather than traditional safari décor, with an outdoor cinema, a star-gazing deck with a trained astronomer, and a full art gallery on site. Less structured than a classic camp — built for travellers who\'d rather explore on their own terms.',
    base:null,per:'per person/night — rates on request',
    features:['68 rooms & 6 suites','Nyaboro Hills, Serengeti views','Star-gazing deck with astronomer','Outdoor cinema & art gallery','Photography studio & lessons','Private wine cellar & chef\'s table'],
-   icon:'🔭',new:true,verified:true,
+   icon:'🔭',new:true,verified:true,elewana:true,
    gallery:[
      {src:'/images/gems/serengeti-explorer/1.jpg',cap:'Aerial View Over the Plains'},
      {src:'/images/gems/serengeti-explorer/2.jpg',cap:'Lodge & Waterhole From Above'},
@@ -6478,6 +6525,11 @@ var GEMS = [
      {src:'/images/gems/serengeti-explorer/16.jpg',cap:'Breakfast Cheese Selection'}
    ]},
 ];
+// Shared live availability calendar for every Elewana Collection property —
+// one portfolio-wide ResRequest booking engine covers all Elewana lodges/camps,
+// rather than a separate calendar per property. Members select the specific
+// property inside the calendar itself.
+var ELEWANA_AVAILABILITY_URL='https://elewana.resrequest.com/page/public/availabilitycalendar';
 var gemFilter='all';
 var gemTypeLabels={lodge:'Lodge',villa:'Villa',camp:'Tented Camp',residence:'Private Residence',retreat:'Wellness Retreat'};
 
@@ -6597,6 +6649,8 @@ function submitGemstoneSourcing(){
   var form=(document.getElementById('gs-form')||{}).value||'';
   var budget=(document.getElementById('gs-budget')||{}).value||'';
   var notes=(document.getElementById('gs-notes')||{}).value||'';
+
+  if(!name){ showFormError('Please enter your name.'); return; }
 
   var msg='Gemstone Sourcing Request\n'
     +'Name: '+(name||'Guest')+'\n'
@@ -6724,6 +6778,8 @@ function submitRealEstateEnquiry(){
   var budget=(document.getElementById('re-budget')||{}).value||'';
   var notes=(document.getElementById('re-notes')||{}).value||'';
 
+  if(!name){ showFormError('Please enter your name.'); return; }
+
   var msg='Real Estate Introduction Request\n'
     +'Name: '+(name||'Guest')+'\n'
     +'Region: '+region+'\n'
@@ -6802,7 +6858,7 @@ function sendMsg(){
   setTimeout(function(){
     var reply = document.createElement('div');
     reply.className = 'msg them';
-    reply.innerHTML = '<div class="msg-row"><img class="msg-avatar" src="/topbar-logo.png" alt="Barafu Luxe"><div class="msg-b">Message received ❖ Opening WhatsApp to connect you with your concierge now.</div></div>'
+    reply.innerHTML = '<div class="msg-row"><img class="msg-avatar" src="/topbar-logo.png" alt="Barafu Luxe" onerror="this.style.display=\'none\';"><div class="msg-b">Message received ❖ Opening WhatsApp to connect you with your concierge now.</div></div>'
       + '<div class="msg-t">Barafu Luxe · '+ts+'</div>';
     msgs.appendChild(reply);
 
@@ -6843,8 +6899,7 @@ function blSendEmail(name, email, tier, message){
         sent_time:    new Date().toLocaleString('en-GB')
       }
     })
-  }).then(function(r){ console.log('Email sent:', r.status); })
-    .catch(function(e){ console.log('Email error:', e.message); });
+  }).catch(function(e){ console.log('Email error:', e.message); });
 }
 
 // ════ FLIGHT TRACKER ════
@@ -7229,6 +7284,7 @@ function openSpaRetreatDetail(idx){
     var name=(document.getElementById('ret-name')||{}).value||'';
     var dates=(document.getElementById('ret-dates')||{}).value||'';
     var guests=(document.getElementById('ret-guests')||{}).value||'1';
+    if(!name || !dates){ showFormError('Please enter your name and preferred dates.'); return; }
     var msg='Wellness Retreat Enquiry\n'
       +'Retreat: '+r.name+' ('+r.nights+' nights)\n'
       +'Venue: '+r.location+'\n'
@@ -7378,7 +7434,7 @@ function openSpaDetail(id){
     +'<div style="font-size:10px;color:var(--mt);line-height:1.7;margin-bottom:12px;">'+(t.desc||'')+'</div>'
     +incHtml
     +'<div class="fgrp"><label class="flbl">Your name</label><input class="finp" id="sp-name" placeholder="Full name"></div>'
-    +'<div class="fgrp"><label class="flbl">Date</label><input class="finp" id="sp-date" type="date" style="color-scheme:dark"></div>'
+    +'<div class="fgrp"><label class="flbl">Date</label><input class="finp" id="sp-date" type="date" min="'+todayISODate()+'" style="color-scheme:dark"></div>'
     +'<div class="fgrp"><label class="flbl">Preferred time</label><select class="fsel" id="sp-time"><option>Morning (9am–12pm)</option><option>Afternoon (12pm–4pm)</option><option>Evening (4pm–6pm)</option></select></div>'
     +'<div class="fgrp"><label class="flbl">Health notes</label><textarea class="ftxt" id="sp-notes" placeholder="Allergies, injuries, pregnancy..."></textarea></div>';
   var btn=document.createElement('button');
@@ -7389,6 +7445,7 @@ function openSpaDetail(id){
     var date=(document.getElementById('sp-date')||{}).value||'';
     var time=(document.getElementById('sp-time')||{}).value||'';
     var notes=(document.getElementById('sp-notes')||{}).value||'';
+    if(!name || !date){ showFormError('Please enter your name and a preferred date.'); return; }
     var msg='Spa Booking\n'
       +'Treatment: '+t.name+' ('+pName+')\n'
       +'Price: '+blDisplay(t.base)+' · '+t.duration+'\n'
@@ -7589,7 +7646,9 @@ function openGemDetail(id){
     +'<div style="margin-bottom:14px;">'+featsHtml+'</div>'
     +seasonHtml
     +((!g.seasons && g.base)?'<div class="price-calc"><div class="pc-total"><span class="pc-total-lbl">From per night</span><span class="pc-total-val">$'+g.base+'</span></div></div>':'')
-    +((!g.seasons && !g.base)?'<div class="price-calc"><div class="pc-total"><span class="pc-total-lbl">Rates</span><span class="pc-total-val" style="font-size:14px;">On request</span></div></div>':'');
+    +((!g.seasons && !g.base)?'<div class="price-calc"><div class="pc-total"><span class="pc-total-lbl">Rates</span><span class="pc-total-val" style="font-size:14px;">On request</span></div></div>':'')
+    +(g.elewana?('<a href="'+ELEWANA_AVAILABILITY_URL+'" target="_blank" rel="noopener noreferrer" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;box-sizing:border-box;padding:12px;margin-top:14px;background:transparent;border:0.5px solid var(--gold);color:var(--gold);font-size:10px;letter-spacing:0.16em;text-transform:uppercase;border-radius:2px;text-decoration:none;font-family:Montserrat,sans-serif;font-weight:500;"><i class="ti ti-calendar-event"></i> Check Live Availability</a>'
+      +'<div style="font-size:9px;color:var(--mt);text-align:center;margin-top:6px;line-height:1.6;">Opens the Elewana Collection booking calendar — select '+(g.name||'this property')+' to see open dates</div>'):'');
 
   var btn=document.createElement('button');
   btn.className='gbtn';
@@ -7679,6 +7738,11 @@ function openEvDetail(id){
     var name=(document.getElementById('ev-name')||{}).value||'';
     var guests=(document.getElementById('ev-guests')||{}).value||'1';
     var dietary=(document.getElementById('ev-dietary')||{}).value||'';
+    // The name field only exists in the DOM when the event isn't full (the
+    // waitlist state renders an info box instead) — only require it then,
+    // or joining the waitlist would be permanently blocked by a field that
+    // was never shown.
+    if(!full && !name){ showFormError('Please enter your name.'); return; }
     var msg=(full?'Waitlist Request':'Event RSVP')+'\n'
       +'Event: '+(ev.name||'')+'\n'
       +'Date: '+dateStr+' · '+(ev.time||'')+'\n'
@@ -7754,6 +7818,7 @@ function openELBook(routeOrEl,aircraft,datetime,price,was){
     var passport = (document.getElementById('el-passport')||{}).value||'';
     var pax = (document.getElementById('el-pax')||{}).value||'1';
     var phone = (document.getElementById('el-phone')||{}).value||'';
+    if(!name || !passport || !phone){ showFormError('Please enter your name, passport/ID number, and WhatsApp number — all required for the flight manifest.'); return; }
     var msg = 'Empty Leg Reservation\n'
       +'Route: '+route+'\n'
       +'Aircraft: '+aircraft+' · '+datetime+'\n'
@@ -8876,7 +8941,7 @@ function openDiningDetail(id){
     +'<div style="font-size:10px;color:var(--gold);margin-bottom:14px;letter-spacing:0.03em;line-height:1.6;">'+v.note+'</div>'
     +(v.hasMenu ? '<button class="gghst" style="width:100%;margin-bottom:14px;" onclick="document.getElementById(\'modal-bg\').classList.remove(\'open\');go(\'s-acl-menu\');">View full menu</button>' : '')
     +'<div class="fgrp"><label class="flbl">Your name</label><input class="finp" id="dn-name" placeholder="Full name"></div>'
-    +'<div class="fgrp"><label class="flbl">Date</label><input class="finp" id="dn-date" type="date" style="color-scheme:dark"></div>'
+    +'<div class="fgrp"><label class="flbl">Date</label><input class="finp" id="dn-date" type="date" min="'+todayISODate()+'" style="color-scheme:dark"></div>'
     +'<div class="fgrp"><label class="flbl">Time</label><select class="fsel" id="dn-time"><option>Lunch — 12:00</option><option>Lunch — 13:00</option><option>Dinner — 19:00</option><option>Dinner — 20:00</option><option>Dinner — 21:00</option></select></div>'
     +'<div class="fgrp"><label class="flbl">Guests</label><select class="fsel" id="dn-guests"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6+</option></select></div>'
     +'<div class="fgrp"><label class="flbl">Occasion & requests</label><textarea class="ftxt" id="dn-notes" placeholder="Anniversary, dietary requirements, preferred table, wine pairing..."></textarea></div>'
@@ -8889,6 +8954,7 @@ function openDiningDetail(id){
     var time=(document.getElementById('dn-time')||{}).value||'';
     var guests=(document.getElementById('dn-guests')||{}).value||'';
     var notes=(document.getElementById('dn-notes')||{}).value||'';
+    if(!name || !date){ showFormError('Please enter your name and a preferred date.'); return; }
     var msg='Dining Reservation\n'
       +'Venue: '+v.name+'\n'
       +'Name: '+(name||'Guest')+'\n'
@@ -8988,6 +9054,12 @@ window.addEventListener('DOMContentLoaded',function(){
     renderDiscoverFeed();
     updateHomeOnlineCount();
   },500);
+  // hz-date is static markup (built into the page, not generated per-open
+  // like the other booking modals), so it can't inline todayISODate() the
+  // way those do — set its min here instead, once, so it can't be booked
+  // for a date that's already passed.
+  var hzDate = document.getElementById('hz-date');
+  if(hzDate && typeof todayISODate==='function') hzDate.min = todayISODate();
 });
 
 
@@ -9339,7 +9411,7 @@ function openACLReservation(){
   var html = '<div class="fwrap">'
     +'<div style="font-size:10px;color:var(--mt);line-height:1.7;margin-bottom:14px;">Arusha Coffee Lodge · Elewana Collection<br>Dinner 19:00–22:30 · Lunch 12:00–15:00</div>'
     +'<div class="fgrp"><label class="flbl">Your name</label><input class="finp" id="acl-name" placeholder="Full name"></div>'
-    +'<div class="fgrp"><label class="flbl">Date</label><input class="finp" id="acl-date" type="date" style="color-scheme:dark"></div>'
+    +'<div class="fgrp"><label class="flbl">Date</label><input class="finp" id="acl-date" type="date" min="'+todayISODate()+'" style="color-scheme:dark"></div>'
     +'<div class="fgrp"><label class="flbl">Time</label><select class="fsel" id="acl-time"><option>Lunch — 12:00</option><option>Lunch — 13:00</option><option>Dinner — 19:00</option><option>Dinner — 20:00</option><option>Dinner — 21:00</option></select></div>'
     +'<div class="fgrp"><label class="flbl">Number of guests</label><select class="fsel" id="acl-guests"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>Private group 7+</option></select></div>'
     +'<div class="fgrp"><label class="flbl">Occasion</label><input class="finp" id="acl-occasion" placeholder="Anniversary, birthday, business dinner..."></div>'
@@ -9355,6 +9427,7 @@ function openACLReservation(){
     var guests=(document.getElementById('acl-guests')||{}).value||'';
     var occasion=(document.getElementById('acl-occasion')||{}).value||'';
     var dietary=(document.getElementById('acl-dietary')||{}).value||'';
+    if(!name || !date){ showFormError('Please enter your name and a preferred date.'); return; }
     var msg='Grill Room Reservation\n'
       +'Venue: The Grill Room, Arusha Coffee Lodge\n'
       +'Name: '+(name||'Guest')+'\n'
@@ -9547,6 +9620,7 @@ function openEqBook(name, price) {
     var guests=(document.getElementById('eq-guests')||{}).value||'';
     var level=(document.getElementById('eq-level')||{}).value||'';
     var notes=(document.getElementById('eq-notes')||{}).value||'';
+    if(!eqName || !phone || !dates){ showFormError('Please enter your name, WhatsApp number, and preferred dates.'); return; }
     var msg='Equestrian Safari Enquiry\n'
       +'Experience: '+name+'\n'
       +'Price: '+price+'\n'
@@ -9882,6 +9956,7 @@ function openObsidianLounge(){
     var name=(document.getElementById('ob-name')||{}).value||'';
     var purpose=(document.getElementById('ob-purpose')||{}).value||'';
     var desc=(document.getElementById('ob-desc')||{}).value||'';
+    if(!name){ showFormError('Please enter your name.'); return; }
     var msg='Obsidian Circle Introduction Request\n'
       +'Name: '+(name||'Obsidian member')+'\n'
       +'Looking for: '+purpose
@@ -10816,6 +10891,7 @@ function sendBookingToTelegram(service, details){
 
 function startTelegramPolling(){
   if(_tgPollTimer) return;
+  if(typeof BL_TG_TOKEN==='undefined' || typeof BL_TG_CHAT==='undefined' || !BL_TG_TOKEN || !BL_TG_CHAT) return;
   pollTelegramReplies();
   _tgPollTimer = setInterval(function(){ pollTelegramReplies(); }, 10000);
 }
@@ -10825,6 +10901,11 @@ function stopTelegramPolling(){
 }
 
 function pollTelegramReplies(){
+  // Telegram bot credentials aren't configured yet — no-op rather than
+  // throwing on every poll tick. Set window.BL_TG_TOKEN and
+  // window.BL_TG_CHAT (e.g. from Firebase remote config or a build-time
+  // value) to enable inbound concierge replies via Telegram.
+  if(typeof BL_TG_TOKEN==='undefined' || typeof BL_TG_CHAT==='undefined' || !BL_TG_TOKEN || !BL_TG_CHAT) return;
   var url = 'https://api.telegram.org/bot' + BL_TG_TOKEN
     + '/getUpdates?offset=' + (_tgLastUpdateId + 1) + '&timeout=0';
   fetch(url)
@@ -11084,7 +11165,6 @@ function fetchLiveFlights(forceRefresh){
           if(statusEl) statusEl.textContent = 'Schedule (quota reached)';
         }
       } else {
-        console.log('AviationStack returned:', JSON.stringify(data).substring(0,200));
         if(!cached){
           _useFallbackFlights(airport);
           if(statusEl) statusEl.textContent = 'Schedule (offline)';
