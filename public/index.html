@@ -76,6 +76,8 @@
 .ab-status{font-size:8px;letter-spacing:0.12em;text-transform:uppercase;padding:3px 8px;border-radius:2px;}
 .ab-status.pending{background:rgba(255,152,0,0.12);color:#FF9800;}
 .ab-status.confirmed{background:rgba(76,175,80,0.12);color:#4CAF50;}
+.ab-status.declined{background:rgba(229,115,115,0.12);color:#e57373;}
+.ab-btn.decline{background:rgba(229,115,115,0.12);color:#e57373;border-color:rgba(229,115,115,0.3);}
 .admin-member{background:var(--card);border:0.5px solid var(--bd);padding:11px 14px;margin-bottom:6px;border-radius:2px;display:flex;justify-content:space-between;align-items:center;}
 .am-info{}
 .am-name{font-size:12px;color:var(--ow);font-weight:400;margin-bottom:1px;}
@@ -1615,11 +1617,55 @@ function renderAdminBookingsFromFB(bookings){
       var confirmBtn=document.createElement('button');
       confirmBtn.className='ab-btn confirm';
       confirmBtn.textContent='Confirm';
-      confirmBtn.onclick=(function(key){ return function(){
+      confirmBtn.onclick=(function(key,email,service){ return function(){
         if(window.FB&&window.FB.updateBooking) window.FB.updateBooking(key,{status:'confirmed'});
         renderAdminBookingsFromFB(bookings);
-      }; })(b.fbKey);
+        // Confirming is the moment a member most wants to hear from us.
+        // The "How Barafu Luxe Works" copy already promises Carats are
+        // "earned automatically with confirmed bookings" and that members
+        // can track status under My Bookings — but until now this live
+        // Firebase-backed confirm path did neither: it only flipped the
+        // status flag, silently. Award the Carats and push a real
+        // notification so the member hears it from us, not by happening
+        // to reopen the app. (sendPushToMember is declared later in the
+        // page but this only runs on click, long after every script has
+        // loaded, so the forward reference is safe.)
+        if(email){
+          if(window.FB && typeof window.FB.awardCarats==='function'){
+            window.FB.awardCarats(email, 10, 'Booking confirmed: '+service).catch(function(err){
+              console.log('awardCarats failed:', err);
+            });
+          }
+          if(typeof sendPushToMember==='function'){
+            sendPushToMember(email, 'Booking confirmed ✓', (service||'Your booking')+' is confirmed.', '/?screen=s-profile', function(status){
+              if(status==='error') console.log('sendPushToMember failed for', email);
+            });
+          }
+        }
+      }; })(b.fbKey, b.email, b.service);
       actions.appendChild(confirmBtn);
+
+      // Previously the only way to reject a request you couldn't fulfil was
+      // "Archive", which calls window.FB.removeBooking and deletes the
+      // record outright. Since My Bookings listens live on Firebase, that
+      // meant the request just vanished from the member's screen with zero
+      // explanation — worse than leaving it pending forever. Decline keeps
+      // the record (so they can see what happened) and tells them directly,
+      // instead of leaving them to wonder if they imagined submitting it.
+      var declineBtn=document.createElement('button');
+      declineBtn.className='ab-btn decline';
+      declineBtn.textContent='Decline';
+      declineBtn.onclick=(function(key,email,service){ return function(){
+        if(!confirm('Decline this request? The member will be notified.')) return;
+        if(window.FB&&window.FB.updateBooking) window.FB.updateBooking(key,{status:'declined'});
+        renderAdminBookingsFromFB(bookings);
+        if(email && typeof sendPushToMember==='function'){
+          sendPushToMember(email, 'About your request', 'We couldn\'t confirm '+(service||'your request')+' — your concierge will follow up on WhatsApp with alternatives.', '/?screen=s-profile', function(status){
+            if(status==='error') console.log('sendPushToMember failed for', email);
+          });
+        }
+      }; })(b.fbKey, b.email, b.service);
+      actions.appendChild(declineBtn);
     }
     var waBtn=document.createElement('button');
     waBtn.className='ab-btn wa';
@@ -3348,7 +3394,21 @@ var DOOR_GROUPS = {
 };
 
 var DINING_VENUES = [
-  {id:'acl-grill',name:'The Grill Room',location:'Arusha Coffee Lodge · Elewana Collection',desc:'An intimate candlelit grill nestled within the coffee plantation. Contemporary African grill cuisine in one of Arusha\'s most celebrated settings.',cuisine:'Contemporary African Grill',dress:'Smart casual to formal',hours:'Lunch 12:00–15:00 · Dinner 19:00–22:30',note:'Full seasonal set menu — updated July 2026.',icon:'🍽️',hasMenu:true,verified:true},
+  // Gallery photos supplied by Chance (Aug 2026) — see /images/dining/acl-grill/.
+  {id:'acl-grill',name:'The Grill Room',location:'Arusha Coffee Lodge · Elewana Collection',desc:'An intimate candlelit grill nestled within the coffee plantation. Contemporary African grill cuisine in one of Arusha\'s most celebrated settings.',cuisine:'Contemporary African Grill',dress:'Smart casual to formal',hours:'Lunch 12:00–15:00 · Dinner 19:00–22:30',note:'Full seasonal set menu — updated July 2026.',icon:'🍽️',hasMenu:true,verified:true,
+   gallery:[
+     {src:'/images/dining/acl-grill/1.jpg',cap:'Fireside Dining Room'},
+     {src:'/images/dining/acl-grill/2.jpg',cap:'Tapas & Sharing Plates'},
+     {src:'/images/dining/acl-grill/3.jpg',cap:'Grazing Platter Selection'},
+     {src:'/images/dining/acl-grill/4.jpg',cap:'Pan-Seared Chicken & Butternut Purée'},
+     {src:'/images/dining/acl-grill/5.jpg',cap:'Beef Fillet with Foie Gras'},
+     {src:'/images/dining/acl-grill/6.jpg',cap:'Beef Tartare'},
+     {src:'/images/dining/acl-grill/7.jpg',cap:'Sorbet with Garden Flowers'},
+     {src:'/images/dining/acl-grill/8.jpg',cap:'Chocolate & Hazelnut Dessert'},
+     {src:'/images/dining/acl-grill/9.jpg',cap:'Chocolate & Hazelnut Dessert — Detail'},
+     {src:'/images/dining/acl-grill/10.jpg',cap:'Garden Cocktail'},
+     {src:'/images/dining/acl-grill/11.jpg',cap:'Cocktail by the Fire'}
+   ]},
   {id:'gran-melia-grill',name:'The Grill',location:'Gran Meliá Arusha',desc:'A signature steakhouse experience on the hotel\'s top floor, known for premium cuts and sweeping views toward Mount Meru.',cuisine:'Steakhouse · Premium Grill',dress:'Smart casual to formal',hours:'Dinner · hours confirmed at booking',note:'Full menu coming soon — reservations already available through your concierge.',icon:'🥩',hasMenu:false,verified:true},
 ];
 
@@ -4025,12 +4085,24 @@ function openTransferBook(route, usd, tzs){
       +'Passengers: '+pax
       +(fastTrack?'\nVIP Airport Fast-Track: Yes (+$150/pp)':'')
       +(notes?'\nNotes: '+notes:'');
-    if(window.FB&&window.submitFormFB)window.submitFormFB(detail,name);
-    var bk=DB.get('bookings')||DEFAULT_BOOKINGS;
-    var now=new Date();
-    var t=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
-    bk.unshift({id:'b'+Date.now(),service:detail,client:name,detail:'App enquiry',price:'$'+usd,status:'pending',time:t});
-    DB.set('bookings',bk);
+    // This used to call window.submitFormFB(detail,name) here — a function
+    // that is never defined anywhere in this file, so that call was always
+    // a silent no-op (guarded by "window.FB && window.submitFormFB", which
+    // is never true). The booking never reached Firebase. It also wrote
+    // straight to the plain local 'bookings' array with no email field —
+    // a different, device-only store that neither the shared admin panel's
+    // live view nor the member's own "My Bookings" (which listens on
+    // Firebase, keyed by email) ever reads. Since Transfers is the
+    // highest-volume, lowest-price-point service in the app — the one
+    // members would book most often — this meant its entire booking
+    // history existed only as a WhatsApp message: invisible to Confirm,
+    // Decline, Carats, and the confirmation push, unlike every other
+    // service in the app. Route it through the same submitForm() that
+    // Helicopter, Yacht, F1, Dining and everything else already uses
+    // correctly, so Transfers gets the same tracking as everything else —
+    // then still hand off to WhatsApp with the fully detailed message,
+    // which is a better experience than submitForm's own generic prompt.
+    submitForm(route+' | $'+usd, detail);
     document.getElementById('modal-bg').classList.remove('open');
     handoffToWhatsApp('https://wa.me/255692312366?text='+encodeURIComponent(msg));
   };
@@ -6278,14 +6350,46 @@ var GEMS = [
      low:{label:'Apr–May',bb:215,fb:290,ai:365}
    }},
   // ── Arusha Coffee Lodge — Elewana Collection partner ──
-  // No real photos or rates supplied yet — Chance to provide both.
-  // Gallery left empty and pricing left unset on purpose, rather than
-  // filling either with placeholders that could look like real content.
+  // Description and features built from the official fact sheet.
+  // Real gallery photos supplied by Chance (Aug 2026) — see
+  // /images/gems/acl-lodge/. Rates still on request; pricing intentionally
+  // left unset rather than guessed.
   {id:'acl-lodge',type:'safari',name:'Arusha Coffee Lodge',location:'Arusha, Tanzania',
-   desc:'Thirty Plantation Houses set among working coffee fields at the foot of Mt Meru, built around a landowner\'s homestead dating to the early 1900s. The main house holds an à la carte restaurant, a cafe bistro, and a fireside lounge — with a private pool and garden terrace beyond. A natural stop either side of a Northern Circuit safari.',
+   desc:'Thirty Plantation Houses set among a working coffee estate at the foot of Mt Meru — a bean-to-cup tour runs right through the fields. On the grounds, Traders Walk gathers five boutiques and a Tanzanite jeweller, alongside Shanga, a social enterprise where Tanzanian artisans with disabilities turn recycled glass into jewellery and glassware. Ten minutes from Arusha Airport, and the natural first or last stop on any Northern Circuit safari.',
    base:null,per:'per person/night — rates on request',
-   features:['30 Plantation Houses','À la carte restaurant & bistro','Fireside lounge','Private pool','Coffee plantation setting','Ideal pre/post-safari stay'],
+   features:['30 Plantation Houses (18 rooms, 12 suites)','Bean-to-cup coffee tour','Shanga social enterprise','Traders Walk & Tanzanite jeweller','Restaurant, bistro & wood-fired pizza oven','10 min from Arusha Airport'],
    icon:'☕',new:true,verified:true,
+   gallery:[
+     {src:'/images/gems/acl-lodge/1.jpg',cap:'Plantation House Exterior'},
+     {src:'/images/gems/acl-lodge/2.jpg',cap:'Plantation House at Sunrise'},
+     {src:'/images/gems/acl-lodge/3.jpg',cap:'Suite Interior & Canopy Bed'},
+     {src:'/images/gems/acl-lodge/4.jpg',cap:'Private Terrace & Fire Pit'},
+     {src:'/images/gems/acl-lodge/5.jpg',cap:'Ensuite Bathroom'}
+   ]},
+  // ── Tarangire Treetops — Elewana Collection partner ──
+  // No real photos or rates supplied yet — Chance to provide both.
+  {id:'tar-treetops',type:'safari',name:'Tarangire Treetops',location:'Tarangire, Tanzania',
+   desc:'Twenty rooms built into a canopy of baobab and marula trees, on raised platforms that feel closer to treehouse than tent. The camp sits alone inside a 312km² private wildlife area on the path of an annual elephant migration — Tarangire holds over 3,000 in the dry season alone. Elewana is one of the largest contributors to the Randilen WMA conservation project that protects this land, and guided bush walks bring it closer still.',
+   base:null,per:'per person/night — rates on request',
+   features:['20 elevated Treetops rooms','Set in baobab & marula canopy','312km² private wildlife area','On an elephant migration path','Guided bush walks','20 min flight to Kuro Airstrip'],
+   icon:'🌳',new:true,verified:true,
+   gallery:[]},
+  // ── Kilindi Zanzibar — Elewana Collection partner ──
+  // No real photos or rates supplied yet — Chance to provide both.
+  {id:'kilindi-znz',type:'villa',name:'Kilindi Zanzibar',location:'Zanzibar, Tanzania',
+   desc:'Fifteen domed, pavilion-style villas — each with a private plunge pool — set across 50 acres of garden on a private beach, looking out over a bay traversed by traditional dhows. Originally designed for ABBA\'s Benny Andersson, it\'s built for romance: a favoured honeymoon setting with its own spa, international-Swahili dining prepared to order, and Stone Town, Jozani Forest, and the spice plantations all within reach. About 75 minutes from Zanzibar\'s airport.',
+   base:null,per:'per person/night — rates on request',
+   features:['15 domed pavilion villas & plunge pools','50 acres of private garden','Originally designed for ABBA\'s Benny Andersson','Private spa & beachfront setting','Diving, spice tours & Stone Town nearby','75 min from Zanzibar Airport'],
+   icon:'🏝️',new:true,verified:true,
+   gallery:[]},
+  // ── Serengeti Explorer — Elewana Collection partner ──
+  // Built from the original full Elewana brochure (pages 58-63) rather
+  // than a separate fact sheet - no real photos or rates supplied yet.
+  {id:'serengeti-explorer',type:'safari',name:'Serengeti Explorer',location:'Serengeti, Tanzania',
+   desc:'A contemporary read on safari, set high in the Nyaboro Hills with sweeping views over the Serengeti. Sixty-eight rooms and six suites lean into natural colour and texture rather than traditional safari décor, with an outdoor cinema, a star-gazing deck with a trained astronomer, and a full art gallery on site. Less structured than a classic camp — built for travellers who\'d rather explore on their own terms.',
+   base:null,per:'per person/night — rates on request',
+   features:['68 rooms & 6 suites','Nyaboro Hills, Serengeti views','Star-gazing deck with astronomer','Outdoor cinema & art gallery','Photography studio & lessons','Private wine cellar & chef\'s table'],
+   icon:'🔭',new:true,verified:true,
    gallery:[]},
 ];
 var gemFilter='all';
@@ -8674,7 +8778,12 @@ function openDiningDetail(id){
   var v=DINING_VENUES.find(function(x){return x.id===id;});
   if(!v) return;
   document.getElementById('modal-ttl').textContent=v.name;
+  // Dining venues had no gallery UI at all before this — buildGemGalleryHtml/
+  // wireGemGallery/the lightbox are the same generic gg-* machinery Hidden
+  // Gems already uses; they only operate on a plain {src,cap} array, so
+  // reusing them here (rather than duplicating a second copy) is safe.
   document.getElementById('modal-body').innerHTML='<div class="fwrap">'
+    +buildGemGalleryHtml(v)
     +'<div style="text-align:center;padding:8px 0 16px;">'
     +'<div style="font-size:36px;margin-bottom:8px;">'+v.icon+'</div>'
     +'<div style="font-family:Cormorant Garamond,serif;font-size:22px;color:var(--ow);margin-bottom:3px;">'+v.name+'</div>'
@@ -8714,6 +8823,7 @@ function openDiningDetail(id){
     handoffToWhatsApp('https://wa.me/255692312366?text='+encodeURIComponent(msg));
   };
   document.getElementById('modal-bg').classList.add('open');
+  if(v.gallery && v.gallery.length) wireGemGallery(v.gallery);
 }
 
 // ── 7. VELOCITY BLACK + ASMALLWORLD INSPIRED FEED ──
@@ -10023,7 +10133,7 @@ function renderMyBookingsList(bookings){
   }
   var html = '';
   bookings.forEach(function(b, idx){
-    var statusColor = b.status==='confirmed' ? '#4CAF50' : b.status==='pending' ? '#FF9800' : 'var(--mt)';
+    var statusColor = b.status==='confirmed' ? '#4CAF50' : b.status==='pending' ? '#FF9800' : b.status==='declined' ? '#e57373' : 'var(--mt)';
     var hasRealDetail = b.detail && b.detail !== 'App enquiry';
     var canCancel = b.status==='confirmed' || b.status==='pending';
     var cancelMsg = 'I would like to cancel my booking: '+(b.service||'Service')+(b.date?' — '+b.date:'')+(hasRealDetail?'\n\n'+b.detail:'');
