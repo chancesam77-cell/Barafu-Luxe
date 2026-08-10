@@ -1693,6 +1693,16 @@ function renderAdminBookingsFromFB(bookings){
     el.appendChild(div);
   });
 }
+// This is defined inside the <script type="module"> block above, which has
+// its own isolated scope — unlike a classic script, top-level functions in a
+// module do NOT automatically become globally callable. openAdmin() (and
+// anything else outside this module) calling renderAdminBookingsFromFB(...)
+// directly would throw "renderAdminBookingsFromFB is not defined" the
+// instant real booking data exists, silently aborting the rest of whatever
+// function called it — which is exactly what was happening here. Bridging
+// it onto window, the same way window.FB already bridges the rest of this
+// module's Firebase functions, fixes that.
+window.renderAdminBookingsFromFB = renderAdminBookingsFromFB;
 function updateBookingStatus(fbKey, status){
   if(window.FB&&window.FB.updateBooking) window.FB.updateBooking(fbKey,{status:status});
 }
@@ -4692,34 +4702,39 @@ function openAdmin(){
   }
   var s=document.getElementById('admin-shell');
   if(s) s.classList.add('open');
-  renderAdminStats();
-  // This used to fall back to renderAdminBookings(), which shows hardcoded
-  // DEFAULT_BOOKINGS demo data ("Demo Member", made-up dollar amounts) with
-  // nothing distinguishing it from real bookings — and it did that both
-  // before Firebase's first snapshot arrived AND whenever bookings were
-  // genuinely, correctly empty (the `.length>0` check treated a real empty
-  // array the same as "not loaded yet"). An admin glancing at the dashboard
-  // during a slow connection could easily mistake fake data for real
-  // activity. renderAdminBookingsFromFB already has a proper "No bookings
-  // yet." empty state, so it's safe to use for any loaded array, empty or
-  // not — only the genuinely-not-loaded-yet case needs its own message, and
-  // the live window.FB.listenBookings subscription (set up on page load)
-  // already re-renders this list the moment real data arrives while admin
-  // is open, so no extra fetch is needed here.
-  if(Array.isArray(window._fbBookings)){
-    renderAdminBookingsFromFB(window._fbBookings);
-  } else {
-    var bkListEl = document.getElementById('adm-bookings-list');
-    if(bkListEl) bkListEl.innerHTML = '<div style="font-size:11px;color:var(--mt);padding:10px 0;">Loading bookings…</div>';
+
+  // Each dashboard section is rendered independently and wrapped so that a
+  // failure in any one of them (a missing element, an unexpected data shape,
+  // anything) can't silently take down every section rendered after it in
+  // this function. That's exactly what happened before: one section
+  // throwing left the rest of the dashboard stuck on its initial "Loading…"
+  // placeholder with no visible error anywhere.
+  function safeRender(fn){
+    try{ fn(); }catch(e){ console.log('Admin dashboard section failed to render:', e); }
   }
-  if(typeof renderAdminEvents==='function') renderAdminEvents();
-  if(typeof renderDiscoverManageList==='function') renderDiscoverManageList();
+
+  safeRender(renderAdminStats);
+  // Show whatever's already available immediately — real Firebase bookings
+  // if they've arrived, otherwise the local cache — rather than leaving the
+  // panel stuck on a loading message if the live Firebase snapshot is slow
+  // to arrive. The live window.FB.listenBookings subscription (set up on
+  // page load) will swap in the real list the moment it arrives while admin
+  // is open, same as before.
+  safeRender(function(){
+    if(window._fbBookings && window._fbBookings.length>0){
+      renderAdminBookingsFromFB(window._fbBookings);
+    } else {
+      renderAdminBookings();
+    }
+  });
+  if(typeof renderAdminEvents==='function') safeRender(renderAdminEvents);
+  if(typeof renderDiscoverManageList==='function') safeRender(renderDiscoverManageList);
 
   // Render immediately from whatever's cached, so the dashboard isn't blank —
   // then refresh live from Firebase, which is the actual source of truth.
-  renderAdminMembers();
-  renderAdminRequestsFromLocal();
-  renderAdminDiscoverList();
+  safeRender(renderAdminMembers);
+  safeRender(renderAdminRequestsFromLocal);
+  safeRender(renderAdminDiscoverList);
 
   if(window.FB && typeof window.FB.getMembers==='function'){
     window.FB.getMembers(function(members){
