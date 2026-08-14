@@ -3390,21 +3390,30 @@ var COMM_TIER_LABELS = {
   obsidian:'Obsidian Only'
 };
 
+// Discover highlights — the auto-scrolling row on Home. Position 0 always
+// gets the large "featured / This week" treatment (see renderDiscoverFeed),
+// so it's kept as whatever's most worth leading with — currently the new
+// Fly-In Safaris segment. Every sub-line here is a real, current fact
+// pulled from that screen's own data (price floors, live counts, actual
+// race dates) rather than a placeholder — check the source array/screen
+// before changing a number so Discover never quietly drifts out of sync
+// with the section it's promoting.
 var DISCOVER_FEED = [
+  {tag:'FLY-IN SAFARIS · NEW',title:'The Sky Is Your Runway',sub:'Executive air safaris · Kenya, Tanzania & beyond',action:"go('s-skysafari')",color:'#6FA8DC'},
+  {tag:'F1 · NEXT RACE IN 7 DAYS',title:'Paddock Access. Zandvoort.',sub:'Dutch GP · 21–23 Aug · 11 races remaining',action:"go('s-f1')",color:'var(--red)'},
+  {tag:'EMPTY LEGS · LIVE',title:'Fly Private. Pay a Fraction.',sub:'Real-time deals · Up to 75% off',action:"go('s-emptylegs')",color:'#4CAF50'},
   {tag:'HELICOPTER · ARUSHA',title:'Breakfast Above the Clouds',sub:'Mount Meru · 12,000 ft · From $8,930',action:"go('s-heli')",color:'var(--gold)'},
+  {tag:'HIDDEN GEMS',title:'Stay Extraordinary',sub:'5 exclusive properties · Gold & Obsidian',action:'openGemsWithTierCheck()',color:'var(--ocean-soft)'},
   {tag:'YACHT · ZANZIBAR',title:'Your Private Ocean',sub:'Sofia Luxury · Full day from $3,800',action:"go('s-yacht')",color:'var(--ocean-soft)'},
-  {tag:'F1 · 2026',title:'Paddock Access. Private Travel.',sub:'14 races remaining · Custom packages',action:"go('s-f1')",color:'var(--red)'},
-  {tag:'EMPTY LEGS · LIVE',title:'Fly Private. Pay Fraction.',sub:'Real-time deals · Up to 75% off',action:"go('s-emptylegs')",color:'#4CAF50'},
-  {tag:'SPA · MEMBERS',title:'Restore. Renew. Rise.',sub:'Peaberries · Arusha Coffee Lodge',action:'openSpaWithTierCheck()',color:'var(--gl)'},
-  {tag:'HIDDEN GEMS',title:'Stay Extraordinary.',sub:'10 exclusive properties · Gold & Obsidian',action:'openGemsWithTierCheck()',color:'var(--ocean-soft)'},
-  {tag:'PRIVATE DINING',title:'The Table is Set.',sub:'ACL Grill · Gran Meliá',action:"go('s-dining')",color:'var(--gold)'},
-  {tag:'TRANSFERS · ARUSHA',title:'Arrive Without Waiting.',sub:'Airport & hotel transfers · From $60',action:"go('s-transfers')",color:'var(--gold)'},
-  {tag:'EVENTS & GALAS',title:'Where Arusha Gathers.',sub:'Curated invitations · Members only',action:"go('s-events')",color:'#9C27B0'},
-  {tag:'FLIGHT TRACKER · LIVE',title:'Know Before They Land.',sub:'JRO · ARK · DAR · ZNZ · MYW',action:"go('s-flights')",color:'var(--mt)'},
-  {tag:'THE CIRCLE',title:'A Room Worth Being In.',sub:'Private members\' network',action:"go('s-circle')",color:'#D4AF37'},
-  {tag:'EQUESTRIAN',title:'Ride the Rift Valley.',sub:'Guided safari rides · By arrangement',action:"go('s-equestrian')",color:'#8D6E63'},
-  {tag:'TANZANITE & GEMSTONES',title:'Straight From the Source.',sub:'Mererani · Umba · Direct sourcing',action:"go('s-gemstones')",color:'#7C4DFF'},
-  {tag:'REAL ESTATE',title:'Property, Off the Market.',sub:'Off-market introductions · Licensed counsel',action:"go('s-realestate')",color:'var(--gold)'},
+  {tag:'SPA · MEMBERS',title:'Restore. Renew. Rise.',sub:'Peaberries & Siringit · 55 treatments',action:'openSpaWithTierCheck()',color:'var(--gl)'},
+  {tag:'PRIVATE DINING',title:'The Table Is Set',sub:'ACL Grill · Gran Meliá rooftop',action:"go('s-dining')",color:'var(--gold)'},
+  {tag:'TRANSFERS · ARUSHA',title:'Arrive Without Waiting',sub:'Airport & hotel transfers from $60',action:"go('s-transfers')",color:'var(--gold)'},
+  {tag:'EVENTS & GALAS',title:'Where Arusha Gathers',sub:'Curated invitations · Members only',action:"go('s-events')",color:'#9C27B0'},
+  {tag:'FLIGHT TRACKER · LIVE',title:'Know Before They Land',sub:'JRO · ARK · DAR · ZNZ · MYW',action:"go('s-flights')",color:'var(--mt)'},
+  {tag:'THE CIRCLE',title:'A Room Worth Being In',sub:'Private members\' network',action:"go('s-circle')",color:'#D4AF37'},
+  {tag:'EQUESTRIAN',title:'Ride the Rift Valley',sub:'7 rides · Camps from $1,020/night',action:"go('s-equestrian')",color:'#8D6E63'},
+  {tag:'TANZANITE & GEMSTONES',title:'Straight From the Source',sub:'Merelani & Umba · 4 stones, direct-sourced',action:"go('s-gemstones')",color:'#7C4DFF'},
+  {tag:'REAL ESTATE',title:'Property, Off the Market',sub:'Beachfront leaseholds · Northern Circuit estates',action:"go('s-realestate')",color:'var(--gold)'},
 ];
 
 // Home screen "doors" - each one groups several of the app's existing
