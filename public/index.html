@@ -2571,6 +2571,43 @@ function removeBookingFB(fbKey){
   <div class="spacer"></div>
 </div>
 
+<!-- ════════════════════ FLY-IN SAFARIS (Barafu Luxe private aviation) ════════════════════ -->
+<div class="screen" id="s-skysafari">
+  <div class="topbar">
+    <button class="tb-back" onclick="go('s-home')"><i class="ti ti-arrow-left"></i></button>
+    <span class="tb-title">Fly-In Safaris</span>
+    <button class="tb-icon" onclick="openNotifyAlert()"><i class="ti ti-bell-plus"></i></button>
+  </div>
+  <div style="position:relative;aspect-ratio:16/10;overflow:hidden;background:#0c0c0c;" id="skysafari-hero-banner">
+    <img src="/images/skysafari/hero/1.jpg" alt="Fly-in safari aircraft landing on a bush airstrip" loading="eager" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.parentNode.style.display='none';">
+    <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(8,8,8,0.92),rgba(8,8,8,0.15) 55%,rgba(8,8,8,0.35));"></div>
+  </div>
+  <div class="luxury-hero" style="border-bottom:0.5px solid rgba(184,137,42,0.15);margin-top:-1px;">
+    <div class="luxury-hero-eyebrow">Barafu Luxe · Private Aviation</div>
+    <div class="luxury-hero-title">The Sky Is<br><em>Your Runway.</em></div>
+    <div class="luxury-hero-sub">Executive fly-in safaris across East Africa. Private-jet comfort, set-departure ease, and direct bush-airstrip access into some of the region's finest camps and lodges.</div>
+    <div class="luxury-hero-rule"></div>
+  </div>
+  <div class="el-explain">
+    <i class="ti ti-info-circle" style="color:var(--gold);font-size:16px;flex-shrink:0;"></i>
+    <div style="font-size:10px;color:var(--mt);line-height:1.8;">Eight-seat Executive Grand Caravans connect Nairobi and Arusha directly to the bush — no long road transfers, no lost time. Guaranteed set departures, a 23kg luggage allowance, VIP fast-track at every airport, and a single check-in that carries across your entire itinerary. All-inclusive, all arranged, all yours.</div>
+  </div>
+  <div style="padding:4px 14px 6px;">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+      <div style="background:var(--card);border:0.5px solid var(--bd);border-radius:2px;padding:10px 12px;"><i class="ti ti-clock-hour-4" style="color:var(--gold);font-size:14px;"></i><div style="font-size:10px;color:var(--ow);margin-top:6px;">More time on safari</div><div style="font-size:9px;color:var(--mt);margin-top:2px;line-height:1.6;">Direct airstrip landings replace hours of road transfer.</div></div>
+      <div style="background:var(--card);border:0.5px solid var(--bd);border-radius:2px;padding:10px 12px;"><i class="ti ti-briefcase" style="color:var(--gold);font-size:14px;"></i><div style="font-size:10px;color:var(--ow);margin-top:6px;">23kg luggage</div><div style="font-size:9px;color:var(--mt);margin-top:2px;line-height:1.6;">Higher allowance than standard bush-flight limits.</div></div>
+      <div style="background:var(--card);border:0.5px solid var(--bd);border-radius:2px;padding:10px 12px;"><i class="ti ti-shield-check" style="color:var(--gold);font-size:14px;"></i><div style="font-size:10px;color:var(--ow);margin-top:6px;">All-inclusive</div><div style="font-size:9px;color:var(--mt);margin-top:2px;line-height:1.6;">Flights, stays, drinks*, activities & transfers bundled.</div></div>
+      <div style="background:var(--card);border:0.5px solid var(--bd);border-radius:2px;padding:10px 12px;"><i class="ti ti-leaf" style="color:var(--gold);font-size:14px;"></i><div style="font-size:10px;color:var(--ow);margin-top:6px;">Carbon offset</div><div style="font-size:9px;color:var(--mt);margin-top:2px;line-height:1.6;">Every flight offset through certified forest carbon programs.</div></div>
+    </div>
+  </div>
+  <div class="sec" style="padding-top:14px;"><div class="slbl">The Journeys</div></div>
+  <div id="skysafari-list" style="padding:0 14px 14px;display:grid;gap:12px;"></div>
+  <div style="margin:0 14px 24px;border-top:0.5px solid var(--bd);padding-top:14px;">
+    <div style="font-size:9px;color:var(--mt);line-height:1.8;">Final rates are being confirmed and will appear here shortly. In the meantime, enquire on any journey and your concierge will confirm pricing personally.</div>
+  </div>
+  <div class="spacer"></div>
+</div>
+
 <!-- ════════════════════ REWARDS / CARATS ════════════════════ -->
 <div class="screen" id="s-rewards">
   <div class="topbar">
@@ -3384,7 +3421,8 @@ var DOOR_GROUPS = {
       {label:'Yacht', sub:'From $2,000', icon:'ti-sailboat', action:"go('s-yacht')"},
       {label:'Helicopter', sub:'From $8,930', icon:'ti-helicopter', action:"go('s-heli')"},
       {label:'Empty Legs', sub:'Up to 75% off', icon:'ti-plane-tilt', action:"go('s-emptylegs')"},
-      {label:'Flight Tracker', sub:'JRO · ARK · DAR', icon:'ti-radar', action:"go('s-flights')"}
+      {label:'Flight Tracker', sub:'JRO · ARK · DAR', icon:'ti-radar', action:"go('s-flights')"},
+      {label:'Fly-In Safaris', sub:'Executive bush-airstrip safaris', icon:'ti-plane-departure', action:"go('s-skysafari')"}
     ]
   },
   dining: {
@@ -3930,6 +3968,7 @@ function go(id, fromPopstate){
   if(id==='s-yacht'){ setTimeout(function(){ try{buildGroupFleet();}catch(e){console.log('Fleet err:',e);} },100); setTimeout(function(){ try{renderWeatherWidget('weather-widget-yacht');}catch(e){} },150); }
   if(id==='s-communities'){ setTimeout(function(){ try{renderCommunities();}catch(e){console.log('renderCommunities err:',e);} },100); }
   if(id==='s-heli'){ setTimeout(function(){ try{renderWeatherWidget('weather-widget-heli');}catch(e){} },150); }
+  if(id==='s-skysafari'){ setTimeout(function(){ try{renderSkySafariPackages();}catch(e){} },100); }
   if(id==='s-concierge'){ try{
 }catch(e){} }
   if(id!=='s-concierge'){ try{
@@ -6543,6 +6582,75 @@ var GEMS = [
 var gemFilter='all';
 var gemTypeLabels={lodge:'Lodge',villa:'Villa',camp:'Tented Camp',residence:'Private Residence',retreat:'Wellness Retreat'};
 
+// ── Fly-In Safaris — Barafu Luxe private aviation (Transport category) ──
+// Underlying capacity is sourced through an aviation partner (brochure
+// supplied by Chance), but the segment is presented as a Barafu Luxe
+// service throughout — no supplier/brand names in any user-facing copy,
+// to avoid disintermediation. Keep it that way in future edits: route
+// property names are stripped of any collection/group prefix, and no
+// "operated by" or "partner" labels naming the supplier. No rate sheet was
+// included in the source brochure; base is intentionally left null ("rates
+// on request") until Chance provides real figures. When a real base
+// arrives, run it through bl() (35% margin, rounded to nearest $5) — same
+// convention used across Hidden Gems.
+var SKYSAFARI_PACKAGES = [
+  {id:'sky-kenya', name:'Kenya Fly-In Safari', duration:'8 Days · 7 Nights', icon:'🦒',
+   summary:'Nairobi to the Mara by air — Amboseli\'s elephants beneath Kilimanjaro, a wild private conservancy, and the golden plains of the Masai Mara.',
+   base:null, per:'per person — rates on request',
+   route:[
+     {nights:1, property:'Hemingways', location:'Nairobi, Kenya'},
+     {nights:2, property:'Tortilis Camp', location:'Amboseli National Park'},
+     {nights:2, property:'Loisaba Tented Camp', location:'Loisaba Conservancy'},
+     {nights:2, property:'Sand River Mara', location:'Masai Mara'}
+   ],
+   features:['Executive Grand Caravan flights','Kilimanjaro views over Amboseli','Private conservancy stay','Masai Mara finale'],
+   gallery:[
+     {src:'/images/skysafari/kenya/1.jpg',cap:'Aboard the Executive Grand Caravan'},
+     {src:'/images/skysafari/kenya/2.jpg',cap:'Amboseli, Beneath Kilimanjaro'},
+     {src:'/images/skysafari/kenya/3.jpg',cap:'A Private Conservancy at Sunset'},
+     {src:'/images/skysafari/kenya/4.jpg',cap:'Sundowner on the Masai Mara'}
+   ],
+   new:true, verified:true},
+  {id:'sky-tanzania', name:'Tanzania Fly-In Safari', duration:'8 Days · 7 Nights', icon:'🌅',
+   summary:'Arusha\'s coffee estates to the Serengeti\'s endless plains — Tarangire\'s elephant herds, Ngorongoro\'s crater rim, and the Great Migration.',
+   base:null, per:'per person — rates on request',
+   route:[
+     {nights:1, property:'Arusha Coffee Lodge', location:'Arusha, Tanzania'},
+     {nights:2, property:'Tarangire Treetops', location:'Tarangire National Park'},
+     {nights:2, property:'The Manor at Ngorongoro', location:'Ngorongoro'},
+     {nights:2, property:'Serengeti Migration Camp or Pioneer Camp', location:'Serengeti National Park'}
+   ],
+   features:['Executive Grand Caravan flights','Tarangire elephant migration path','Ngorongoro crater rim views','Serengeti Migration or Pioneer Camp'],
+   gallery:[
+     {src:'/images/skysafari/tanzania/1.jpg',cap:'Arusha, Among the Coffee Estates'},
+     {src:'/images/skysafari/tanzania/2.jpg',cap:'Treetop Living in Tarangire'},
+     {src:'/images/skysafari/tanzania/3.jpg',cap:'The Ngorongoro Crater From Above'},
+     {src:'/images/skysafari/tanzania/4.jpg',cap:'Poolside in the Serengeti'}
+   ],
+   new:true, verified:true},
+  {id:'sky-eastafrica', name:'East Africa Grand Circuit', duration:'13 Days · 12 Nights', icon:'✦',
+   summary:'The complete circuit — Kenya and Tanzania woven into a single unbroken journey, from Amboseli and Loisaba to the Mara, Ngorongoro and the Serengeti.',
+   base:null, per:'per person — rates on request',
+   route:[
+     {nights:1, property:'Hemingways', location:'Nairobi, Kenya'},
+     {nights:2, property:'Tortilis Camp', location:'Amboseli National Park'},
+     {nights:2, property:'Loisaba Tented Camp', location:'Loisaba Conservancy'},
+     {nights:2, property:'Sand River Mara', location:'Masai Mara'},
+     {nights:2, property:'The Manor at Ngorongoro', location:'Ngorongoro'},
+     {nights:3, property:'Serengeti Migration Camp or Pioneer Camp', location:'Serengeti National Park'}
+   ],
+   features:['The full Kenya + Tanzania circuit','Two of East Africa\'s most exclusive addresses','13 days across six iconic reserves','Single check-in across both countries'],
+   gallery:[
+     {src:'/images/skysafari/eastafrica/1.jpg',cap:'Above the Clouds'},
+     {src:'/images/skysafari/eastafrica/2.jpg',cap:'Amboseli, Beneath Kilimanjaro'},
+     {src:'/images/skysafari/eastafrica/3.jpg',cap:'Treetop Living in Tarangire'},
+     {src:'/images/skysafari/eastafrica/4.jpg',cap:'The Ngorongoro Crater From Above'}
+   ],
+   new:true, verified:true}
+];
+var SKYSAFARI_INCLUDED = ['All domestic flights & statutory taxes','Full-board accommodation at each property on your route','House drinks — water, soft drinks, juices, tea/coffee, beer, house wines & selected spirits','Laundry service','Shared daytime game drives in 4x4 vehicles with an English-speaking driver-guide','Bush breakfast, walking safari, scenic sundowners, spa treatment, nature walk, Maasai village visit & farewell dinner','All transfers, including to/from JKIA and JRO','Medical Emergency Evacuation Insurance','VIP fast-track service at both airports'];
+var SKYSAFARI_OPTIONAL = ['Private game drives — exclusive use of a vehicle','Hot air ballooning (per adult / child 8+)','Specialist activities, e.g. e-mountain biking','Extended stays — extra nights along your route or pre/post-safari beach stays','Special celebrations — custom honeymoon & anniversary arrangements'];
+
 // Educational categories, not live inventory — Barafu Luxe sources on
 // request through licensed Arusha dealers rather than holding fixed stock.
 var GEMSTONE_CATEGORIES=[
@@ -7671,6 +7779,118 @@ function openGemDetail(id){
   el.appendChild(f);
   document.getElementById('modal-bg').classList.add('open');
   if(g.gallery && g.gallery.length) wireGemGallery(g.gallery);
+}
+
+// ════ SKYSAFARI (fly-in safaris, Transport category) ════
+function renderSkySafariPackages(){
+  var el=document.getElementById('skysafari-list');
+  if(!el) return;
+  el.innerHTML='';
+  (SKYSAFARI_PACKAGES||[]).forEach(function(p,i){ el.appendChild(buildSkySafariCard(p,i)); });
+}
+
+function buildSkySafariCard(p,i){
+  var card=document.createElement('div');
+  card.className='gem-prop-card';
+  card.dataset.gid=p.id;
+
+  var priceDisplay = p.base ? ('$'+bl(p.base)) : 'On request';
+  var featsHtml=(p.features||[]).slice(0,4).map(function(f){
+    return '<span class="gem-feat-tag">'+f+'</span>';
+  }).join('');
+  var routeStr=(p.route||[]).map(function(r){return r.nights+'N '+r.property;}).join(' · ');
+  var coverSrc = p.gallery && p.gallery[0] ? p.gallery[0].src : '';
+  var coverHtml = coverSrc ? ('<div style="aspect-ratio:16/10;border-radius:2px;overflow:hidden;margin-bottom:14px;background:#0c0c0c;"><img src="'+coverSrc+'" alt="'+(p.name||'')+'" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.parentNode.style.display=\'none\';"></div>') : '';
+
+  card.innerHTML =
+    '<div class="gem-prop-inner">'
+    +(p.new?'<div class="gem-new-badge">New ✦</div>':'')
+    +coverHtml
+    +'<div class="gem-prop-icon">'+(p.icon||'✦')+'</div>'
+    +'<div class="gem-prop-name">'+(p.name||'')+'</div>'
+    +'<div class="gem-prop-loc"><i class="ti ti-clock-hour-4" style="font-size:11px;color:var(--gold);opacity:0.5;"></i>'+(p.duration||'')+(p.verified?' &nbsp;<span class="verified-badge"><i class="ti ti-check"></i>Verified</span>':'')+'</div>'
+    +'<div class="gem-prop-desc">'+(p.summary||'')+'</div>'
+    +'<div style="font-size:9px;color:var(--mt);line-height:1.7;margin:2px 0 10px;">'+routeStr+'</div>'
+    +'<div class="gem-prop-feats">'+featsHtml+'</div>'
+    +'<div class="gem-prop-bottom">'
+    +'<div>'
+    +'<div class="gem-prop-from">From</div>'
+    +'<div class="gem-prop-price">'+priceDisplay+'</div>'
+    +'<div class="gem-prop-per">'+(p.per||'per person')+'</div>'
+    +'</div>'
+    +'<button class="gem-enquire-btn">View journey</button>'
+    +'</div>'
+    +'</div>';
+
+  var btn=card.querySelector('.gem-enquire-btn');
+  if(btn) btn.onclick=function(e){ e.stopPropagation(); openSkySafariDetail(p.id); };
+  card.onclick=function(){ openSkySafariDetail(p.id); };
+  return card;
+}
+
+function openSkySafariDetail(id){
+  var p=SKYSAFARI_PACKAGES.filter(function(x){return x.id===id;})[0];
+  if(!p) return;
+  document.getElementById('modal-ttl').textContent=p.name;
+  var el=document.getElementById('modal-body');
+  el.innerHTML='';
+  var f=document.createElement('div');
+  f.className='fwrap';
+
+  var routeHtml=(p.route||[]).map(function(r,i){
+    return '<div style="display:flex;gap:10px;align-items:flex-start;padding:9px 0;'+(i<p.route.length-1?'border-bottom:0.5px solid var(--bd);':'')+'">'
+      +'<div style="flex-shrink:0;width:36px;text-align:center;font-family:Cormorant Garamond,serif;font-size:15px;color:var(--gl);">'+r.nights+'N</div>'
+      +'<div><div style="font-size:11px;color:var(--ow);">'+r.property+'</div><div style="font-size:9px;color:var(--mt);margin-top:2px;">'+r.location+'</div></div>'
+      +'</div>';
+  }).join('');
+
+  var featsHtml=(p.features||[]).map(function(feat){
+    return '<span style="display:inline-block;background:var(--soft);border:0.5px solid var(--bd);padding:3px 10px;border-radius:10px;font-size:9px;color:var(--mt);margin:2px 4px 2px 0;letter-spacing:0.06em;">'+feat+'</span>';
+  }).join('');
+
+  var includedHtml=(SKYSAFARI_INCLUDED||[]).map(function(inc){
+    return '<div style="display:flex;gap:8px;align-items:flex-start;padding:4px 0;"><i class="ti ti-check" style="color:var(--gold);font-size:12px;margin-top:2px;flex-shrink:0;"></i><div style="font-size:10px;color:var(--mt);line-height:1.7;">'+inc+'</div></div>';
+  }).join('');
+
+  var optionalHtml=(SKYSAFARI_OPTIONAL||[]).map(function(opt){
+    return '<div style="display:flex;gap:8px;align-items:flex-start;padding:4px 0;"><i class="ti ti-plus" style="color:var(--mt);font-size:12px;margin-top:2px;flex-shrink:0;"></i><div style="font-size:10px;color:var(--mt);line-height:1.7;">'+opt+'</div></div>';
+  }).join('');
+
+  var priceBlock = p.base
+    ? '<div class="price-calc"><div class="pc-total"><span class="pc-total-lbl">From per person</span><span class="pc-total-val">$'+bl(p.base)+'</span></div></div>'
+    : '<div class="price-calc"><div class="pc-total"><span class="pc-total-lbl">Rates</span><span class="pc-total-val" style="font-size:14px;">On request</span></div></div>';
+
+  var galleryHtml = buildGemGalleryHtml(p);
+
+  f.innerHTML=galleryHtml
+    +'<div style="text-align:center;padding:12px 0 16px;">'
+    +'<div style="font-size:36px;margin-bottom:8px;">'+(p.icon||'✦')+'</div>'
+    +'<div style="font-family:Cormorant Garamond,serif;font-size:22px;color:var(--ow);margin-bottom:3px;">'+(p.name||'')+'</div>'
+    +'<div style="font-size:10px;color:var(--mt);"><i class="ti ti-clock-hour-4" style="font-size:11px;"></i> '+(p.duration||'')+'</div>'
+    +'</div>'
+    +'<div style="font-size:11px;color:var(--mt);line-height:1.8;margin-bottom:14px;">'+(p.summary||'')+'</div>'
+    +'<div style="margin-bottom:16px;">'+featsHtml+'</div>'
+    +'<div style="font-size:9px;letter-spacing:0.18em;color:var(--gold);text-transform:uppercase;margin-bottom:8px;">The Route</div>'
+    +'<div style="margin-bottom:16px;">'+routeHtml+'</div>'
+    +'<div style="font-size:9px;letter-spacing:0.18em;color:var(--gold);text-transform:uppercase;margin-bottom:8px;">Included</div>'
+    +'<div style="margin-bottom:16px;">'+includedHtml+'</div>'
+    +'<div style="font-size:9px;letter-spacing:0.18em;color:var(--gold);text-transform:uppercase;margin-bottom:8px;">Optional — Quoted Separately</div>'
+    +'<div style="margin-bottom:16px;">'+optionalHtml+'</div>'
+    +priceBlock;
+
+  var btn=document.createElement('button');
+  btn.className='gbtn';
+  btn.innerHTML='<i class="ti ti-brand-whatsapp"></i> Enquire — '+(p.name||'');
+  btn.onclick=function(){
+    var msg='Fly-In Safari Enquiry\nJourney: '+(p.name||'')+'\nDuration: '+(p.duration||'');
+    submitForm('Fly-In Safari: '+p.name, msg);
+    document.getElementById('modal-bg').classList.remove('open');
+    handoffToWhatsApp('https://wa.me/255692312366?text='+encodeURIComponent(msg));
+  };
+  f.appendChild(btn);
+  el.appendChild(f);
+  document.getElementById('modal-bg').classList.add('open');
+  if(p.gallery && p.gallery.length) wireGemGallery(p.gallery);
 }
 
 // ════ EVENTS ════
